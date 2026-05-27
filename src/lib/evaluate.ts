@@ -220,25 +220,25 @@ const rules: Finding[] = [
   {
     id: "atheism-meaning-nihilism",
     kind: "implication",
-    title: "Your answers imply life has no objective meaning",
+    title: "A fork in the road about meaning",
     requires: ["noDeity", "meaningNeedsTranscendent"],
     explanation:
-      "You hold that objective meaning requires God or an immortal soul, and that no deity exists. If you also take there to be no immortal soul, these jointly entail that no human life can be objectively meaningful: a nihilist conclusion you may not have intended to endorse.",
+      "Two of your answers point in the same direction: you hold that objective meaning requires God or an immortal soul, and that no deity exists. If there is also no immortal soul, those premises lead to the conclusion that finite lives lack objective meaning. That is not a verdict on you — it is a fork. Most who reach it keep one of two well-developed paths: drop the requirement (objective naturalists argue that love, knowledge, and creativity make a finite life genuinely meaningful), or accept that meaning is something we confer rather than discover.",
     bridge:
-      "No immortal soul exists either (so the only routes to transcendent meaning are both closed).",
+      "No immortal soul exists either, so the transcendent routes to meaning are closed.",
     nextQuestion:
-      "Do you accept nihilism about objective meaning, or would you instead allow that finite, worldly goods can make a life objectively meaningful?",
+      "Which premise do you actually hold most firmly — that meaning needs transcendence, or that this life can be objectively worthwhile on its own terms?",
     sourceIds: ["meaning", "atheism"],
   },
   {
     id: "atheism-moral-nihilism",
     kind: "implication",
-    title: "Your answers imply there are no moral obligations",
+    title: "A fork in the road about moral obligation",
     requires: ["noDeity", "divineCommandOnly"],
     explanation:
-      "If every moral obligation is true solely because God commands it, and no God exists to command anything, then no moral obligation is true. Your two answers jointly entail that nothing is morally obligatory.",
+      "Two of your answers point the same way: if every moral obligation holds solely because God commands it, and no God exists to issue commands, then nothing is obligatory. This is a fork, not a sentence. Many who notice it keep their morality by loosening the first premise — holding that some duties (against cruelty, say) hold on grounds that do not depend on a divine command at all.",
     nextQuestion:
-      "Do you accept that nothing is obligatory, or would you allow some obligations to hold without a divine command?",
+      "Which do you hold more firmly — that obligation comes only from God's command, or that at least some things are genuinely owed regardless?",
     sourceIds: ["voluntarism", "moralAntiRealism", "atheism"],
   },
   {

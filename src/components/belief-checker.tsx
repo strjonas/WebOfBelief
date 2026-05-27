@@ -405,6 +405,36 @@ export function BeliefChecker() {
     }
   }, []);
 
+  const shareBadge = useCallback(async () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/png"),
+    );
+    if (!blob) return;
+    const file = new File([blob], "web-of-belief.png", { type: "image/png" });
+    const nav = navigator as Navigator & {
+      canShare?: (data?: ShareData) => boolean;
+    };
+    if (nav.canShare?.({ files: [file] }) && nav.share) {
+      try {
+        await nav.share({
+          files: [file],
+          title: BRAND,
+          text: "I mapped which of my beliefs fit together — see yours:",
+          url: window.location.origin,
+        });
+      } catch {
+        // The user dismissed the share sheet, or it failed; nothing to do.
+      }
+      return;
+    }
+    downloadBadge();
+    setCopyNotice(
+      "Your browser can't share files directly, so the image was downloaded — attach it to your post.",
+    );
+  }, [downloadBadge]);
+
   function answeredForCategory(categoryId: BeliefCategoryId) {
     return statementsForCategory(categoryId).filter(
       (statement) => answers[statement.id],
@@ -678,6 +708,20 @@ export function BeliefChecker() {
             </div>
           </div>
 
+          {affirmed.length > 0 ? (
+            <p className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-600">
+              <span className="font-semibold text-slate-900">
+                How to read this.
+              </span>{" "}
+              This is a mirror, not a judge. Every result below is a fork, not a
+              verdict: where two of your beliefs pull apart, you decide which one
+              to keep. Nothing here tells you the right answer — and consistency
+              is a floor, not proof that a belief is true. The point is the
+              examined life: to see your commitments clearly and hold them on
+              purpose.
+            </p>
+          ) : null}
+
           {isConsistent ? (
             <div className="mt-7 flex items-start gap-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-5 text-emerald-950 sm:p-6">
               <svg
@@ -698,8 +742,8 @@ export function BeliefChecker() {
                 </p>
                 <p className="mt-1 text-sm leading-6">
                   {argumentCount + implicationCount > 0
-                    ? "Your affirmed beliefs hold together with no flat conflict. There are still implications and live tensions below worth thinking through."
-                    : "On every relationship this tool checks, your stated beliefs are mutually consistent. Share the badge below or answer more topics to stress-test it."}
+                    ? "They hold together with no flat conflict. The implications and live tensions below are not problems — just the next things worth thinking through."
+                    : "On every relationship this tool checks, your stated beliefs fit together. That is a real achievement and a good place to build from — though it is a floor, not a finish line. Answer more topics to keep stress-testing it."}
                 </p>
               </div>
             </div>
@@ -730,10 +774,10 @@ export function BeliefChecker() {
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  onClick={downloadBadge}
+                  onClick={shareBadge}
                   className="rounded-lg bg-teal-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-900"
                 >
-                  Download image
+                  Share
                 </button>
                 <button
                   type="button"
@@ -741,6 +785,13 @@ export function BeliefChecker() {
                   className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-900"
                 >
                   Copy image
+                </button>
+                <button
+                  type="button"
+                  onClick={downloadBadge}
+                  className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-500"
+                >
+                  Download image
                 </button>
                 <button
                   type="button"

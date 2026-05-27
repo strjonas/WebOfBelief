@@ -94,3 +94,46 @@ the argument map rather than advertising or promising transformation.
 
 No one can engineer a viral response, and designing for critique and trust is
 more appropriate than promising conversion or a psychological outcome.
+
+## Launch post drafts
+
+These are starting points. Re-check each community's rules first; some restrict
+links or AI-assisted content, so reading the room (and possibly messaging mods)
+matters more than the exact wording.
+
+### r/CosmicSkeptic (or r/askphilosophy in self-post form)
+
+The sub is discussion-first and allergic to advertising, so the post leads with
+the *idea* and asks to be torn apart, not with the product.
+
+> **Title:** I built a "belief consistency checker" that flags where your worldview
+> contradicts itself — tell me where the logic is wrong
+>
+> **Body:** Quine's idea that beliefs form a web, not a list, has always stuck with
+> me, so I tried to make it concrete. You answer plain statements (God exists,
+> some morality is objective, only consequences matter, etc.) and it shows where
+> the ones you affirmed (a) flatly contradict, (b) logically commit you to
+> something further, or (c) are coherent even though people often call them
+> incompatible. Every result cites the relevant SEP entry.
+>
+> Two examples it catches: affirming a perfectly good God *and* that genuinely
+> gratuitous suffering exists is the logical problem of evil; affirming "meaning
+> needs God or a soul" *and* atheism commits you to nihilism about meaning unless
+> you drop one.
+>
+> I deliberately kept it a transparent rule set rather than a black box, so the
+> reasoning is inspectable — which means it's also falsifiable. **Where is a rule
+> too strong, too weak, or just wrong?** Link in comments.
+
+### X / Bluesky
+
+Short, concrete, one provocative example, no hype:
+
+> Most "what's your worldview" quizzes just label you. I built one that checks
+> whether the beliefs you pick can actually all be true at once — and shows you
+> the exact contradiction when they can't, with a source for every call.
+>
+> Mine came out consistent except one fork about meaning. What about yours?
+> [link]
+
+Pair the post with the shareable result badge (counts only) as the image.

@@ -1,70 +1,84 @@
 # Web of Belief
 
-Web of Belief is a source-backed worldview reflection website (named after
-Quine and Ullian's *The Web of Belief*). Users affirm, reject, or remain unsure
-about carefully worded statements. The app reports:
+**See whether your beliefs actually fit together.**
+[webofbelief.app](https://webofbelief.app) · [Live demo](https://consistent-three.vercel.app) · [Method & sources](https://consistent-three.vercel.app/method)
 
-[Live website](https://consistent-three.vercel.app) | [Source repository](https://github.com/strjonas/consistent)
+You answer plain statements about God, morality, meaning, free will, mind, and
+right action. A small, inspectable rule engine then shows you where your stated
+beliefs **contradict**, what they **commit you to**, and which "obviously
+incompatible" pairs are in fact **coherent**. Every result links to the relevant
+[Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/) entry.
 
-- `Direct conflict`: exact affirmed propositions cannot both hold as worded.
-- `Logical implication`: affirmed statements (sometimes with one stated bridge)
-  validly entail a further conclusion the user may not have meant to accept.
-- `Live argument`: a significant tension that needs an exposed, disputed
-  bridge premise.
-- `Coherent combination`: a pairing frequently treated as conflicting even
-  though it has a recognized philosophical account.
+Named after Quine and Ullian's *The Web of Belief* (1970): no belief stands
+alone; they hang together, and a strain in one place is felt across the web.
 
-It intentionally does not score a person, infer an entire worldview from an
-identity label, or interpret arbitrary free-text beliefs.
+## What it tells you
 
-## Run Locally
+Each result is one of four kinds, and the engine is deliberately conservative —
+it only ever reasons from statements you explicitly mark "I believe this."
+
+| Kind | Meaning |
+| --- | --- |
+| **Direct conflict** | The exact statements you affirmed cannot both be true as worded (e.g. "a personal God exists" + "no deity exists"). |
+| **Logical implication** | Your answers (sometimes plus one stated bridge) validly entail a further conclusion you may not have meant to accept (e.g. atheism + "morality is only God's commands" ⟹ nothing is obligatory). |
+| **Live argument** | A serious tension that turns on a disputed bridge premise, which the result names and leaves open (e.g. divine hiddenness; the evidentialist challenge to theism). |
+| **Coherent combination** | A pairing often dismissed as incoherent that has a recognized philosophical home (e.g. atheism + objective meaning). |
+
+## Design principles
+
+- **A mirror, not a judge.** Every result is framed as a fork you decide, never
+  a verdict. It does not tell you which belief to drop. The goal is the examined
+  life, and the experience is meant to be edifying, not crushing.
+- **Restraint over false precision.** No "consistency score," no AI inference, no
+  Z3 verdict. The hard part is whether a natural-language commitment entails a
+  contested bridge premise — a philosophical question, not a solver bug — so the
+  app exposes each premise instead of disguising interpretation as proof.
+- **Sourced.** Topic selection is grounded in the
+  [PhilPapers 2020 Survey](https://survey2020.philpeople.org/) and
+  [Pew's Religious Landscape Study](https://www.pewresearch.org/rls/); every
+  position summary and rule cites SEP.
+- **Private by default.** Answers live only in browser memory. The shareable
+  badge and summary contain counts only — never your individual answers — and
+  nothing is uploaded.
+
+## Run locally
 
 ```bash
 npm install
-npm run dev
+npm run dev    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The methodology and
-source library are available at `/method`.
-
-For production, set `NEXT_PUBLIC_SITE_URL` to the canonical HTTPS origin,
-especially after attaching a custom domain. This ensures canonical, sitemap,
-robots, and social-preview URLs use that domain. Without it, a Vercel build
-falls back to its Vercel production URL. The current deployment uses the
-Vercel production alias until a custom domain is selected.
+In production, set `NEXT_PUBLIC_SITE_URL` to the canonical HTTPS origin (e.g.
+`https://webofbelief.app`) so canonical tags, the sitemap, robots, the social
+preview, and the share badge all use that domain. Without it, a Vercel build
+falls back to its production URL.
 
 ## Verify
 
 ```bash
-npm test
+npm test     # rule-engine + component tests (Vitest)
 npm run lint
 npm run build
-npm audit --audit-level=moderate
 ```
 
-## Architecture
+## How it's built
 
-- `src/lib/beliefs.ts` holds question wording, balanced position summaries,
-  and source metadata.
-- `src/lib/evaluate.ts` holds the small deterministic finding rule set.
-- `src/lib/evaluate.test.ts` guards the distinction between contradiction,
-  disputed argument, and compatible combination.
-- `src/components/belief-checker.tsx` implements the browser-only questionnaire
-  and privacy-safe summary.
-- `src/app/method/page.tsx` publishes limits and citations.
+- `src/lib/beliefs.ts` — statement wording, plain-language glosses, balanced
+  for/against summaries, and source metadata.
+- `src/lib/evaluate.ts` — the deterministic finding rules (the whole "engine").
+- `src/lib/evaluate.test.ts` — guards the line between contradiction, implication,
+  disputed argument, and coherent combination.
+- `src/components/belief-checker.tsx` — the browser-only questionnaire, results,
+  edifying framing, and the client-side share badge (drawn with Canvas, no deps).
+- `src/app/method/page.tsx` — published method, limits, and full source library.
 
-The app uses Next.js 16 App Router and React 19. No database or account system
-is needed for the initial product; responses exist only in local component
-state.
+Next.js 16 (App Router) + React 19. No database or accounts; responses exist only
+in local component state.
 
-## Research And Release
+## Launch & legal
 
-Research rationale and current community-posting constraints are recorded in
+Research rationale and community-posting constraints are in
 [docs/research-and-launch.md](docs/research-and-launch.md). Any public launch
-should request corrections rather than claim philosophical proof.
-
-Before making a public production deployment, confirm any applicable legal
-pages and hosting/privacy disclosures for the publisher's jurisdiction. For a
-publisher in Germany, review `§ 5 DDG` provider-information requirements and
-GDPR transparency obligations rather than assuming a static site requires no
-public notices.
+should invite correction of the argument map rather than claim philosophical
+proof. Before a public production deployment, confirm applicable provider/privacy
+disclosures for your jurisdiction (for Germany, `§ 5 DDG` and GDPR transparency).
