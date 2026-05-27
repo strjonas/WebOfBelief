@@ -3,6 +3,8 @@
 Belief Mirror is a source-backed worldview reflection website. Users affirm,
 reject, or remain unsure about carefully worded statements. The app reports:
 
+[Live website](https://consistent-three.vercel.app) | [Source repository](https://github.com/strjonas/consistent)
+
 - `Direct conflict`: exact affirmed propositions cannot both hold as worded.
 - `Live argument`: a significant tension that needs an exposed, disputed
   bridge premise.
@@ -25,7 +27,8 @@ source library are available at `/method`.
 For production, set `NEXT_PUBLIC_SITE_URL` to the canonical HTTPS origin,
 especially after attaching a custom domain. This ensures canonical, sitemap,
 robots, and social-preview URLs use that domain. Without it, a Vercel build
-falls back to its Vercel production URL.
+falls back to its Vercel production URL. The current deployment uses the
+Vercel production alias until a custom domain is selected.
 
 ## Verify
 
