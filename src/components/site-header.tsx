@@ -9,9 +9,9 @@ export function SiteHeader() {
           className="flex items-center gap-3 text-sm font-semibold tracking-tight text-slate-950"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-950 font-mono text-xs text-white">
-            BM
+            WB
           </span>
-          Belief Mirror
+          Web of Belief
         </Link>
         <nav aria-label="Main" className="flex items-center gap-5 text-sm">
           <a

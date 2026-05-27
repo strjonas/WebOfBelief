@@ -1,6 +1,10 @@
 import type { Answer, BeliefId, SourceId } from "./beliefs";
 
-export type FindingKind = "conflict" | "argument" | "compatible";
+export type FindingKind =
+  | "conflict"
+  | "argument"
+  | "implication"
+  | "compatible";
 
 export type AnswerMap = Partial<Record<BeliefId, Answer>>;
 
@@ -95,13 +99,15 @@ const rules: Finding[] = [
   },
   {
     id: "avoidable-animal-harm",
-    kind: "conflict",
-    title: "Avoidable animal suffering in principle and purchase",
+    kind: "argument",
+    title: "Causing harm is wrong, yet buying into it is permitted",
     requires: ["minorConvenienceHarmWrong", "factoryFarmPermissible"],
     explanation:
-      "Both statements specify severe avoidable sentient suffering exchanged merely for taste or convenience; one declares that wrong and the other permissible.",
+      "One statement is about causing severe avoidable suffering; the other about buying from a system that inflicts it. These collide only if purchasing counts as morally relevant participation in the harm. The causal-inefficacy objection denies that a single purchase changes how many animals suffer, so this is a serious tension rather than a flat contradiction.",
+    bridge:
+      "Buying from a system that severely harms animals is morally relevant participation in that harm; an individual purchase is not causally inert.",
     nextQuestion:
-      "Is your practical situation outside the condition, or do you reject the principle when purchasing participates in harm?",
+      "Do you accept that bridge, or hold that individual purchases are causally insignificant (and is that consistent with how you judge other complicity cases)?",
     sourceIds: ["animals"],
   },
   {
@@ -145,15 +151,13 @@ const rules: Finding[] = [
   },
   {
     id: "moral-grounding",
-    kind: "argument",
+    kind: "compatible",
     title: "God and objective morality",
     requires: ["perfectGod", "moralFacts"],
     explanation:
-      "The combination is common and coherent, but it opens a grounding question: whether moral truths depend on God, God's nature, commands, or independent reasons.",
-    bridge:
-      "Objective moral reality needs a personal divine explanation rather than a non-theistic account.",
+      "This pairing is coherent and is the standard theistic moral-realist view; it is not a tension in your beliefs. The open question is only what grounds the moral facts: God's nature, God's commands, or reasons that hold independently.",
     nextQuestion:
-      "What precisely grounds moral facts in your view, and does that make divine commands necessary?",
+      "Do moral facts depend on God in your view, or could they hold independently of any divine command?",
     sourceIds: ["moralArguments", "voluntarism", "moralAntiRealism"],
   },
   {
@@ -191,12 +195,80 @@ const rules: Finding[] = [
       "What exception, uncertainty, or theory of participation makes the purchase permissible in your view?",
     sourceIds: ["animals"],
   },
+  {
+    id: "consequences-and-constraints",
+    kind: "conflict",
+    title: "Only consequences matter, yet some acts are off-limits",
+    requires: ["consequencesOnly", "sideConstraints"],
+    explanation:
+      "If rightness depends only on consequences, then the act with the best consequences is right and cannot be wrong. The other statement says some such act is nonetheless wrong. Both cannot hold.",
+    nextQuestion:
+      "Do you mean outcomes always settle rightness, or that there are genuine limits (rights, duties) that outcomes cannot override?",
+    sourceIds: ["consequentialism", "deontology"],
+  },
+  {
+    id: "foreknowledge-without-deity",
+    kind: "conflict",
+    title: "An infallible divine belief, but no deity to hold it",
+    requires: ["infallibleForeknowledge", "noDeity"],
+    explanation:
+      "The foreknowledge statement asserts that an infallible divine belief already exists about your choices. A belief requires a believer, so this presupposes a deity. Affirming it together with the claim that no deity exists is inconsistent.",
+    nextQuestion:
+      "Did you mean the future is simply fixed or predictable, rather than known by a divine mind?",
+    sourceIds: ["foreknowledge", "atheism"],
+  },
+  {
+    id: "atheism-meaning-nihilism",
+    kind: "implication",
+    title: "Your answers imply life has no objective meaning",
+    requires: ["noDeity", "meaningNeedsTranscendent"],
+    explanation:
+      "You hold that objective meaning requires God or an immortal soul, and that no deity exists. If you also take there to be no immortal soul, these jointly entail that no human life can be objectively meaningful: a nihilist conclusion you may not have intended to endorse.",
+    bridge:
+      "No immortal soul exists either (so the only routes to transcendent meaning are both closed).",
+    nextQuestion:
+      "Do you accept nihilism about objective meaning, or would you instead allow that finite, worldly goods can make a life objectively meaningful?",
+    sourceIds: ["meaning", "atheism"],
+  },
+  {
+    id: "atheism-moral-nihilism",
+    kind: "implication",
+    title: "Your answers imply there are no moral obligations",
+    requires: ["noDeity", "divineCommandOnly"],
+    explanation:
+      "If every moral obligation is true solely because God commands it, and no God exists to command anything, then no moral obligation is true. Your two answers jointly entail that nothing is morally obligatory.",
+    nextQuestion:
+      "Do you accept that nothing is obligatory, or would you allow some obligations to hold without a divine command?",
+    sourceIds: ["voluntarism", "moralAntiRealism", "atheism"],
+  },
+  {
+    id: "evidentialism-and-theism",
+    kind: "argument",
+    title: "Evidence-only belief and belief in God",
+    requires: ["beliefNeedsEvidence", "perfectGod"],
+    explanation:
+      "You hold that belief requires adequate evidence, and you believe God exists. By your own standard, theistic belief is justified only if there is adequate evidence for it. This is the classic evidentialist challenge to religious belief, and theists answer it in different ways.",
+    bridge:
+      "There is not adequate evidence that a personal God exists.",
+    nextQuestion:
+      "Do you hold that there is adequate evidence for God, or that belief in God can be properly basic or otherwise justified without it?",
+    sourceIds: ["religionEpistemology", "atheism"],
+  },
 ];
 
+const kindOrder: Record<FindingKind, number> = {
+  conflict: 0,
+  implication: 1,
+  argument: 2,
+  compatible: 3,
+};
+
 export function evaluateBeliefs(answers: AnswerMap): Finding[] {
-  return rules.filter((rule) =>
-    rule.requires.every((beliefId) => answers[beliefId] === "affirm"),
-  );
+  return rules
+    .filter((rule) =>
+      rule.requires.every((beliefId) => answers[beliefId] === "affirm"),
+    )
+    .sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind]);
 }
 
 export function affirmedBeliefs(answers: AnswerMap): BeliefId[] {

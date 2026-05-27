@@ -69,4 +69,87 @@ describe("evaluateBeliefs", () => {
       2,
     );
   });
+
+  it("treats causing-versus-buying animal harm as an argument, not a flat conflict", () => {
+    const results = evaluateBeliefs({
+      minorConvenienceHarmWrong: "affirm",
+      factoryFarmPermissible: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "avoidable-animal-harm",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+  });
+
+  it("surfaces the nihilism implication of atheism plus transcendence-required meaning", () => {
+    const results = evaluateBeliefs({
+      noDeity: "affirm",
+      meaningNeedsTranscendent: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "atheism-meaning-nihilism",
+        kind: "implication",
+      }),
+    ]);
+  });
+
+  it("surfaces the no-obligation implication of atheism plus divine-command-only morality", () => {
+    const results = evaluateBeliefs({
+      noDeity: "affirm",
+      divineCommandOnly: "affirm",
+    });
+
+    expect(results.map((result) => result.id)).toContain(
+      "atheism-moral-nihilism",
+    );
+  });
+
+  it("flags consequentialism and side-constraints as a direct conflict", () => {
+    const results = evaluateBeliefs({
+      consequencesOnly: "affirm",
+      sideConstraints: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "consequences-and-constraints",
+        kind: "conflict",
+      }),
+    ]);
+  });
+
+  it("flags an infallible divine belief alongside atheism as inconsistent", () => {
+    const results = evaluateBeliefs({
+      infallibleForeknowledge: "affirm",
+      noDeity: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "foreknowledge-without-deity",
+        kind: "conflict",
+      }),
+    ]);
+  });
+
+  it("orders findings with conflicts before softer relationships", () => {
+    const results = evaluateBeliefs({
+      consequencesOnly: "affirm",
+      sideConstraints: "affirm",
+      noDeity: "affirm",
+      moralFacts: "affirm",
+    });
+
+    expect(results[0].kind).toBe("conflict");
+    expect(results.map((result) => result.kind)).toEqual([
+      "conflict",
+      "compatible",
+    ]);
+  });
 });

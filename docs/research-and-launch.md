@@ -1,6 +1,7 @@
 # Research and launch notes
 
-Reviewed: 2026-05-27.
+Reviewed: 2026-05-27. (App renamed to **Web of Belief**, after Quine & Ullian's
+*The Web of Belief*; intended domain `webofbelief.app`.)
 
 ## Product standard
 
@@ -9,10 +10,28 @@ natural-language beliefs. The model is deliberately narrower:
 
 1. It reasons only from propositions a user explicitly affirms.
 2. It labels a `Direct conflict` only when those exact formulations conflict.
-3. It labels contested moves as `Live argument` and states the needed premise.
-4. It highlights some `Coherent combination` results to avoid common false
+3. It labels a `Logical implication` when affirmed statements (sometimes with one
+   explicitly stated bridge) validly entail a further conclusion the user may not
+   have meant to endorse — e.g. `noDeity` + `divineCommandOnly` entail that
+   nothing is obligatory.
+4. It labels contested moves as `Live argument` and states the needed premise.
+5. It highlights some `Coherent combination` results to avoid common false
    accusations of inconsistency.
-5. It does not accept arbitrary free-text beliefs in this initial version.
+6. It does not accept arbitrary free-text beliefs in this initial version.
+
+### Soundness review (2026-05-27)
+
+- The eight strict `Direct conflict` rules are pairs whose precise wordings are
+  contradictories, so a contradiction is reported only on double-affirmation.
+- `minorConvenienceHarmWrong` + `factoryFarmPermissible` was **downgraded from a
+  conflict to a `Live argument`**: one statement concerns *causing* harm and the
+  other *buying from* a harmful system, and the causal-inefficacy / inefficacy
+  objection (McMullen & Halteman 2018; SEP *Moral Status of Animals*) is a live
+  position on which the two can be held together. The collision now turns on an
+  explicit complicity bridge premise.
+- `perfectGod` + `moralFacts` was **reframed from an argument to a `Coherent
+  combination`**: theistic moral realism is the standard, consistent view, so an
+  amber "tension" flag there was a false accusation.
 
 A solver such as Z3 could validate a fixed formal encoding, but cannot establish
 whether contested philosophical bridge premises are true or whether a user's
@@ -50,6 +69,9 @@ library, including:
 - [Physicalism](https://plato.stanford.edu/entries/physicalism/)
 - [Dualism](https://plato.stanford.edu/entries/dualism/)
 - [The Moral Status of Animals](https://plato.stanford.edu/entries/moral-animal/)
+- [Consequentialism](https://plato.stanford.edu/entries/consequentialism/)
+- [Deontological Ethics](https://plato.stanford.edu/entries/ethics-deontological/)
+- [Epistemology of Religion](https://plato.stanford.edu/entries/religion-epistemology/)
 
 ## Community fit research
 

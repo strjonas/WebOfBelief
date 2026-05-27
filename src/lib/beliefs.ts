@@ -14,7 +14,10 @@ export type SourceId =
   | "foreknowledge"
   | "physicalism"
   | "dualism"
-  | "animals";
+  | "animals"
+  | "consequentialism"
+  | "deontology"
+  | "religionEpistemology";
 
 export type BeliefCategoryId =
   | "religion"
@@ -29,12 +32,15 @@ export type BeliefId =
   | "gratuitousSuffering"
   | "nonresistantNonbelief"
   | "infallibleForeknowledge"
+  | "beliefNeedsEvidence"
   | "moralFacts"
   | "attitudeOnlyMorality"
   | "divineCommandOnly"
   | "independentDuty"
   | "naturalMeaning"
   | "meaningNeedsTranscendent"
+  | "consequencesOnly"
+  | "sideConstraints"
   | "determinism"
   | "samePastAlternative"
   | "responsibilityWithoutAlternatives"
@@ -64,6 +70,7 @@ export interface BeliefStatement {
   id: BeliefId;
   category: BeliefCategoryId;
   prompt: string;
+  plain: string;
   clarify: string;
   caseFor: string;
   caseAgainst: string;
@@ -183,13 +190,35 @@ export const sources: Record<SourceId, Source> = {
     url: "https://plato.stanford.edu/entries/moral-animal/",
     use: "Reviews sentience, personhood, interests, and food-choice implications.",
   },
+  consequentialism: {
+    id: "consequentialism",
+    title: "Consequentialism",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/consequentialism/",
+    use: "Defines the view that rightness depends only on outcomes, and its main objections.",
+  },
+  deontology: {
+    id: "deontology",
+    title: "Deontological Ethics",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/ethics-deontological/",
+    use: "Presents agent-relative constraints on which some acts are wrong even when they maximize the good.",
+  },
+  religionEpistemology: {
+    id: "religionEpistemology",
+    title: "Epistemology of Religion",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/religion-epistemology/",
+    use: "Covers evidentialism (Locke, Clifford) and reformed-epistemology replies about belief in God.",
+  },
 };
 
 export const categories: BeliefCategory[] = [
   {
     id: "religion",
     name: "God and evidence",
-    description: "Theism, atheism, suffering, hiddenness, and foreknowledge.",
+    description:
+      "Theism, atheism, suffering, hiddenness, foreknowledge, and evidence.",
   },
   {
     id: "value",
@@ -208,8 +237,9 @@ export const categories: BeliefCategory[] = [
   },
   {
     id: "practice",
-    name: "Animals and action",
-    description: "What moral concern commits us to in ordinary choices.",
+    name: "Right action and animals",
+    description:
+      "Consequences, moral limits, and what we owe sentient animals.",
   },
 ];
 
@@ -219,6 +249,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "religion",
     prompt:
       "A personal God exists who is omniscient, omnipotent, perfectly good, and perfectly loving.",
+    plain:
+      "There is a single, all-knowing, all-powerful, perfectly good and loving God.",
     clarify:
       "This is classical personal theism, not merely a first cause, spirit, or impersonal ground of reality.",
     caseFor:
@@ -231,6 +263,7 @@ export const beliefStatements: BeliefStatement[] = [
     id: "noDeity",
     category: "religion",
     prompt: "No god or deity exists.",
+    plain: "No gods of any kind exist.",
     clarify:
       "This is the positive philosophical claim of atheism, stronger than merely lacking belief.",
     caseFor:
@@ -244,6 +277,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "religion",
     prompt:
       "Some suffering exists that no omniscient, omnipotent, perfectly good being could have morally sufficient reason to permit.",
+    plain:
+      "Some suffering is so pointless that no all-good, all-powerful God could have a good reason to allow it.",
     clarify:
       "The key term is gratuitous: not merely terrible suffering, but suffering unjustifiable for a perfectly good all-powerful being.",
     caseFor:
@@ -257,6 +292,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "religion",
     prompt:
       "Some people capable of relating to God honestly seek that relationship, do not resist it, and still cannot believe God exists.",
+    plain:
+      "Some people sincerely want to believe in God and aren't resisting, yet still can't.",
     clarify:
       "This concerns nonresistant nonbelief, not indifference or deliberate rejection.",
     caseFor:
@@ -270,6 +307,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "religion",
     prompt:
       "Before a human choice occurs, an infallible divine belief already correctly specifies that exact choice.",
+    plain:
+      "God already knows exactly what you will choose before you choose it, and cannot be mistaken.",
     clarify:
       "The statement deliberately concerns prior, error-proof knowledge of a concrete future act.",
     caseFor:
@@ -279,10 +318,27 @@ export const beliefStatements: BeliefStatement[] = [
     sourceIds: ["foreknowledge", "freeWill"],
   },
   {
+    id: "beliefNeedsEvidence",
+    category: "religion",
+    prompt:
+      "It is wrong to accept a claim as true unless it is adequately supported by evidence.",
+    plain:
+      "You should not accept a claim as true unless there is good evidence for it.",
+    clarify:
+      "This is evidentialism about belief, applied to any claim, including religious and anti-religious ones.",
+    caseFor:
+      "Evidentialists such as Locke and W. K. Clifford argue that believing beyond the evidence is intellectually and morally irresponsible.",
+    caseAgainst:
+      "Reformed epistemologists hold some beliefs can be properly basic, and pragmatists allow non-evidential grounds; the principle may also struggle to support itself.",
+    sourceIds: ["religionEpistemology"],
+  },
+  {
     id: "moralFacts",
     category: "value",
     prompt:
       "At least some moral facts are true regardless of what any person or society approves.",
+    plain:
+      "Some things are right or wrong no matter what anyone thinks or approves.",
     clarify:
       "For example, whether cruelty is wrong is not made true merely by our preferences or conventions.",
     caseFor:
@@ -296,6 +352,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "value",
     prompt:
       "Every moral truth depends only on the attitudes or approvals of persons or societies.",
+    plain:
+      "Morality is entirely a matter of what people or societies happen to approve of.",
     clarify:
       "Affirm this only if no moral truth is independent of all human or social approval.",
     caseFor:
@@ -308,6 +366,7 @@ export const beliefStatements: BeliefStatement[] = [
     id: "divineCommandOnly",
     category: "value",
     prompt: "Every moral obligation is true solely because God commands it.",
+    plain: "Things are right or wrong only because God commands them.",
     clarify:
       "This is a strong divine-command claim about obligation, not merely that God reliably commands what is good.",
     caseFor:
@@ -321,6 +380,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "value",
     prompt:
       "At least one moral obligation would remain true even if no deity commanded it.",
+    plain:
+      "At least one thing would still be right or wrong even if no God commanded it.",
     clarify:
       "This accepts at least one command-independent duty, whether or not a God exists.",
     caseFor:
@@ -334,6 +395,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "value",
     prompt:
       "A finite human life can be objectively meaningful through worthwhile activity even if no God or immortal soul exists.",
+    plain:
+      "A life can be truly meaningful through worthwhile activity even if there is no God or afterlife.",
     clarify:
       "Objective naturalism says meaning can depend on real value in this world rather than transcendence.",
     caseFor:
@@ -347,6 +410,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "value",
     prompt:
       "No finite human life can be objectively meaningful unless God or an immortal soul exists.",
+    plain:
+      "Without God or an immortal soul, life cannot have any real, objective meaning.",
     clarify:
       "This says transcendence is necessary for objective meaning, not merely helpful or personally important.",
     caseFor:
@@ -360,6 +425,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "freedom",
     prompt:
       "Given exactly the same complete past and laws of nature, only one future human action is possible.",
+    plain:
+      "Given the exact same past, only one future was ever really possible.",
     clarify:
       "This is causal or nomological determinism as applied to choices.",
     caseFor:
@@ -373,6 +440,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "freedom",
     prompt:
       "At least sometimes, a person could choose differently while the entire past and laws of nature remained exactly the same.",
+    plain:
+      "Sometimes you could have genuinely chosen otherwise, even with the past exactly the same.",
     clarify:
       "This asserts alternative possibilities under the same past and laws, rather than freedom understood only as acting on one's reasons.",
     caseFor:
@@ -386,6 +455,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "freedom",
     prompt:
       "A person can sometimes be morally responsible even when no alternative action was possible.",
+    plain:
+      "You can be truly responsible for an act even if you could not have done otherwise.",
     clarify:
       "This focuses on moral responsibility, which some accounts distinguish from the power to do otherwise.",
     caseFor:
@@ -399,6 +470,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "mind",
     prompt:
       "Once every physical fact is fixed, every fact about conscious experience is fixed too.",
+    plain:
+      "Once you fix all the physical facts, every fact about conscious experience is fixed too.",
     clarify:
       "This is a supervenience-style physicalist claim: no mental difference without a physical difference.",
     caseFor:
@@ -412,6 +485,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "mind",
     prompt:
       "A world physically identical to ours but entirely lacking conscious experience is genuinely possible.",
+    plain:
+      "A world physically identical to ours but with no conscious experience at all is genuinely possible.",
     clarify:
       "This is the philosophical-zombie possibility claim, not a prediction about actual neuroscience.",
     caseFor:
@@ -421,10 +496,42 @@ export const beliefStatements: BeliefStatement[] = [
     sourceIds: ["physicalism", "dualism"],
   },
   {
+    id: "consequencesOnly",
+    category: "practice",
+    prompt:
+      "Whether an action is morally right depends only on how good or bad its consequences are.",
+    plain:
+      "Whether an act is right depends only on whether its results are good or bad.",
+    clarify:
+      "This is consequentialism: outcomes are the sole determinant of rightness, with no act ruled out in advance.",
+    caseFor:
+      "Consequentialists argue that what ultimately matters morally is making outcomes better rather than worse.",
+    caseAgainst:
+      "Deontologists object that this can require betraying, harming, or using people whenever the totals come out ahead.",
+    sourceIds: ["consequentialism", "deontology"],
+  },
+  {
+    id: "sideConstraints",
+    category: "practice",
+    prompt:
+      "Some actions are morally wrong even when performing them would produce the best overall consequences.",
+    plain:
+      "Some acts are wrong even if doing them would lead to the best overall outcome.",
+    clarify:
+      "This asserts agent-relative constraints, such as a duty not to kill an innocent person even to prevent more deaths.",
+    caseFor:
+      "Deontologists hold that persons have rights or dignity that cannot be overridden by aggregate benefit.",
+    caseAgainst:
+      "Consequentialists argue it is irrational to forbid an act that genuinely makes the world go best.",
+    sourceIds: ["deontology", "consequentialism"],
+  },
+  {
     id: "animalsMatter",
     category: "practice",
     prompt:
       "Sentient non-human animals deserve direct moral consideration because their suffering matters.",
+    plain:
+      "Animals' suffering matters for their own sake, not just because humans care about them.",
     clarify:
       "Direct consideration means animal suffering counts for their own sake, not only because humans care.",
     caseFor:
@@ -438,6 +545,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "practice",
     prompt:
       "Causing severe avoidable suffering to a sentient animal merely for minor convenience or taste is morally wrong.",
+    plain:
+      "Causing an animal severe, avoidable suffering just for taste or convenience is wrong.",
     clarify:
       "The claim is restricted to severe, avoidable harm traded for a minor interest.",
     caseFor:
@@ -451,6 +560,8 @@ export const beliefStatements: BeliefStatement[] = [
     category: "practice",
     prompt:
       "Even when practical alternatives are available to me, it is morally permissible to buy food from systems that severely harm sentient animals merely for taste or convenience.",
+    plain:
+      "Even with easy alternatives, it is fine to buy food from systems that severely harm animals just for taste or convenience.",
     clarify:
       "This is deliberately conditional: it does not address survival, health necessity, subsistence, or uncertainty about production.",
     caseFor:

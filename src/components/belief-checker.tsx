@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   beliefStatements,
   categories,
@@ -28,14 +28,140 @@ const choices: Array<{ id: Answer; label: string }> = [
 const findingLabels: Record<FindingKind, string> = {
   conflict: "Direct conflict",
   argument: "Live argument",
+  implication: "Logical implication",
   compatible: "Coherent combination",
 };
 
 const findingColors: Record<FindingKind, string> = {
   conflict: "border-rose-300 bg-rose-50 text-rose-950",
   argument: "border-amber-300 bg-amber-50 text-amber-950",
+  implication: "border-indigo-300 bg-indigo-50 text-indigo-950",
   compatible: "border-emerald-300 bg-emerald-50 text-emerald-950",
 };
+
+const BRAND = "Web of Belief";
+
+interface BadgeData {
+  conflicts: number;
+  implications: number;
+  arguments: number;
+  compatibles: number;
+  affirmed: number;
+  host: string;
+}
+
+const badgeStats: Array<{
+  key: keyof Pick<
+    BadgeData,
+    "conflicts" | "implications" | "arguments" | "compatibles"
+  >;
+  label: string;
+  dot: string;
+}> = [
+  { key: "conflicts", label: "Conflicts", dot: "#fb7185" },
+  { key: "implications", label: "Implications", dot: "#818cf8" },
+  { key: "arguments", label: "Live tensions", dot: "#fbbf24" },
+  { key: "compatibles", label: "Coherent", dot: "#34d399" },
+];
+
+function drawBadge(canvas: HTMLCanvasElement, data: BadgeData) {
+  const w = 1200;
+  const h = 630;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  ctx.fillStyle = "#0b1220";
+  ctx.fillRect(0, 0, w, h);
+
+  // Faint "web of belief" node graph in the background.
+  const nodes = [
+    [980, 110],
+    [1090, 210],
+    [930, 250],
+    [1060, 360],
+    [995, 470],
+    [1110, 520],
+    [880, 430],
+    [1015, 150],
+  ];
+  ctx.strokeStyle = "rgba(45, 212, 191, 0.18)";
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < nodes.length; i += 1) {
+    for (let j = i + 1; j < nodes.length; j += 1) {
+      const dx = nodes[i][0] - nodes[j][0];
+      const dy = nodes[i][1] - nodes[j][1];
+      if (Math.hypot(dx, dy) < 175) {
+        ctx.beginPath();
+        ctx.moveTo(nodes[i][0], nodes[i][1]);
+        ctx.lineTo(nodes[j][0], nodes[j][1]);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.fillStyle = "rgba(45, 212, 191, 0.55)";
+  for (const [nx, ny] of nodes) {
+    ctx.beginPath();
+    ctx.arc(nx, ny, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const sans =
+    "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+
+  ctx.fillStyle = "#2dd4bf";
+  ctx.font = `700 26px ${sans}`;
+  ctx.fillText(BRAND.toUpperCase(), 80, 110);
+
+  const consistent = data.conflicts === 0;
+  ctx.fillStyle = "#f8fafc";
+  ctx.font = `700 70px ${sans}`;
+  const headline = consistent
+    ? "My beliefs hold together."
+    : `${data.conflicts} conflict${data.conflicts === 1 ? "" : "s"} to resolve.`;
+  ctx.fillText(headline, 80, 250);
+
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = `400 27px ${sans}`;
+  ctx.fillText(
+    `Checked across ${data.affirmed} stated belief${
+      data.affirmed === 1 ? "" : "s"
+    } — God, ethics, meaning, freedom & mind.`,
+    80,
+    305,
+  );
+
+  const startX = 80;
+  const top = 360;
+  const chipW = 242;
+  const chipH = 150;
+  const gap = 24;
+  badgeStats.forEach((stat, index) => {
+    const x = startX + index * (chipW + gap);
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.beginPath();
+    ctx.roundRect(x, top, chipW, chipH, 22);
+    ctx.fill();
+
+    ctx.fillStyle = stat.dot;
+    ctx.beginPath();
+    ctx.arc(x + 34, top + 42, 9, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#f8fafc";
+    ctx.font = `700 60px ${sans}`;
+    ctx.fillText(String(data[stat.key]), x + 28, top + 108);
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = `600 22px ${sans}`;
+    ctx.fillText(stat.label, x + 28, top + 138);
+  });
+
+  ctx.fillStyle = "#475569";
+  ctx.font = `500 24px ${sans}`;
+  ctx.fillText(`${data.host} · examine yours`, 80, 580);
+}
 
 function statementsForCategory(categoryId: BeliefCategoryId) {
   return beliefStatements.filter((statement) => statement.category === categoryId);
@@ -74,6 +200,10 @@ function StatementCard({
     <fieldset className="rounded-2xl border-2 border-slate-200 bg-white p-5 shadow-sm shadow-slate-950/[0.03] sm:p-6">
       <legend className="sr-only">{statement.prompt}</legend>
       <p className="text-lg font-semibold leading-7 text-slate-950">
+        {statement.plain}
+      </p>
+      <p className="mt-2 text-sm leading-6 text-slate-500">
+        <span className="font-semibold text-slate-600">Precisely: </span>
         {statement.prompt}
       </p>
 
@@ -202,7 +332,78 @@ export function BeliefChecker() {
   const visibleStatements = statementsForCategory(activeTopic.id);
   const conflictCount = countFindings(findings, "conflict");
   const argumentCount = countFindings(findings, "argument");
+  const implicationCount = countFindings(findings, "implication");
   const compatibleCount = countFindings(findings, "compatible");
+  const isConsistent = conflictCount === 0 && affirmed.length > 0;
+
+  const badgeData: BadgeData = useMemo(
+    () => ({
+      conflicts: conflictCount,
+      implications: implicationCount,
+      arguments: argumentCount,
+      compatibles: compatibleCount,
+      affirmed: affirmed.length,
+      host:
+        typeof window === "undefined"
+          ? "webofbelief.app"
+          : window.location.host || "webofbelief.app",
+    }),
+    [
+      conflictCount,
+      implicationCount,
+      argumentCount,
+      compatibleCount,
+      affirmed.length,
+    ],
+  );
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [badgeUrl, setBadgeUrl] = useState("");
+
+  useEffect(() => {
+    if (!showResults) return;
+    const canvas = canvasRef.current ?? document.createElement("canvas");
+    canvasRef.current = canvas;
+    try {
+      drawBadge(canvas, badgeData);
+      setBadgeUrl(canvas.toDataURL("image/png"));
+    } catch {
+      setBadgeUrl("");
+    }
+  }, [showResults, badgeData]);
+
+  const downloadBadge = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "web-of-belief.png";
+      link.click();
+      URL.revokeObjectURL(url);
+    }, "image/png");
+  }, []);
+
+  const copyBadge = useCallback(async () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    try {
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/png"),
+      );
+      if (!blob || !navigator.clipboard || !("write" in navigator.clipboard)) {
+        throw new Error("unsupported");
+      }
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob }),
+      ]);
+      setCopyNotice("Image copied. Paste it into a post or message.");
+    } catch {
+      setCopyNotice("Image copy is unavailable here — use Download image.");
+    }
+  }, []);
 
   function answeredForCategory(categoryId: BeliefCategoryId) {
     return statementsForCategory(categoryId).filter(
@@ -242,11 +443,11 @@ export function BeliefChecker() {
 
   async function copyPrivateSummary() {
     const summary =
-      `Belief Mirror reflection: I answered ${answeredCount} statements; ` +
+      `${BRAND} reflection: I answered ${answeredCount} statements; ` +
       `${unansweredCount} unanswered statements were treated as not sure. ` +
-      `It identified ${conflictCount} direct conflict(s), ${argumentCount} live argument(s), ` +
-      `and ${compatibleCount} coherent combination(s). It is a discussion prompt, not a verdict. ` +
-      `${window.location.origin}`;
+      `It identified ${conflictCount} direct conflict(s), ${implicationCount} logical implication(s), ` +
+      `${argumentCount} live argument(s), and ${compatibleCount} coherent combination(s). ` +
+      `It is a discussion prompt, not a verdict. ${window.location.origin}`;
     try {
       await navigator.clipboard.writeText(summary);
       setCopyNotice("Summary copied. It includes counts only, not your choices.");
@@ -443,11 +644,13 @@ export function BeliefChecker() {
                 Results
               </p>
               <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
-                {conflictCount === 0
-                  ? "No direct conflict detected"
-                  : `${conflictCount} direct conflict${
+                {conflictCount > 0
+                  ? `${conflictCount} direct conflict${
                       conflictCount === 1 ? "" : "s"
-                    } to examine`}
+                    } to examine`
+                  : isConsistent
+                    ? "Your beliefs hold together"
+                    : "No direct conflict detected"}
               </h3>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
                 Checked {affirmed.length} belief
@@ -458,10 +661,11 @@ export function BeliefChecker() {
                 worldview coherent or incoherent.
               </p>
             </div>
-            <div className="flex gap-2 text-center text-xs sm:text-sm">
+            <div className="grid grid-cols-2 gap-2 text-center text-xs sm:flex sm:text-sm">
               {(
                 [
                   ["conflict", conflictCount],
+                  ["implication", implicationCount],
                   ["argument", argumentCount],
                   ["compatible", compatibleCount],
                 ] as const
@@ -474,12 +678,39 @@ export function BeliefChecker() {
             </div>
           </div>
 
-          {findings.length === 0 ? (
+          {isConsistent ? (
+            <div className="mt-7 flex items-start gap-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-5 text-emerald-950 sm:p-6">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="mt-0.5 h-8 w-8 shrink-0 rounded-full bg-emerald-600 p-1.5 text-white"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              <div>
+                <p className="text-base font-semibold">
+                  No direct contradictions among the beliefs you affirmed.
+                </p>
+                <p className="mt-1 text-sm leading-6">
+                  {argumentCount + implicationCount > 0
+                    ? "Your affirmed beliefs hold together with no flat conflict. There are still implications and live tensions below worth thinking through."
+                    : "On every relationship this tool checks, your stated beliefs are mutually consistent. Share the badge below or answer more topics to stress-test it."}
+                </p>
+              </div>
+            </div>
+          ) : null}
+
+          {findings.length === 0 && !isConsistent ? (
             <p className="mt-7 rounded-2xl bg-slate-50 p-5 text-sm leading-6 text-slate-600">
               None of the explicit relationships in this version was
               triggered. Answer additional topics to broaden the check.
             </p>
-          ) : (
+          ) : findings.length === 0 ? null : (
             <div className="mt-7 grid gap-4">
               {findings.map((finding) => (
                 <FindingCard key={finding.id} finding={finding} />
@@ -487,33 +718,62 @@ export function BeliefChecker() {
             </div>
           )}
 
-          <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-6">
-            <p className="max-w-xl text-sm leading-6 text-slate-500">
-              Your responses stay in this browser session. The shared summary
-              contains counts only.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={resetCheck}
-                className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-500"
-              >
-                Start over
-              </button>
-              <button
-                type="button"
-                onClick={copyPrivateSummary}
-                className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-900"
-              >
-                Copy summary
-              </button>
+          <div className="mt-8 grid gap-6 border-t border-slate-100 pt-7 lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-800">
+                Share your web of belief
+              </p>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
+                A shareable image with your counts only — never your individual
+                answers. It is drawn in your browser; nothing is uploaded.
+              </p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={downloadBadge}
+                  className="rounded-lg bg-teal-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-900"
+                >
+                  Download image
+                </button>
+                <button
+                  type="button"
+                  onClick={copyBadge}
+                  className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-900"
+                >
+                  Copy image
+                </button>
+                <button
+                  type="button"
+                  onClick={copyPrivateSummary}
+                  className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-500"
+                >
+                  Copy text summary
+                </button>
+                <button
+                  type="button"
+                  onClick={resetCheck}
+                  className="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-500"
+                >
+                  Start over
+                </button>
+              </div>
+              {copyNotice ? (
+                <p aria-live="polite" className="mt-4 text-sm text-teal-800">
+                  {copyNotice}
+                </p>
+              ) : null}
             </div>
+            {badgeUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={badgeUrl}
+                alt="Shareable summary of your belief-consistency counts"
+                width={1200}
+                height={630}
+                className="h-auto w-full rounded-2xl border border-slate-200 shadow-sm"
+              />
+            ) : null}
           </div>
-          {copyNotice ? (
-            <p aria-live="polite" className="mt-4 text-sm text-teal-800">
-              {copyNotice}
-            </p>
-          ) : null}
         </section>
       ) : null}
     </section>

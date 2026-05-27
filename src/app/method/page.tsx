@@ -5,7 +5,7 @@ import { sources } from "@/lib/beliefs";
 export const metadata: Metadata = {
   title: "Method and sources",
   description:
-    "How Belief Mirror distinguishes direct conflicts from philosophical arguments and which sources support its prompts.",
+    "How Web of Belief distinguishes direct conflicts, logical implications, and live philosophical arguments, and which sources support its prompts.",
   alternates: {
     canonical: "/method",
   },
@@ -18,6 +18,13 @@ const methods = [
       "Affirming both that at least one moral fact is independent of approval and that every moral truth depends only on approval.",
     standard:
       "Reported only where the precise affirmed sentences negate one another or cannot both hold under their stated definitions.",
+  },
+  {
+    name: "Logical implication",
+    example:
+      "Affirming both that no deity exists and that every moral obligation is true solely because God commands it — which together entail that nothing is obligatory.",
+    standard:
+      "Surfaced when affirmed statements (sometimes with one clearly stated bridge) validly entail a further conclusion you may not have meant to accept. It is not a contradiction, but a commitment to notice.",
   },
   {
     name: "Live argument",
@@ -52,7 +59,7 @@ export default function MethodPage() {
           Accuracy begins with restraint.
         </h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-stone-600">
-          Belief Mirror reports relationships among exact statements you mark
+          Web of Belief reports relationships among exact statements you mark
           as true. It does not infer a complete worldview or assign a
           consistency score.
         </p>

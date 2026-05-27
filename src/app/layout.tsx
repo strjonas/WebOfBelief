@@ -18,23 +18,23 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: {
-    default: "Belief Mirror | Examine what fits together",
-    template: "%s | Belief Mirror",
+    default: "Web of Belief | See whether your beliefs fit together",
+    template: "%s | Web of Belief",
   },
   description:
-    "A source-backed belief consistency checker that separates direct conflicts from live philosophical arguments.",
+    "A source-backed belief consistency checker that separates direct conflicts, logical implications, and live philosophical arguments.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Belief Mirror | Examine what fits together",
+    title: "Web of Belief | See whether your beliefs fit together",
     description:
       "Reflect on worldview commitments with explicit logic and balanced philosophical sources.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Belief Mirror | Examine what fits together",
+    title: "Web of Belief | See whether your beliefs fit together",
     description:
       "Reflect on worldview commitments with explicit logic and balanced philosophical sources.",
   },
@@ -56,7 +56,7 @@ export default function RootLayout({
         {children}
         <footer className="mt-auto border-t border-slate-200 bg-white">
           <div className="mx-auto flex w-full max-w-6xl flex-col justify-between gap-3 px-6 py-7 text-sm text-slate-500 sm:flex-row lg:px-8">
-            <p>Belief Mirror. Reflection prompts, not a verdict on a person.</p>
+            <p>Web of Belief. Reflection prompts, not a verdict on a person.</p>
             <div className="flex flex-wrap gap-5">
               <Link className="transition hover:text-slate-900" href="/method">
                 Method, sources, and limitations

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "Belief Mirror: source-backed reflection on which beliefs can stand together";
+  "Web of Belief: source-backed reflection on which beliefs can stand together";
 export const size = {
   width: 1200,
   height: 630,
@@ -60,9 +60,9 @@ export default function OpenGraphImage() {
                   width: 54,
                 }}
               >
-                BM
+                WB
               </div>
-              Belief Mirror
+              Web of Belief
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               <div
@@ -90,8 +90,8 @@ export default function OpenGraphImage() {
               </div>
             </div>
             <div style={{ color: "#57534e", display: "flex", fontSize: 24 }}>
-              Conflicts, live arguments, and coherent combinations - with
-              sources.
+              Conflicts, logical implications, live arguments, and coherent
+              combinations - with sources.
             </div>
           </div>
           <div
@@ -116,7 +116,7 @@ export default function OpenGraphImage() {
                 lineHeight: 1,
               }}
             >
-              19
+              22
             </div>
             <div
               style={{

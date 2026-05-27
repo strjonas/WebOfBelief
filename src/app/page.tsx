@@ -8,15 +8,16 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-6xl gap-10 px-6 pb-12 pt-12 lg:grid-cols-[1fr_22rem] lg:px-8 lg:pb-16 lg:pt-16">
           <div>
             <p className="inline-flex rounded-full bg-teal-100 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-teal-950">
-              19 statements | about 4 minutes
+              22 statements | about 5 minutes
             </p>
             <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[1.06] tracking-[-0.055em] text-slate-950 sm:text-6xl">
               Check whether your beliefs fit together.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-              Choose statements about God, morality, meaning, freedom,
-              consciousness, and animals. See direct conflicts, serious
-              tensions, and combinations that are coherent after all.
+              Choose statements about God, morality, meaning, right action,
+              freedom, consciousness, and animals. See direct conflicts, the
+              implications you are committed to, serious tensions, and
+              combinations that are coherent after all.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <a

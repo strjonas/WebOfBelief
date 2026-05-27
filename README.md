@@ -1,11 +1,14 @@
-# Belief Mirror
+# Web of Belief
 
-Belief Mirror is a source-backed worldview reflection website. Users affirm,
-reject, or remain unsure about carefully worded statements. The app reports:
+Web of Belief is a source-backed worldview reflection website (named after
+Quine and Ullian's *The Web of Belief*). Users affirm, reject, or remain unsure
+about carefully worded statements. The app reports:
 
 [Live website](https://consistent-three.vercel.app) | [Source repository](https://github.com/strjonas/consistent)
 
 - `Direct conflict`: exact affirmed propositions cannot both hold as worded.
+- `Logical implication`: affirmed statements (sometimes with one stated bridge)
+  validly entail a further conclusion the user may not have meant to accept.
 - `Live argument`: a significant tension that needs an exposed, disputed
   bridge premise.
 - `Coherent combination`: a pairing frequently treated as conflicting even
