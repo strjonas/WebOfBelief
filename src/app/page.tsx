@@ -10,10 +10,16 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-12 px-6 pt-12 pb-14 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pt-16 lg:pb-20">
           <div className="flex flex-col justify-between gap-10">
             <div>
-              <p className="font-sans text-[0.75rem] uppercase tracking-[0.22em] text-mark">
-                a consistency check &middot; after w. v. quine &amp; j. s. ullian (1970)
-              </p>
-              <h1 className="mt-7 font-serif text-[2.65rem] font-medium leading-[1.05] tracking-tight text-ink sm:text-[3.4rem]">
+              <figure className="border-l border-mark pl-4">
+                <blockquote className="font-serif text-[1.05rem] italic leading-7 text-ink-soft">
+                  &ldquo;The unexamined life is not worth living for a human
+                  being.&rdquo;
+                </blockquote>
+                <figcaption className="mt-1 font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+                  — Socrates, in Plato&apos;s <em>Apology</em>, 38a
+                </figcaption>
+              </figure>
+              <h1 className="mt-8 font-serif text-[2.65rem] font-medium leading-[1.05] tracking-tight text-ink sm:text-[3.4rem]">
                 Twenty-two beliefs.
                 <br />
                 <span className="text-ink-soft">
@@ -139,6 +145,13 @@ export default function Home() {
               can still be false; an incoherent one is at least one belief away
               from coherence. The point is the examined life — to see your
               commitments clearly and hold them on purpose.
+            </p>
+            <p className="font-serif text-[0.92rem] italic leading-6 text-muted sm:col-span-2">
+              The name borrows W.&nbsp;V.&nbsp;Quine and J.&nbsp;S.&nbsp;Ullian&apos;s
+              metaphor (<em>The Web of Belief</em>, 1970): no belief stands
+              alone. The engine itself is not Quinean holism — just a small set
+              of explicit rules, each one a recognised move in the contemporary
+              literature.
             </p>
           </div>
         </div>
