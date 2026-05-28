@@ -1,28 +1,71 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Spectral } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/site-header";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
-const spectral = Spectral({
+const spectral = localFont({
+  src: [
+    { path: "./fonts/spectral-latin-300-normal.woff2", weight: "300" },
+    {
+      path: "./fonts/spectral-latin-300-italic.woff2",
+      weight: "300",
+      style: "italic",
+    },
+    { path: "./fonts/spectral-latin-400-normal.woff2", weight: "400" },
+    {
+      path: "./fonts/spectral-latin-400-italic.woff2",
+      weight: "400",
+      style: "italic",
+    },
+    { path: "./fonts/spectral-latin-500-normal.woff2", weight: "500" },
+    {
+      path: "./fonts/spectral-latin-500-italic.woff2",
+      weight: "500",
+      style: "italic",
+    },
+    { path: "./fonts/spectral-latin-600-normal.woff2", weight: "600" },
+    {
+      path: "./fonts/spectral-latin-600-italic.woff2",
+      weight: "600",
+      style: "italic",
+    },
+    { path: "./fonts/spectral-latin-700-normal.woff2", weight: "700" },
+    {
+      path: "./fonts/spectral-latin-700-italic.woff2",
+      weight: "700",
+      style: "italic",
+    },
+  ],
+  display: "swap",
+  fallback: ["Georgia", "Times New Roman", "serif"],
+  adjustFontFallback: "Times New Roman",
   variable: "--font-serif",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
 });
 
-const plexSans = IBM_Plex_Sans({
+const plexSans = localFont({
+  src: [
+    { path: "./fonts/ibm-plex-sans-latin-400-normal.woff2", weight: "400" },
+    { path: "./fonts/ibm-plex-sans-latin-500-normal.woff2", weight: "500" },
+    { path: "./fonts/ibm-plex-sans-latin-600-normal.woff2", weight: "600" },
+    { path: "./fonts/ibm-plex-sans-latin-700-normal.woff2", weight: "700" },
+  ],
+  display: "swap",
+  fallback: ["system-ui", "Arial", "sans-serif"],
   variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
-const plexMono = IBM_Plex_Mono({
+const plexMono = localFont({
+  src: [
+    { path: "./fonts/ibm-plex-mono-latin-400-normal.woff2", weight: "400" },
+    { path: "./fonts/ibm-plex-mono-latin-500-normal.woff2", weight: "500" },
+    { path: "./fonts/ibm-plex-mono-latin-600-normal.woff2", weight: "600" },
+  ],
+  display: "swap",
+  fallback: ["SFMono-Regular", "Menlo", "monospace"],
   variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {

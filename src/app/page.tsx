@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BeliefCheckerBoundary } from "@/components/belief-checker-boundary";
 import { BeliefChecker } from "@/components/belief-checker";
 import { BeliefWebDiagram } from "@/components/belief-web-diagram";
 
@@ -158,7 +159,12 @@ export default function Home() {
       </section>
 
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-8">
-        <BeliefChecker />
+        <noscript>
+          <p className="mt-12 border-l-2 border-mark bg-paper-soft px-5 py-4 font-serif text-[1rem] leading-7 text-ink-soft">This checker needs JavaScript enabled; you can still read the method and sources <a href="/method" className="underline decoration-mark decoration-2 underline-offset-[5px]">here</a>.</p>
+        </noscript>
+        <BeliefCheckerBoundary>
+          <BeliefChecker />
+        </BeliefCheckerBoundary>
       </div>
 
       {/* Why these questions — restrained, type-led */}
