@@ -246,11 +246,29 @@ export default function MethodPage() {
             privacy &amp; wellbeing
           </p>
           <p className="mt-3 font-serif text-[1rem] leading-7 text-ink-soft">
-            Answers stay in browser memory for the current page and are not sent
-            to a server by this application. The share action copies counts and
-            the structural shape of your affirmations only — never your
-            individual stances. Results are invitations to revisit reasons,
-            never judgments of intelligence, character, or identity.
+            Your answers stay in browser memory for the current page and are
+            not sent to any server. The share action only emits counts and the
+            structural shape of your affirmations — never your individual
+            stances. The image is rendered in your browser, not uploaded.
+          </p>
+          <p className="mt-3 font-serif text-[1rem] leading-7 text-ink-soft">
+            The only outbound signal is an anonymous, cookieless pageview
+            count via{" "}
+            <a
+              href="https://vercel.com/docs/analytics"
+              target="_blank"
+              rel="noreferrer"
+              className="text-mark underline decoration-mark/40 underline-offset-[3px] transition hover:decoration-mark"
+            >
+              Vercel Web Analytics
+            </a>
+            : URL path, country, and device class — no IP storage, no
+            fingerprinting, and crucially no record of which statements you
+            affirmed.
+          </p>
+          <p className="mt-3 font-serif text-[1rem] leading-7 text-ink-soft">
+            Results are invitations to revisit reasons, never judgments of
+            intelligence, character, or identity.
           </p>
         </section>
       </div>

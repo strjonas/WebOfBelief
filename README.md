@@ -67,4 +67,10 @@ npm run build  # production build
 - `src/app/method/page.tsx` — published method, limits, and full source
   library.
 
-Next.js 16 (App Router) + React 19. No database, no accounts, no analytics.
+Next.js 16 (App Router) + React 19. No database, no accounts. Anonymous,
+cookieless pageview counts via Vercel Web Analytics; individual answers are
+never sent anywhere.
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).
