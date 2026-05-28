@@ -1,61 +1,146 @@
 import Link from "next/link";
 import { BeliefChecker } from "@/components/belief-checker";
+import { BeliefWebDiagram } from "@/components/belief-web-diagram";
 
 export default function Home() {
   return (
     <main className="flex-1">
-      <section className="overflow-hidden border-b border-slate-200 bg-white">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-6 pb-12 pt-12 lg:grid-cols-[1fr_22rem] lg:px-8 lg:pb-16 lg:pt-16">
-          <div>
-            <p className="inline-flex rounded-full bg-teal-100 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-teal-950">
-              22 statements | about 5 minutes
-            </p>
-            <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[1.06] tracking-[-0.055em] text-slate-950 sm:text-6xl">
-              Check whether your beliefs fit together.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-              Choose statements about God, morality, meaning, right action,
-              freedom, consciousness, and animals. See direct conflicts, the
-              implications you are committed to, serious tensions, and
-              combinations that are coherent after all.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+      {/* Masthead — a single horizontal page-wide bar like a journal header */}
+      <section className="border-b border-rule">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-12 px-6 pt-12 pb-14 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pt-16 lg:pb-20">
+          <div className="flex flex-col justify-between gap-10">
+            <div>
+              <p className="font-sans text-[0.75rem] uppercase tracking-[0.22em] text-mark">
+                a consistency check &middot; after w. v. quine &amp; j. s. ullian (1970)
+              </p>
+              <h1 className="mt-7 font-serif text-[2.65rem] font-medium leading-[1.05] tracking-tight text-ink sm:text-[3.4rem]">
+                Twenty-two beliefs.
+                <br />
+                <span className="text-ink-soft">
+                  One web. Find out where it tears.
+                </span>
+              </h1>
+              <p className="mt-7 max-w-xl text-lg leading-[1.6] text-ink-soft">
+                Answer plain statements about God, morality, meaning, freedom,
+                mind, and right action. The check shows where the beliefs you
+                hold (a) flatly contradict, (b) commit you to a further
+                conclusion, (c) live in real philosophical tension, or (d) hold
+                together despite a common false alarm. Every result cites the
+                Stanford Encyclopedia of Philosophy entry behind the call.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-baseline gap-x-8 gap-y-4">
               <a
                 href="#check"
-                className="rounded-lg bg-teal-800 px-7 py-4 text-base font-semibold text-white transition hover:bg-teal-900"
+                className="group inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink"
               >
-                Start answering
+                <span className="font-mono text-[0.78rem] tracking-[0.18em] text-mark">
+                  §1
+                </span>
+                Begin the check
+                <span className="transition group-hover:translate-x-1">→</span>
               </a>
               <Link
                 href="/method"
-                className="text-sm font-semibold text-slate-600 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950"
+                className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
               >
-                How does it check?
+                How the engine reasons
               </Link>
+              <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+                22 statements &middot; ~5 min &middot; no login
+              </span>
             </div>
           </div>
-          <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-900/[0.08]">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-300">
-              What happens
-            </p>
-            <ol className="mt-5 space-y-5 text-sm leading-6 text-slate-200">
-              <li className="flex gap-3">
-                <span className="font-bold text-teal-300">1</span>
-                Select what you believe, reject, or are unsure about.
-              </li>
-              <li className="flex gap-3">
-                <span className="font-bold text-teal-300">2</span>
-                Run the check on the statements you marked true.
-              </li>
-              <li className="flex gap-3">
-                <span className="font-bold text-teal-300">3</span>
-                Inspect the reasons and source links behind each result.
-              </li>
-            </ol>
-            <p className="mt-6 border-t border-white/10 pt-5 text-xs leading-5 text-slate-400">
-              No login. Responses remain in your browser.
+
+          <aside className="flex flex-col">
+            <figure className="border border-rule bg-paper-soft p-5 sm:p-7">
+              <figcaption className="mb-3 flex items-baseline justify-between font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
+                <span>
+                  <span className="font-mono text-mark">fig. 1</span>{" "}
+                  &middot; the engine&apos;s rule-graph
+                </span>
+                <span>22 nodes / 20 edges</span>
+              </figcaption>
+              <BeliefWebDiagram
+                className="block h-auto w-full"
+                title="Diagram showing 22 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark logical implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
+              />
+              <div className="mt-5 border-t border-rule-soft pt-3 font-sans text-[0.7rem] leading-5 text-muted">
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                  <li className="flex items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-[2px] w-5 bg-mark"
+                    />
+                    direct conflict
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-[2px] w-5 bg-indigo-ink"
+                    />
+                    logical implication
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-[2px] w-5"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(to right, #8a5a14 50%, transparent 50%)",
+                        backgroundSize: "5px 100%",
+                      }}
+                    />
+                    live argument
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-[2px] w-5"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(to right, #2d4a36 25%, transparent 25%)",
+                        backgroundSize: "3px 100%",
+                      }}
+                    />
+                    coherent combination
+                  </li>
+                </ul>
+              </div>
+            </figure>
+            <p className="mt-3 font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+              <span className="font-mono normal-case tracking-normal text-mark">
+                ¶
+              </span>{" "}
+              the diagram is the engine. tapping &ldquo;check&rdquo; lights up
+              the edges your answers actually trigger.
             </p>
           </aside>
+        </div>
+      </section>
+
+      {/* "What it is / what it is not" — a marginalia-style block. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-x-12 gap-y-6 px-6 py-10 sm:grid-cols-[10rem_1fr] lg:px-8">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-mark">
+            <span className="section-mark" />
+            what this is
+          </p>
+          <div className="grid gap-6 sm:grid-cols-2">
+            <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
+              A small, inspectable rule engine. Every &ldquo;contradiction&rdquo;
+              it reports cites a specific pair of statements you affirmed and a
+              specific source. It is not an AI judging you; it is a mirror you
+              can argue with.
+            </p>
+            <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
+              Consistency is a <em>floor</em>, not proof. A coherent worldview
+              can still be false; an incoherent one is at least one belief away
+              from coherence. The point is the examined life — to see your
+              commitments clearly and hold them on purpose.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -63,28 +148,33 @@ export default function Home() {
         <BeliefChecker />
       </div>
 
-      <section className="border-t border-slate-200 bg-slate-950 text-white">
-        <div className="mx-auto flex w-full max-w-6xl flex-col justify-between gap-8 px-6 py-12 lg:flex-row lg:items-center lg:px-8">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-300">
-              Why these questions?
-            </p>
-            <h2 className="mt-3 max-w-xl text-2xl font-semibold tracking-tight">
-              Chosen from major philosophical debates, checked against public
-              relevance.
+      {/* Why these questions — restrained, type-led */}
+      <section className="border-t border-rule">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-x-12 gap-y-8 px-6 py-14 sm:grid-cols-[10rem_1fr] lg:px-8">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-mark">
+            <span className="section-mark" />
+            why these
+          </p>
+          <div className="max-w-3xl">
+            <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-ink">
+              Twenty-two statements drawn from the questions philosophers and
+              the public most disagree about.
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-stone-300">
+            <p className="mt-4 font-serif text-[1.05rem] leading-7 text-ink-soft">
               Topic selection uses the PhilPapers 2020 survey of philosophers
-              and Pew Research Center&apos;s 2023-24 Religious Landscape Study.
-              Explanations link directly to scholarly reference entries.
+              and Pew Research&apos;s 2023–24 Religious Landscape Study. Each
+              statement&apos;s explanation links to the relevant Stanford
+              Encyclopedia of Philosophy entry; nothing here treats one school
+              as obvious.
             </p>
+            <Link
+              href="/method"
+              className="mt-6 inline-flex items-baseline gap-2 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink underline decoration-mark decoration-2 underline-offset-[5px] transition hover:decoration-ink"
+            >
+              <span aria-hidden="true">↳</span> View method, classification
+              standard, and the full source library
+            </Link>
           </div>
-          <Link
-            href="/method"
-            className="w-fit rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-50"
-          >
-            View method and sources
-          </Link>
         </div>
       </section>
     </main>

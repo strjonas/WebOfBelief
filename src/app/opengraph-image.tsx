@@ -8,126 +8,215 @@ export const size = {
 };
 export const contentType = "image/png";
 
+const nodes: Array<[number, number]> = [
+  [50, 50],
+  [120, 30],
+  [200, 60],
+  [270, 90],
+  [80, 110],
+  [160, 130],
+  [240, 160],
+  [40, 200],
+  [130, 220],
+  [220, 230],
+  [285, 250],
+  [90, 280],
+  [180, 290],
+];
+
+const edges: Array<[number, number, number, number]> = [
+  [50, 50, 120, 30],
+  [120, 30, 200, 60],
+  [200, 60, 270, 90],
+  [50, 50, 80, 110],
+  [80, 110, 160, 130],
+  [200, 60, 160, 130],
+  [160, 130, 240, 160],
+  [80, 110, 40, 200],
+  [40, 200, 130, 220],
+  [130, 220, 220, 230],
+  [220, 230, 285, 250],
+  [130, 220, 180, 290],
+  [90, 280, 180, 290],
+  [40, 200, 90, 280],
+  [160, 130, 130, 220],
+];
+
 export default function OpenGraphImage() {
   return new ImageResponse(
     (
       <div
         style={{
-          background: "#faf8f3",
-          color: "#1c1917",
+          background: "#ece9e0",
+          color: "#11131a",
           display: "flex",
+          flexDirection: "column",
           height: "100%",
           width: "100%",
+          fontFamily: "Georgia, 'Times New Roman', serif",
+          padding: 60,
+          boxSizing: "border-box",
         }}
       >
         <div
           style={{
-            alignItems: "stretch",
+            border: "1px solid #b1ad9f",
             display: "flex",
-            height: 494,
-            margin: "68px 76px",
-            width: 1048,
+            flexDirection: "column",
+            flex: 1,
+            padding: "44px 56px",
           }}
         >
+          {/* Masthead */}
+          <div
+            style={{
+              alignItems: "baseline",
+              borderBottom: "1px solid #b1ad9f",
+              display: "flex",
+              gap: 22,
+              paddingBottom: 18,
+            }}
+          >
+            <div
+              style={{
+                color: "#7a1f1d",
+                display: "flex",
+                fontFamily: "monospace",
+                fontSize: 22,
+                letterSpacing: "0.22em",
+              }}
+            >
+              VOL. I
+            </div>
+            <div style={{ display: "flex", fontSize: 32, fontWeight: 500 }}>
+              Web of Belief
+            </div>
+            <div
+              style={{
+                color: "#545860",
+                display: "flex",
+                fontFamily: "monospace",
+                fontSize: 18,
+                letterSpacing: "0.18em",
+                marginLeft: "auto",
+                textTransform: "uppercase",
+              }}
+            >
+              A CONSISTENCY CHECK
+            </div>
+          </div>
+
+          {/* Body row */}
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              width: 700,
+              flex: 1,
+              gap: 40,
+              paddingTop: 36,
             }}
           >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                width: 700,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  fontSize: 60,
+                  fontWeight: 500,
+                  letterSpacing: "-0.025em",
+                  lineHeight: 1.06,
+                }}
+              >
+                <div style={{ display: "flex" }}>Twenty-two beliefs.</div>
+                <div style={{ color: "#545860", display: "flex" }}>
+                  One web. Where does it tear?
+                </div>
+              </div>
+              <div
+                style={{
+                  color: "#545860",
+                  display: "flex",
+                  fontSize: 22,
+                  lineHeight: 1.4,
+                  marginTop: 24,
+                  maxWidth: 620,
+                }}
+              >
+                Direct conflicts, logical implications, live arguments, and
+                coherent combinations — every call cites the Stanford
+                Encyclopedia of Philosophy.
+              </div>
+            </div>
+
             <div
               style={{
                 alignItems: "center",
+                borderLeft: "1px solid #b1ad9f",
                 display: "flex",
-                fontSize: 27,
-                fontWeight: 600,
-                gap: 18,
+                flex: 1,
+                justifyContent: "center",
+                paddingLeft: 36,
               }}
             >
-              <div
-                style={{
-                  alignItems: "center",
-                  background: "#1c1917",
-                  borderRadius: 18,
-                  color: "#faf8f3",
-                  display: "flex",
-                  fontSize: 20,
-                  height: 54,
-                  justifyContent: "center",
-                  letterSpacing: "-0.04em",
-                  width: 54,
-                }}
+              <svg
+                width="320"
+                height="320"
+                viewBox="0 0 320 320"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                WB
-              </div>
-              Web of Belief
-            </div>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div
-                style={{
-                  color: "#0f766e",
-                  fontSize: 20,
-                  fontWeight: 700,
-                  letterSpacing: "0.18em",
-                  marginBottom: 24,
-                  textTransform: "uppercase",
-                }}
-              >
-                Source-backed worldview reflection
-              </div>
-              <div
-                style={{
-                  fontSize: 62,
-                  fontWeight: 650,
-                  letterSpacing: "-0.055em",
-                  lineHeight: 1.04,
-                  maxWidth: 820,
-                }}
-              >
-                Which of your beliefs can stand together?
-              </div>
-            </div>
-            <div style={{ color: "#57534e", display: "flex", fontSize: 24 }}>
-              Conflicts, logical implications, live arguments, and coherent
-              combinations - with sources.
+                {edges.map(([x1, y1, x2, y2], idx) => (
+                  <line
+                    key={`e-${idx}`}
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke={idx % 5 === 0 ? "#7a1f1d" : "#11131a"}
+                    strokeWidth={idx % 5 === 0 ? 1.6 : 1}
+                    opacity={idx % 5 === 0 ? 0.85 : 0.45}
+                  />
+                ))}
+                {nodes.map(([x, y], idx) => (
+                  <circle
+                    key={`n-${idx}`}
+                    cx={x}
+                    cy={y}
+                    r="5"
+                    fill={idx % 4 === 0 ? "#7a1f1d" : "#ece9e0"}
+                    stroke={idx % 4 === 0 ? "#7a1f1d" : "#11131a"}
+                    strokeWidth="1.5"
+                  />
+                ))}
+              </svg>
             </div>
           </div>
+
+          {/* Footer */}
           <div
             style={{
-              alignItems: "center",
-              border: "2px solid #d6d3d1",
-              borderRadius: 34,
+              borderTop: "1px solid #b1ad9f",
+              color: "#545860",
               display: "flex",
-              flexDirection: "column",
-              flexShrink: 0,
-              gap: 20,
-              justifyContent: "center",
-              marginLeft: 48,
-              width: 250,
+              fontFamily: "monospace",
+              fontSize: 18,
+              justifyContent: "space-between",
+              letterSpacing: "0.18em",
+              marginTop: 28,
+              paddingTop: 14,
+              textTransform: "uppercase",
             }}
           >
-            <div
-              style={{
-                color: "#0f766e",
-                fontSize: 78,
-                fontWeight: 650,
-                lineHeight: 1,
-              }}
-            >
-              22
+            <div style={{ display: "flex" }}>
+              22 statements &middot; ~5 minutes
             </div>
-            <div
-              style={{
-                color: "#57534e",
-                display: "flex",
-                fontSize: 22,
-                textAlign: "center",
-                width: 170,
-              }}
-            >
-              carefully framed statements
+            <div style={{ color: "#7a1f1d", display: "flex" }}>
+              webofbelief.app
             </div>
           </div>
         </div>
