@@ -27,19 +27,20 @@ import {
 
 const choices: Array<{ id: Answer; label: string; hint: string }> = [
   { id: "affirm", label: "I believe this", hint: "Affirm as worded." },
-  { id: "reject", label: "I do not believe this", hint: "Deny as worded." },
+  { id: "reject", label: "I reject this", hint: "Reject as worded." },
   { id: "unsure", label: "Not sure", hint: "No settled view." },
   {
     id: "qualify",
-    label: "Need to qualify",
-    hint: "I have a view but the binary as stated doesn't capture it.",
+    label: "Conditional / qualify",
+    hint:
+      "Use for hypothetical, if-this-were-true, or otherwise qualified readings.",
   },
 ];
 
 const findingLabels: Record<FindingKind, string> = {
   conflict: "Direct conflict",
   argument: "Live argument",
-  implication: "Logical implication",
+  implication: "Conditional implication",
   compatible: "Coherent combination",
 };
 
@@ -58,6 +59,15 @@ const findingAccents: Record<FindingKind, { rule: string; ink: string }> = {
 };
 
 const BRAND = "Web of Belief";
+
+const deityDependentStatementIds = new Set<BeliefId>([
+  "perfectGod",
+  "infallibleForeknowledge",
+  "divineCommandOnly",
+]);
+
+const deityDependentContextNote =
+  "You have already affirmed that no god or deity exists. Choose “I believe this” only if you also take this deity-dependent sentence to be actually true; choose “Conditional / qualify” for a hypothetical reading, or reject it as worded.";
 
 interface BadgeData {
   conflicts: number;
@@ -126,12 +136,10 @@ function drawBadge(canvas: HTMLCanvasElement, data: BadgeData) {
   ctx.stroke();
 
   // Headline (kept short so it always fits)
-  const consistent = data.conflicts === 0 && data.affirmed > 0;
   ctx.fillStyle = "#11131a";
   ctx.font = `500 60px ${serif}`;
-  const headline = consistent
-    ? "My beliefs hold together."
-    : data.conflicts === 0
+  const headline =
+    data.conflicts === 0
       ? "Mapping my web of belief."
       : `${data.conflicts} contradiction${
           data.conflicts === 1 ? "" : "s"
@@ -235,7 +243,7 @@ function drawBadge(canvas: HTMLCanvasElement, data: BadgeData) {
     { key: "conflicts", label: "Direct conflict", color: "#7a1f1d", glyph: "⊥" },
     {
       key: "implications",
-      label: "Logical implication",
+      label: "Conditional implication",
       color: "#2b3672",
       glyph: "⊢",
     },
@@ -314,11 +322,13 @@ function StatementCard({
   index,
   answer,
   onAnswer,
+  contextNote,
 }: {
   statement: BeliefStatement;
   index: number;
   answer?: Answer;
   onAnswer: (answer: Answer) => void;
+  contextNote?: string;
 }) {
   const selectedLabel = choices.find((choice) => choice.id === answer)?.label;
 
@@ -334,6 +344,16 @@ function StatementCard({
       <p className="mt-2 font-serif text-[0.95rem] italic leading-6 text-muted">
         Precisely: {statement.prompt}
       </p>
+
+      {contextNote ? (
+        <p className="mt-4 border-l-2 border-amber-ink bg-paper-soft px-4 py-3 font-serif text-[0.95rem] leading-6 text-ink-soft">
+          <span className="font-sans text-[0.68rem] uppercase tracking-[0.18em] text-amber-ink">
+            answer as an actual belief
+          </span>
+          <br />
+          {contextNote}
+        </p>
+      ) : null}
 
       <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {choices.map((choice) => {
@@ -370,7 +390,7 @@ function StatementCard({
             <label
               key={choice.id}
               title={choice.hint}
-              className={`${baseLabel} ${selected ? selectedClasses : idleClasses}`}
+              className={`${baseLabel} focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-mark ${selected ? selectedClasses : idleClasses}`}
             >
               <input
                 type="radio"
@@ -525,7 +545,7 @@ export function BeliefChecker() {
   const argumentCount = countFindings(findings, "argument");
   const implicationCount = countFindings(findings, "implication");
   const compatibleCount = countFindings(findings, "compatible");
-  const isConsistent = conflictCount === 0 && affirmed.length > 0;
+  const noDirectConflict = conflictCount === 0 && affirmed.length > 0;
 
   const affirmedSet = useMemo(() => new Set(affirmed), [affirmed]);
   const triggeredEdges = useMemo<Array<[BeliefId, BeliefId, FindingKind]>>(() => {
@@ -648,13 +668,13 @@ export function BeliefChecker() {
     if (conflictCount > 0) {
       return `My belief web has ${conflictCount} contradiction${
         conflictCount === 1 ? "" : "s"
-      } to resolve. Map yours — every call cites SEP:`;
+      } to examine. Each finding cites a philosophical source:`;
     }
-    if (isConsistent) {
-      return "My beliefs hold together — no flat contradictions across the rule set (yet). Map yours — every call cites SEP:";
+    if (noDirectConflict) {
+      return "No direct contradiction detected in my belief web. Conditional implications and live arguments are separated from verdicts:";
     }
-    return "Mapping my web of belief. Every call cites SEP — see where yours pulls against itself:";
-  }, [conflictCount, isConsistent]);
+    return "Mapping my web of belief with a small source-backed consistency check:";
+  }, [conflictCount, noDirectConflict]);
 
   const siteOrigin =
     typeof window === "undefined" ? "https://webofbelief.app" : window.location.origin;
@@ -734,7 +754,7 @@ export function BeliefChecker() {
       `${BRAND} reflection: I answered ${answeredCount} statements; ` +
       `${unansweredCount} unanswered statements were treated as not sure. ` +
       qualifiedNote +
-      `It identified ${conflictCount} direct conflict(s), ${implicationCount} logical implication(s), ` +
+      `It identified ${conflictCount} direct conflict(s), ${implicationCount} conditional implication(s), ` +
       `${argumentCount} live argument(s), and ${compatibleCount} coherent combination(s). ` +
       `It is a discussion prompt, not a verdict. ${siteOrigin}`;
     try {
@@ -771,6 +791,13 @@ export function BeliefChecker() {
             Answer only the statements you want to examine. Skip any of them —
             unselected answers count as Not sure when you check. Your responses
             never leave the browser.
+          </p>
+          <p className="mt-3 max-w-2xl font-serif text-[0.98rem] italic leading-7 text-muted">
+            Only &ldquo;I believe this&rdquo; is used as a premise. Rejecting,
+            being unsure, or marking a sentence as conditional/qualified is
+            never treated as belief in its opposite. If a claim is only
+            hypothetical for you (&ldquo;if God existed...&rdquo;), do not affirm it as
+            an actual belief.
           </p>
         </div>
         <div className="w-full max-w-sm border-l-2 border-mark pl-5">
@@ -847,15 +874,15 @@ export function BeliefChecker() {
             </p>
             <p className="mt-2 font-serif text-[0.95rem] leading-6 text-ink-soft">
               Partial answers are fine. Skipped statements count as Not sure
-              and cannot trigger a finding.
+              and only affirmed statements can trigger a finding.
             </p>
             <button
               type="button"
               onClick={reviewResults}
-              aria-label="Check selected beliefs"
+              aria-label="Check affirmed beliefs"
               className="mt-4 w-full border border-ink bg-ink px-4 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
             >
-              Check selected beliefs <span aria-hidden="true">→</span>
+              Check affirmed beliefs <span aria-hidden="true">→</span>
             </button>
           </div>
         </aside>
@@ -877,6 +904,11 @@ export function BeliefChecker() {
           <div className="mt-7 space-y-1">
             {visibleStatements.map((statement, localIdx) => {
               const startIdx = categoryStartIndex.get(activeTopic.id) ?? 0;
+              const contextNote =
+                answers.noDeity === "affirm" &&
+                deityDependentStatementIds.has(statement.id)
+                  ? deityDependentContextNote
+                  : undefined;
               return (
                 <StatementCard
                   key={statement.id}
@@ -884,6 +916,7 @@ export function BeliefChecker() {
                   index={startIdx + localIdx}
                   answer={answers[statement.id]}
                   onAnswer={(answer) => answerStatement(statement.id, answer)}
+                  contextNote={contextNote}
                 />
               );
             })}
@@ -916,10 +949,10 @@ export function BeliefChecker() {
               <button
                 type="button"
                 onClick={reviewResults}
-                aria-label="Check selected beliefs"
+                aria-label="Check affirmed beliefs"
                 className="border border-ink bg-ink px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
               >
-                Check selected beliefs <span aria-hidden="true">→</span>
+                Check affirmed beliefs <span aria-hidden="true">→</span>
               </button>
             )}
           </div>
@@ -943,13 +976,11 @@ export function BeliefChecker() {
                   ? `${conflictCount} direct conflict${
                       conflictCount === 1 ? "" : "s"
                     } to examine`
-                  : isConsistent
-                    ? "Your beliefs hold together"
-                    : "No direct conflict detected"}
+                  : "No direct conflict detected"}
               </h3>
               <p className="mt-4 max-w-2xl font-serif text-[1rem] leading-7 text-ink-soft">
                 Checked {affirmed.length} belief
-                {affirmed.length === 1 ? "" : "s"} you selected as true. This
+                {affirmed.length === 1 ? "" : "s"} you affirmed as true. This
                 check treats {unansweredCount} unselected statement
                 {unansweredCount === 1 ? "" : "s"} as Not sure
                 {qualifiedCount > 0
@@ -990,11 +1021,11 @@ export function BeliefChecker() {
               </span>
               <br />
               This is a mirror, not a judge. Every result below is a fork, not a
-              verdict: where two of your beliefs pull apart, you decide which
-              one to keep. Nothing here tells you the right answer — and
-              consistency is a floor, not proof that a belief is true. The
-              point is the examined life: to see your commitments clearly and
-              hold them on purpose.
+              verdict: where two commitments pull apart, you can revise,
+              qualify, or defend the bridge between them. Nothing here tells
+              you the right answer — and consistency is a floor, not proof that
+              a belief is true. The point is the examined life: to see your
+              commitments clearly and hold them on purpose.
             </p>
           ) : null}
 
@@ -1019,24 +1050,26 @@ export function BeliefChecker() {
             </figure>
           ) : null}
 
-          {isConsistent ? (
+          {noDirectConflict ? (
             <div className="mt-8 border-l-[3px] border-forest bg-paper-soft px-5 py-5">
               <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-forest">
                 <span className="section-mark" />
-                coherent across the checks
+                no direct conflict across the checks
               </p>
               <p className="mt-3 font-serif text-[1.05rem] leading-7 text-ink">
                 No direct contradictions among the beliefs you affirmed.
               </p>
               <p className="mt-2 font-serif text-[0.97rem] italic leading-7 text-ink-soft">
                 {argumentCount + implicationCount > 0
-                  ? "They hold together with no flat conflict. The implications and live tensions below are not problems — just the next things worth thinking through."
-                  : "On every relationship this tool checks, your stated beliefs fit together. That is a real achievement and a good place to build from — though it is a floor, not a finish line. Answer more topics to keep stress-testing it."}
+                  ? "The conditional implications and live arguments below are not charges of inconsistency. They name consequences, bridge premises, or pressure points worth checking."
+                  : compatibleCount > 0
+                    ? "The coherent combinations below are recognized positions, not exceptions you need to explain away."
+                    : "On every relationship this version checks, your affirmed statements trigger no finding. That leaves plenty untested, but avoids the flat conflicts this engine is designed to catch."}
               </p>
             </div>
           ) : null}
 
-          {findings.length === 0 && !isConsistent ? (
+          {findings.length === 0 && !noDirectConflict ? (
             <p className="mt-8 border-l-2 border-rule-soft px-5 py-4 font-serif text-[1rem] italic leading-7 text-ink-soft">
               None of the explicit relationships in this version was triggered.
               Answer additional topics to broaden the check.

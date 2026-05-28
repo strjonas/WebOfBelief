@@ -7,6 +7,9 @@ const perfectGod =
   "A personal God exists who is omniscient, omnipotent, perfectly good, and perfectly loving.";
 const gratuitousSuffering =
   "Some suffering exists that no omniscient, omnipotent, perfectly good being could have morally sufficient reason to permit.";
+const noDeity = "No god or deity exists.";
+const infallibleForeknowledge =
+  "Before a human choice occurs, an infallible divine belief already correctly specifies that exact choice.";
 
 beforeAll(() => {
   Object.defineProperty(window, "requestAnimationFrame", {
@@ -44,7 +47,7 @@ describe("BeliefChecker", () => {
     expect(screen.getAllByText("Recorded: I believe this.")).toHaveLength(2);
 
     await user.click(
-      screen.getByRole("button", { name: "Check selected beliefs" }),
+      screen.getByRole("button", { name: "Check affirmed beliefs" }),
     );
 
     expect(
@@ -91,7 +94,7 @@ describe("BeliefChecker", () => {
     render(<BeliefChecker />);
 
     const reviewButton = screen.getByRole("button", {
-      name: "Check selected beliefs",
+      name: "Check affirmed beliefs",
     }) as HTMLButtonElement;
 
     expect(reviewButton.disabled).toBe(false);
@@ -102,8 +105,42 @@ describe("BeliefChecker", () => {
     ).toBeDefined();
     expect(
       screen.getByText(
-        "Checked 0 beliefs you selected as true. This check treats 22 unselected statements as Not sure. Results report relationships in the rule set; they do not prove your complete worldview coherent or incoherent.",
+        "Checked 0 beliefs you affirmed as true. This check treats 22 unselected statements as Not sure. Results report relationships in the rule set; they do not prove your complete worldview coherent or incoherent.",
       ),
     ).toBeDefined();
+  });
+
+  it("explains deity-dependent statements after atheism and ignores qualified hypotheticals", async () => {
+    const user = userEvent.setup();
+    render(<BeliefChecker />);
+
+    await user.click(
+      screen.getByRole("radio", {
+        name: `I believe this: ${noDeity}`,
+      }),
+    );
+
+    expect(
+      screen.getAllByText(
+        /You have already affirmed that no god or deity exists/,
+      ),
+    ).not.toHaveLength(0);
+
+    await user.click(
+      screen.getByRole("radio", {
+        name: `Conditional / qualify: ${infallibleForeknowledge}`,
+      }),
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Check affirmed beliefs" }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "No direct conflict detected" }),
+    ).toBeDefined();
+    expect(
+      screen.queryByText("An infallible divine belief, but no deity to hold it"),
+    ).toBeNull();
   });
 });
