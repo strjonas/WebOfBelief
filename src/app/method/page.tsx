@@ -5,7 +5,7 @@ import { sources } from "@/lib/beliefs";
 export const metadata: Metadata = {
   title: "Method and sources",
   description:
-    "How Web of Belief distinguishes direct conflicts, logical implications, and live philosophical arguments, and which sources support its prompts.",
+    "How Web of Belief distinguishes direct conflicts, conditional implications, and live philosophical arguments, and which sources support its prompts.",
   alternates: {
     canonical: "/method",
   },
@@ -21,12 +21,12 @@ const methods = [
       "Reported only where the precise affirmed sentences negate one another or cannot both hold under their stated definitions.",
   },
   {
-    name: "Logical implication",
+    name: "Conditional implication",
     mark: "⊢",
     example:
       "Affirming both that no deity exists and that every moral obligation is true solely because God commands it — which together entail that nothing is obligatory.",
     standard:
-      "Surfaced when affirmed statements (sometimes with one clearly stated bridge) validly entail a further conclusion you may not have meant to accept. It is not a contradiction, but a commitment to notice.",
+      "Surfaced when affirmed statements, sometimes under an explicitly stated added premise, entail a further conclusion you may not have meant to accept. It is not a contradiction, and the added premise is open to rejection.",
   },
   {
     name: "Live argument",
@@ -85,7 +85,10 @@ export default function MethodPage() {
               </span>
               <span>
                 <span className="font-medium text-ink">Your selections </span>
-                are held in browser memory for this page only.
+                are held in browser memory for this page only. Only &ldquo;I
+                believe this&rdquo; is used as a premise; rejection, uncertainty,
+                and qualification are not treated as belief in the opposite
+                sentence.
               </span>
             </li>
             <li className="flex gap-4">
@@ -184,7 +187,7 @@ export default function MethodPage() {
             topic selection
           </p>
           <h2 className="mt-3 font-serif text-2xl font-medium leading-snug tracking-tight text-ink">
-            Two surveys, no editorial guess.
+            Survey-led scope, explicit limits.
           </h2>
           <p className="mt-4 font-serif text-[1rem] leading-7 text-ink-soft">
             The initial domains come from the official PhilPapers 2020 Survey,

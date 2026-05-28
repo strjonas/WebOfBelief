@@ -134,7 +134,7 @@ export function BeliefWebDiagram({
   showClusters = true,
   decorative = false,
   className,
-  title = "A diagram of the belief web this tool checks. Twenty-two statements are connected by edges representing direct conflicts, logical implications, live arguments, and coherent combinations.",
+  title = "A diagram of the belief web this tool checks. Twenty-two statements are connected by edges representing direct conflicts, conditional implications, live arguments, and coherent combinations.",
 }: BeliefWebDiagramProps) {
   const triggered = triggeredEdges
     ? new Set<string>(triggeredEdges.map(([a, b]) => edgeKey(a, b)))

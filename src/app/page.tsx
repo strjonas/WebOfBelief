@@ -30,10 +30,11 @@ export default function Home() {
               <p className="mt-7 max-w-xl text-lg leading-[1.6] text-ink-soft">
                 Answer plain statements about God, morality, meaning, freedom,
                 mind, and right action. The check shows where the beliefs you
-                hold (a) flatly contradict, (b) commit you to a further
-                conclusion, (c) live in real philosophical tension, or (d) hold
-                together despite a common false alarm. Every result cites the
-                Stanford Encyclopedia of Philosophy entry behind the call.
+                hold (a) flatly contradict, (b) may commit you to a further
+                conclusion under an exposed premise, (c) live in real
+                philosophical tension, or (d) fit together despite a common
+                false alarm. Every result cites the Stanford Encyclopedia of
+                Philosophy entry behind the call.
               </p>
             </div>
 
@@ -71,7 +72,7 @@ export default function Home() {
               </figcaption>
               <BeliefWebDiagram
                 className="block h-auto w-full"
-                title="Diagram showing 22 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark logical implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
+                title="Diagram showing 22 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark conditional implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
               />
               <div className="mt-5 border-t border-rule-soft pt-3 font-sans text-[0.7rem] leading-5 text-muted">
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
@@ -87,7 +88,7 @@ export default function Home() {
                       aria-hidden="true"
                       className="inline-block h-[2px] w-5 bg-indigo-ink"
                     />
-                    logical implication
+                    conditional implication
                   </li>
                   <li className="flex items-center gap-2">
                     <span
@@ -142,10 +143,11 @@ export default function Home() {
               can argue with.
             </p>
             <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
-              Consistency is a <em>floor</em>, not proof. A coherent worldview
-              can still be false; an incoherent one is at least one belief away
-              from coherence. The point is the examined life — to see your
-              commitments clearly and hold them on purpose.
+              Only statements you affirm become premises. Rejections,
+              uncertainty, and qualifications are not treated as hidden
+              opposite beliefs. Consistency is a <em>floor</em>, not proof: the
+              point is to see your commitments clearly and hold them on
+              purpose.
             </p>
             <p className="font-serif text-[0.92rem] italic leading-6 text-muted sm:col-span-2">
               The name borrows W.&nbsp;V.&nbsp;Quine and J.&nbsp;S.&nbsp;Ullian&apos;s

@@ -148,8 +148,8 @@ export default function OpenGraphImage() {
                   maxWidth: 620,
                 }}
               >
-                Direct conflicts, logical implications, live arguments, and
-                coherent combinations — every call cites the Stanford
+                Direct conflicts, conditional implications, live arguments, and
+                coherent combinations — every finding cites the Stanford
                 Encyclopedia of Philosophy.
               </div>
             </div>

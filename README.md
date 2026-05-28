@@ -5,9 +5,9 @@
 
 You answer plain statements about God, morality, meaning, free will, mind, and
 right action. A small, inspectable rule engine then shows you where your stated
-beliefs **contradict**, what they **commit you to**, and which "obviously
-incompatible" pairs are in fact **coherent**. Every result links to the
-relevant [Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/)
+beliefs **contradict**, what they **may commit you to under stated premises**,
+and which "obviously incompatible" pairs are in fact **coherent**. Every result
+links to the relevant [Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/)
 entry.
 
 Named after Quine and Ullian's *The Web of Belief* (1970): no belief stands
@@ -21,15 +21,17 @@ only ever reasons from statements you explicitly mark "I believe this."
 | Kind | Meaning |
 | --- | --- |
 | ⊥ &nbsp;**Direct conflict** | The exact statements you affirmed cannot both be true as worded. *Example:* "a personal God exists" + "no deity exists". |
-| ⊢ &nbsp;**Logical implication** | Your answers (sometimes plus one stated bridge) validly entail a further conclusion you may not have meant to accept. *Example:* atheism + "morality is only God's commands" ⟹ nothing is obligatory. |
+| ⊢ &nbsp;**Conditional implication** | Your answers, sometimes under one explicitly stated added premise, entail a further conclusion you may not have meant to accept. The added premise is open to rejection. *Example:* atheism + "morality is only God's commands" ⟹ nothing is obligatory. |
 | ‡ &nbsp;**Live argument** | A serious tension that turns on a disputed bridge premise, which the result names and leaves open. *Example:* divine hiddenness; the evidentialist challenge to theism. |
 | ≈ &nbsp;**Coherent combination** | A pairing often dismissed as incoherent that has a recognized philosophical home. *Example:* atheism + objective meaning. |
 
 ## Design principles
 
 - **A mirror, not a judge.** Every result is framed as a fork you decide,
-  never a verdict. It does not tell you which belief to drop. The goal is the
-  examined life, and the experience is meant to be edifying, not crushing.
+  never a verdict. It does not tell you which belief to drop; revision,
+  qualification, and defended bridge premises all remain live options. The goal
+  is the examined life, and the experience is meant to be edifying, not
+  crushing.
 - **Restraint over false precision.** No "consistency score," no AI inference,
   no Z3 verdict. The hard part is whether a natural-language commitment
   entails a contested bridge premise — a philosophical question, not a solver

@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     template: "%s | Web of Belief",
   },
   description:
-    "A source-backed belief consistency checker that separates direct conflicts, logical implications, and live philosophical arguments.",
+    "A source-backed belief consistency checker that separates direct conflicts, conditional implications, and live philosophical arguments.",
   alternates: {
     canonical: "/",
   },
