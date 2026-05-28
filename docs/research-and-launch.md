@@ -95,45 +95,117 @@ the argument map rather than advertising or promising transformation.
 No one can engineer a viral response, and designing for critique and trust is
 more appropriate than promising conversion or a psychological outcome.
 
-## Launch post drafts
+## Launch post drafts — refined 28 May 2026
 
-These are starting points. Re-check each community's rules first; some restrict
-links or AI-assisted content, so reading the room (and possibly messaging mods)
-matters more than the exact wording.
+The previous drafts read as generic launch posts. These rewrites lead with a
+*specific* philosophical observation, demonstrate familiarity with the actual
+debates the target audience cares about, and explicitly invite teardown rather
+than approval. Pick one Reddit and one X variant, don't run multiple at once.
 
-### r/CosmicSkeptic (or r/askphilosophy in self-post form)
+Re-check each community's rules immediately before posting; r/CosmicSkeptic
+public rules currently require relation to CosmicSkeptic, respect, and no
+spam or low-effort posts, and the broader atheism subs restrict
+machine-generated content.
 
-The sub is discussion-first and allergic to advertising, so the post leads with
-the *idea* and asks to be torn apart, not with the product.
+### Reddit — primary post for r/CosmicSkeptic
 
-> **Title:** I built a "belief consistency checker" that flags where your worldview
-> contradicts itself — tell me where the logic is wrong
+The strongest framing here. It earns its place on Alex's sub by landing
+directly on the debates he runs (problem of evil, animal ethics, evidentialism,
+free will), and it asks for correction rather than approval.
+
+> **Title:** Most "your worldview is inconsistent!" arguments smuggle in a bridge premise nobody states. I formalized the six most common ones — tell me where the rules are wrong.
 >
-> **Body:** Quine's idea that beliefs form a web, not a list, has always stuck with
-> me, so I tried to make it concrete. You answer plain statements (God exists,
-> some morality is objective, only consequences matter, etc.) and it shows where
-> the ones you affirmed (a) flatly contradict, (b) logically commit you to
-> something further, or (c) are coherent even though people often call them
-> incompatible. Every result cites the relevant SEP entry.
+> **Body:**
 >
-> Two examples it catches: affirming a perfectly good God *and* that genuinely
-> gratuitous suffering exists is the logical problem of evil; affirming "meaning
-> needs God or a soul" *and* atheism commits you to nihilism about meaning unless
-> you drop one.
+> Watch enough analytical philosophy and a pattern emerges. The accusation
+> *"your view is inconsistent!"* almost always smuggles in an unstated
+> philosophical premise the other side wouldn't grant. Without the premise,
+> the contradiction dissolves; with it, it bites — but it's the premise that
+> should be argued, not waved at.
 >
-> I deliberately kept it a transparent rule set rather than a black box, so the
-> reasoning is inspectable — which means it's also falsifiable. **Where is a rule
-> too strong, too weak, or just wrong?** Link in comments.
-
-### X / Bluesky
-
-Short, concrete, one provocative example, no hype:
-
-> Most "what's your worldview" quizzes just label you. I built one that checks
-> whether the beliefs you pick can actually all be true at once — and shows you
-> the exact contradiction when they can't, with a source for every call.
+> So I wrote a small rule engine that splits *"contradicts itself"* into four
+> kinds, every call citing SEP:
 >
-> Mine came out consistent except one fork about meaning. What about yours?
-> [link]
+> - **Direct conflict** — the two sentences negate under their stated meanings. Eight of them. E.g. *"at least one moral truth is mind-independent"* vs. *"every moral truth depends only on approval."*
+> - **Logical implication** — your affirmations validly entail a further claim, with the bridge stated. E.g. *"no deity"* + *"obligation holds only because God commands it"* ⊢ nothing is obligatory.
+> - **Live argument** — there's a clash *only if* a contested bridge holds, and the bridge is named. Divine hiddenness; causal inefficacy in animal ethics; the consequence argument; evidentialism vs. theism.
+> - **Coherent combination** — theism + moral realism, atheism + moral realism, atheism + objective meaning. Surfaced because people get told these are inconsistent when they aren't.
+>
+> 22 statements, ~5 minutes, every finding cites a Stanford entry, source is open.
+>
+> **Two judgment calls I expect to lose on:**
+>
+> 1. *"Factory-farm meat is permissible"* + *"causing minor harm for convenience is wrong"* — I have it as a **live argument**, not a direct conflict, leaning on the inefficacy objection (McMullen & Halteman 2018). Animal ethicists will say I went too soft.
+> 2. *"Belief requires adequate evidence"* + *"I believe in God"* — also a **live argument**, not a conflict, because reformed epistemology and properly-basic belief are live replies. Atheists will say I went too soft the other way.
+>
+> Where is a rule too strong, too weak, or just wrong? Link in comments per sub rules.
 
-Pair the post with the shareable result badge (counts only) as the image.
+**Why this works:** the title is a thesis, not a pitch; the body demonstrates
+the actual move the engine makes; the two self-disclosed weak spots invite
+the most engaged commenters on both sides to argue, which is how a thread
+sustains itself past hour two.
+
+### Reddit — alternative for r/askphilosophy or r/philosophy (mod-permission required)
+
+Drier, more academic, drops the rhetorical title.
+
+> **Title:** A small rule engine that distinguishes direct conflicts, logical implications, and live philosophical arguments across 22 belief statements — looking for corrections to the rules.
+>
+> **Body:**
+>
+> Twenty-two statements drawn from PhilPapers 2020 topics (God, meta-ethics,
+> meaning of life, mind, free will, animal ethics). The engine reports four
+> kinds of finding and is transparent: every rule names the premises it uses
+> and a SEP entry.
+>
+> I'd like specific corrections rather than general impressions. Particular
+> calls I'm uncertain about:
+>
+> - Foreknowledge + alternative possibilities — classified as a live argument with the standard fatalist bridge, not a conflict, on the grounds that Ockham/Boethian/Molinist replies are live.
+> - The animal-ethics conflict was downgraded to a live argument on the inefficacy objection. Reasonable to push back.
+> - The "atheism + meaning-needs-transcendence" pairing is reported as a *logical implication* (nihilism) rather than a *direct conflict*, with an explicit bridge denying immortal soul.
+>
+> Source is open. Where would you tighten or loosen a rule?
+
+### X / Bluesky — three variants, pick one
+
+All three are tested to fit the X 280-char limit. Pair with the result-badge
+image as the attachment; the dark oxblood diagram reads at thumbnail size.
+
+**Variant A — the surprise-finding hook (recommended).** Story-shape; gives
+the reader a specific claim to argue with.
+
+> I built a worldview-consistency checker thinking the *contradictions* would be the interesting findings.
+>
+> They aren't. The *implications* are.
+>
+> "No deity" + "obligation comes only from God's command" ⊢ nothing is obligatory.
+>
+> People affirm both without noticing. ↓
+
+**Variant B — the bridge-premise hook.** Strongest for a philosophy-Twitter
+audience that already knows the moves.
+
+> Most "your worldview is inconsistent!" arguments smuggle in an unstated bridge premise.
+>
+> Mine names the premise every time.
+>
+> 22 statements. 4 kinds of finding. Every call cites Stanford. Tell me where the rules are wrong. ↓
+
+**Variant C — the Quine epigraph.** For the more literary feed.
+
+> "Our beliefs face the tribunal of experience not individually but as a corporate body." — W. V. Quine
+>
+> Took him literally. A 22-node belief web that lights up the edges where your answers contradict, imply, or live in tension. ↓
+
+### What *not* to post
+
+- "Hey everyone, I built…" / "Check out my new…" — the strongest correlation in subs that block AI-generated posts is the launch-pitch opening.
+- A title that asks a yes/no question ("Is your worldview consistent?"). It reads as a quiz; the audience this targets is allergic to quizzes.
+- The result badge alone on Reddit. Reddit's discussion subs reward a *text post that invites correction*, not an image drop. The image works for X/Bluesky/IG; on Reddit, link in the comments per rules.
+
+### Order of operations
+
+1. r/CosmicSkeptic primary post during US/UK Sunday evening (highest discussion-sub engagement window).
+2. Wait 24 h. If the thread is sustaining itself, post Variant A on X with the badge image attached and link back to the Reddit thread.
+3. If r/philosophy or r/askphilosophy moderators respond positively to a pre-post message, the alternative academic draft goes there next, with a comment linking to the CosmicSkeptic thread for substantive critique already in flight.
