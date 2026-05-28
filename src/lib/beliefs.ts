@@ -50,7 +50,7 @@ export type BeliefId =
   | "minorConvenienceHarmWrong"
   | "factoryFarmPermissible";
 
-export type Answer = "affirm" | "reject" | "unsure";
+export type Answer = "affirm" | "reject" | "unsure" | "qualify";
 
 export interface Source {
   id: SourceId;
@@ -314,7 +314,7 @@ export const beliefStatements: BeliefStatement[] = [
     caseFor:
       "Many conceptions of divine omniscience include complete knowledge of future human actions.",
     caseAgainst:
-      "Open-theist and other accounts restrict or differently interpret knowledge of future free choices.",
+      "Open theism restricts the content of foreknowledge; Boethian and Aquinas-style eternity replies hold that timeless knowledge does not make the future fixed for an agent acting in time; Molinism appeals to counterfactuals of freedom; Ockhamists distinguish hard and soft facts about the past. The 'live argument' below names the bridge premise these replies reject.",
     sourceIds: ["foreknowledge", "freeWill"],
   },
   {
@@ -490,9 +490,9 @@ export const beliefStatements: BeliefStatement[] = [
     clarify:
       "This is the philosophical-zombie possibility claim, not a prediction about actual neuroscience.",
     caseFor:
-      "Conceivability arguments use such a world to challenge physicalist entailment of consciousness.",
+      "Conceivability arguments (Chalmers) use such a world to challenge physicalist entailment of consciousness.",
     caseAgainst:
-      "Physicalists deny that apparent conceivability establishes metaphysical possibility.",
+      "Conceivability is not possibility: a priori imaginability can outrun what is metaphysically possible (Type-B physicalists), and illusionists (Frankish, Dennett) deny we even conceive a coherent zombie. Affirm this only if you mean genuine metaphysical possibility, not merely that the scenario seems imaginable.",
     sourceIds: ["physicalism", "dualism"],
   },
   {

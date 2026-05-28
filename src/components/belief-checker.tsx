@@ -25,10 +25,15 @@ import {
   beliefWebDiagramNodes,
 } from "./belief-web-diagram";
 
-const choices: Array<{ id: Answer; label: string }> = [
-  { id: "affirm", label: "I believe this" },
-  { id: "reject", label: "I do not believe this" },
-  { id: "unsure", label: "Not sure" },
+const choices: Array<{ id: Answer; label: string; hint: string }> = [
+  { id: "affirm", label: "I believe this", hint: "Affirm as worded." },
+  { id: "reject", label: "I do not believe this", hint: "Deny as worded." },
+  { id: "unsure", label: "Not sure", hint: "No settled view." },
+  {
+    id: "qualify",
+    label: "Need to qualify",
+    hint: "I have a view but the binary as stated doesn't capture it.",
+  },
 ];
 
 const findingLabels: Record<FindingKind, string> = {
@@ -330,7 +335,7 @@ function StatementCard({
         Precisely: {statement.prompt}
       </p>
 
-      <div className="mt-5 grid gap-2 sm:grid-cols-3">
+      <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {choices.map((choice) => {
           const selected = answer === choice.id;
           const baseLabel =
@@ -340,12 +345,31 @@ function StatementCard({
               ? "border-mark bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-mark)]"
               : choice.id === "reject"
                 ? "border-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-ink)]"
-                : "border-amber-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-amber-ink)]";
+                : choice.id === "unsure"
+                  ? "border-amber-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-amber-ink)]"
+                  : "border-indigo-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-indigo-ink)]";
           const idleClasses =
             "text-muted hover:border-ink hover:text-ink";
+          const idleGlyph =
+            choice.id === "affirm"
+              ? "+"
+              : choice.id === "reject"
+                ? "–"
+                : choice.id === "unsure"
+                  ? "?"
+                  : "±";
+          const selectedGlyphColor =
+            choice.id === "affirm"
+              ? "text-mark"
+              : choice.id === "reject"
+                ? "text-ink"
+                : choice.id === "unsure"
+                  ? "text-amber-ink"
+                  : "text-indigo-ink";
           return (
             <label
               key={choice.id}
+              title={choice.hint}
               className={`${baseLabel} ${selected ? selectedClasses : idleClasses}`}
             >
               <input
@@ -360,16 +384,10 @@ function StatementCard({
               <span
                 aria-hidden="true"
                 className={`font-mono text-[0.78rem] tracking-[0.12em] ${
-                  selected
-                    ? choice.id === "affirm"
-                      ? "text-mark"
-                      : choice.id === "reject"
-                        ? "text-ink"
-                        : "text-amber-ink"
-                    : "text-muted/60"
+                  selected ? selectedGlyphColor : "text-muted/60"
                 }`}
               >
-                {selected ? "✓" : choice.id === "affirm" ? "+" : choice.id === "reject" ? "–" : "?"}
+                {selected ? "✓" : idleGlyph}
               </span>
               <span className="font-serif">{choice.label}</span>
             </label>
@@ -496,6 +514,9 @@ export function BeliefChecker() {
 
   const answeredCount = Object.keys(answers).length;
   const unansweredCount = beliefStatements.length - answeredCount;
+  const qualifiedCount = Object.values(answers).filter(
+    (a) => a === "qualify",
+  ).length;
   const findings = useMemo(() => evaluateBeliefs(answers), [answers]);
   const affirmed = useMemo(() => affirmedBeliefs(answers), [answers]);
   const activeTopic = categories[topicIndex];
@@ -705,9 +726,14 @@ export function BeliefChecker() {
   }
 
   async function copyPrivateSummary() {
+    const qualifiedNote =
+      qualifiedCount > 0
+        ? `${qualifiedCount} were flagged as needing qualification. `
+        : "";
     const summary =
       `${BRAND} reflection: I answered ${answeredCount} statements; ` +
       `${unansweredCount} unanswered statements were treated as not sure. ` +
+      qualifiedNote +
       `It identified ${conflictCount} direct conflict(s), ${implicationCount} logical implication(s), ` +
       `${argumentCount} live argument(s), and ${compatibleCount} coherent combination(s). ` +
       `It is a discussion prompt, not a verdict. ${siteOrigin}`;
@@ -925,9 +951,12 @@ export function BeliefChecker() {
                 Checked {affirmed.length} belief
                 {affirmed.length === 1 ? "" : "s"} you selected as true. This
                 check treats {unansweredCount} unselected statement
-                {unansweredCount === 1 ? "" : "s"} as Not sure. Results report
-                relationships in the rule set; they do not prove your complete
-                worldview coherent or incoherent.
+                {unansweredCount === 1 ? "" : "s"} as Not sure
+                {qualifiedCount > 0
+                  ? `, and ignores ${qualifiedCount} you flagged as needing qualification`
+                  : ""}
+                . Results report relationships in the rule set; they do not
+                prove your complete worldview coherent or incoherent.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-left sm:max-w-xs">

@@ -237,6 +237,8 @@ const rules: Finding[] = [
     requires: ["noDeity", "divineCommandOnly"],
     explanation:
       "Two of your answers point the same way: if every moral obligation holds solely because God commands it, and no God exists to issue commands, then nothing is obligatory. This is a fork, not a sentence. Many who notice it keep their morality by loosening the first premise — holding that some duties (against cruelty, say) hold on grounds that do not depend on a divine command at all.",
+    bridge:
+      "'Solely because God commands it' is read constitutively — commands make obligations exist, rather than merely reveal them. On a weaker, purely epistemic reading (commands tell us what is already obligatory), the inference does not run.",
     nextQuestion:
       "Which do you hold more firmly — that obligation comes only from God's command, or that at least some things are genuinely owed regardless?",
     sourceIds: ["voluntarism", "moralAntiRealism", "atheism"],
