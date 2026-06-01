@@ -15,6 +15,7 @@ const methods = [
   {
     name: "Direct conflict",
     mark: "⊥",
+    plain: "As worded, both claims can't be true at once.",
     example:
       "Affirming both that at least one moral fact is independent of approval and that every moral truth depends only on approval.",
     standard:
@@ -23,6 +24,8 @@ const methods = [
   {
     name: "Conditional implication",
     mark: "⊢",
+    plain:
+      "Each claim is fine alone; together, with one added premise, they entail a further conclusion.",
     example:
       "Affirming both that no deity exists and that every moral obligation is true solely because God commands it — which together entail that nothing is obligatory.",
     standard:
@@ -31,6 +34,8 @@ const methods = [
   {
     name: "Live argument",
     mark: "‡",
+    plain:
+      "No outright clash — the two beliefs sit in real tension, and the step that connects them is one people genuinely argue over.",
     example:
       "Affirming both a perfectly loving personal God and nonresistant nonbelief.",
     standard:
@@ -39,6 +44,8 @@ const methods = [
   {
     name: "Coherent combination",
     mark: "≈",
+    plain:
+      "Often called incompatible in debate, yet a recognized position holds them together.",
     example:
       "Affirming both atheism and objective meaning through finite worthwhile activity.",
     standard:
@@ -143,6 +150,9 @@ export default function MethodPage() {
                   <h3 className="font-serif text-[1.2rem] font-medium tracking-tight text-ink">
                     {method.name}
                   </h3>
+                  <p className="mt-2 font-serif text-[1.02rem] leading-7 text-ink">
+                    {method.plain}
+                  </p>
                   <p className="mt-2 font-serif text-[0.97rem] leading-7 text-ink-soft">
                     <span className="font-sans text-[0.7rem] uppercase tracking-[0.16em] text-muted">
                       example —
@@ -278,8 +288,9 @@ export default function MethodPage() {
             .
           </p>
           <p className="mt-3 font-serif text-[1rem] leading-7 text-ink-soft">
-            Results are invitations to revisit reasons, never judgments of
-            intelligence, character, or identity.
+            A result just sends you back to the reasons behind a belief. It
+            says nothing about your intelligence, your character, or who you
+            are.
           </p>
         </section>
       </div>

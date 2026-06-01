@@ -5,6 +5,8 @@ import { BeliefChecker } from "./belief-checker";
 
 const perfectGod =
   "A personal God exists who is omniscient, omnipotent, perfectly good, and perfectly loving.";
+const moralFacts =
+  "At least some moral facts are true regardless of what any person or society approves.";
 const gratuitousSuffering =
   "Some suffering exists that no omniscient, omnipotent, perfectly good being could have morally sufficient reason to permit.";
 const noDeity = "No god or deity exists.";
@@ -30,6 +32,11 @@ describe("BeliefChecker", () => {
   it("records visible radio selections and displays a direct conflict", async () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);
+
+    // God topics no longer lead; open that topic before answering them.
+    await user.click(
+      screen.getByRole("button", { name: "God and evidence. 0 of 6 answered." }),
+    );
 
     const godChoice = screen.getByRole("radio", {
       name: `I believe this: ${perfectGod}`,
@@ -64,27 +71,27 @@ describe("BeliefChecker", () => {
 
     await user.click(
       screen.getByRole("radio", {
-        name: `I believe this: ${perfectGod}`,
+        name: `I believe this: ${moralFacts}`,
       }),
     );
     await user.click(
       screen.getByRole("button", {
-        name: "Next topic: Morality and meaning (optional)",
+        name: "Next topic: Freedom and responsibility (optional)",
       }),
     );
 
     expect(
-      screen.getByRole("heading", { name: "Morality and meaning" }),
+      screen.getByRole("heading", { name: "Freedom and responsibility" }),
     ).toBeDefined();
 
     await user.click(
       screen.getByRole("button", {
-        name: "God and evidence. 1 of 6 answered.",
+        name: "Morality and meaning. 1 of 6 answered.",
       }),
     );
 
     const restoredChoice = screen.getByRole("radio", {
-      name: `I believe this: ${perfectGod}`,
+      name: `I believe this: ${moralFacts}`,
     }) as HTMLInputElement;
     expect(restoredChoice.checked).toBe(true);
   });
@@ -113,6 +120,10 @@ describe("BeliefChecker", () => {
   it("explains deity-dependent statements after atheism and ignores qualified hypotheticals", async () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);
+
+    await user.click(
+      screen.getByRole("button", { name: "God and evidence. 0 of 6 answered." }),
+    );
 
     await user.click(
       screen.getByRole("radio", {

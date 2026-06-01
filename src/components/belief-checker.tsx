@@ -46,6 +46,19 @@ const choices: Array<{ id: Answer; label: string; hint: string }> = [
   },
 ];
 
+// One plain line per kind, so the label is legible before the full
+// explanation. Wording mirrors the contradiction-vs-tension guide.
+// findingLabels/findingMarks/findingAccents now live in @/lib/findings
+// (shared with the compare view); findingGlosses stays local — it's only
+// used in this file's FindingCard.
+const findingGlosses: Record<FindingKind, string> = {
+  conflict: "As worded, both can't be true at once.",
+  implication: "Together, with one added premise, they entail a further conclusion.",
+  argument:
+    "No outright clash — but they're in real tension, and the step connecting them is one people still argue over.",
+  compatible: "Often called incompatible, yet a recognized view holds them together.",
+};
+
 const BRAND = "Web of Belief";
 
 const deityDependentStatementIds = new Set<BeliefId>([
@@ -481,6 +494,9 @@ function FindingCard({ finding }: { finding: Finding }) {
           {finding.title}
         </h4>
       </div>
+      <p className="mt-2 font-serif text-[0.9rem] italic leading-6 text-muted">
+        {findingGlosses[finding.kind]}
+      </p>
       <p className="mt-4 font-serif text-[1rem] leading-7 text-ink-soft">
         {finding.explanation}
       </p>
@@ -795,7 +811,7 @@ export function BeliefChecker() {
   async function copyPrivateSummary() {
     const qualifiedNote =
       qualifiedCount > 0
-        ? `${qualifiedCount} were flagged as needing qualification. `
+        ? `${qualifiedCount} were marked conditional and set aside. `
         : "";
     const summary =
       `${BRAND} reflection: I answered ${answeredCount} statements; ` +
@@ -1032,7 +1048,7 @@ export function BeliefChecker() {
                 check treats {unansweredCount} unselected statement
                 {unansweredCount === 1 ? "" : "s"} as Not sure
                 {qualifiedCount > 0
-                  ? `, and ignores ${qualifiedCount} you flagged as needing qualification`
+                  ? `, and sets aside ${qualifiedCount} you marked conditional`
                   : ""}
                 . Results report relationships in the rule set; they do not
                 prove your complete worldview coherent or incoherent.
@@ -1068,12 +1084,14 @@ export function BeliefChecker() {
                 how to read this
               </span>
               <br />
-              This is a mirror, not a judge. Every result below is a fork, not a
-              verdict: where two commitments pull apart, you can revise,
-              qualify, or defend the bridge between them. Nothing here tells
-              you the right answer — and consistency is a floor, not proof that
-              a belief is true. The point is the examined life: to see your
-              commitments clearly and hold them on purpose.
+              Nothing here is a verdict on you. Each result just points to a
+              place where two of your beliefs pull against each other — and what
+              to do there is your call: drop one, add a condition, or make the
+              case for the premise that joins them. Being consistent won&apos;t
+              make a belief true; plenty of tidy worldviews are wrong. It only
+              means your beliefs aren&apos;t quietly working against each other.
+              The aim is to see what you actually believe, and choose it on
+              purpose.
             </p>
           ) : null}
 

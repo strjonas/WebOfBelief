@@ -137,8 +137,8 @@ export default function Home() {
             <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
               A small, inspectable rule engine. Every &ldquo;contradiction&rdquo;
               it reports cites a specific pair of statements you affirmed and a
-              specific source. It is not an AI judging you; it is a mirror you
-              can argue with.
+              specific source. There&apos;s no AI sizing you up here — just a
+              mirror you can argue with.
             </p>
             <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
               Only statements you affirm become premises. Rejections,

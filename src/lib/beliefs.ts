@@ -215,12 +215,6 @@ export const sources: Record<SourceId, Source> = {
 
 export const categories: BeliefCategory[] = [
   {
-    id: "religion",
-    name: "God and evidence",
-    description:
-      "Theism, atheism, suffering, hiddenness, foreknowledge, and evidence.",
-  },
-  {
     id: "value",
     name: "Morality and meaning",
     description: "Objective value, moral grounding, and meaningful lives.",
@@ -234,6 +228,12 @@ export const categories: BeliefCategory[] = [
     id: "mind",
     name: "Mind and consciousness",
     description: "Physical completeness and subjective experience.",
+  },
+  {
+    id: "religion",
+    name: "God and evidence",
+    description:
+      "Theism, atheism, suffering, hiddenness, foreknowledge, and evidence.",
   },
   {
     id: "practice",

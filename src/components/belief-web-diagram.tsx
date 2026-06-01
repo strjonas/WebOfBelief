@@ -85,11 +85,11 @@ const edges: Edge[] = [
 ];
 
 const clusterLabels: ClusterLabel[] = [
-  { text: "i. god & evidence", x: 16, y: 18, anchor: "start" },
-  { text: "ii. morality & meaning", x: 464, y: 18, anchor: "end" },
-  { text: "iii. freedom", x: 16, y: 350, anchor: "start" },
-  { text: "iv. mind", x: 320, y: 350, anchor: "start" },
-  { text: "v. right action", x: 464, y: 350, anchor: "end" },
+  { text: "god & evidence", x: 16, y: 18, anchor: "start" },
+  { text: "morality & meaning", x: 464, y: 18, anchor: "end" },
+  { text: "freedom", x: 16, y: 350, anchor: "start" },
+  { text: "mind", x: 320, y: 350, anchor: "start" },
+  { text: "right action", x: 464, y: 350, anchor: "end" },
 ];
 
 // Pure colors (no Tailwind variables) so the SVG can be inlined without
