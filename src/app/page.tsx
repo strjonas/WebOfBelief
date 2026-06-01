@@ -29,33 +29,30 @@ export default function Home() {
                 </span>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-[1.6] text-ink-soft">
-                Answer plain statements about God, morality, meaning, freedom,
-                mind, and right action. The check shows where the beliefs you
-                hold (a) flatly contradict, (b) may commit you to a further
-                conclusion under an exposed premise, (c) live in real
-                philosophical tension, or (d) fit together despite a common
-                false alarm. Every result cites the Stanford Encyclopedia of
-                Philosophy entry behind the call.
+                Answer plain statements about God, morality, freedom, and mind.
+                The check shows where your beliefs flatly clash, where one
+                quietly commits you to another (a conditional implication), and
+                where they hold together. Every result cites the Stanford
+                Encyclopedia of Philosophy entry behind the call.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-baseline gap-x-8 gap-y-4">
-              <BeginCheckLink className="group inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink">
-                <span className="font-mono text-[0.78rem] tracking-[0.18em] text-mark">
-                  §1
-                </span>
+            <div className="flex flex-col gap-5">
+              <BeginCheckLink className="group inline-flex w-fit items-center gap-3 border border-ink bg-ink px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark">
                 Begin the check
                 <span className="transition group-hover:translate-x-1">→</span>
               </BeginCheckLink>
-              <Link
-                href="/method"
-                className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-              >
-                How the engine reasons
-              </Link>
-              <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-                22 statements &middot; ~5 min &middot; no login
-              </span>
+              <div className="flex flex-wrap items-baseline gap-x-6 gap-y-3">
+                <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+                  22 statements &middot; ~5 min &middot; no login
+                </span>
+                <Link
+                  href="/method"
+                  className="font-sans text-[0.72rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+                >
+                  How the engine reasons
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -64,7 +61,7 @@ export default function Home() {
               <figcaption className="mb-3 flex items-baseline justify-between font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
                 <span>
                   <span className="font-mono text-mark">fig. 1</span>{" "}
-                  &middot; the engine&apos;s rule-graph
+                  &middot; the rule-graph — the map of checks it runs
                 </span>
                 <span>22 nodes / 20 edges</span>
               </figcaption>
@@ -133,27 +130,45 @@ export default function Home() {
             <span className="section-mark" />
             what this is
           </p>
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="max-w-3xl">
             <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
-              A small, inspectable rule engine. Every &ldquo;contradiction&rdquo;
-              it reports cites a specific pair of statements you affirmed and a
-              specific source. There&apos;s no AI sizing you up here — just a
-              mirror you can argue with.
+              A small, inspectable rule engine. Every
+              &ldquo;contradiction&rdquo; it reports cites a specific pair of
+              statements you affirmed and a specific source — there&apos;s no AI
+              sizing you up here, just a mirror you can argue with.
             </p>
-            <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
-              Only statements you affirm become premises. Rejections,
-              uncertainty, and qualifications are not treated as hidden
-              opposite beliefs. Consistency is a <em>floor</em>, not proof: the
-              point is to see your commitments clearly and hold them on
-              purpose.
-            </p>
-            <p className="font-serif text-[0.92rem] italic leading-6 text-muted sm:col-span-2">
-              The name borrows W.&nbsp;V.&nbsp;Quine and J.&nbsp;S.&nbsp;Ullian&apos;s
-              metaphor (<em>The Web of Belief</em>, 1970): no belief stands
-              alone. The engine itself is not Quinean holism — just a small set
-              of explicit rules, each one a recognised move in the contemporary
-              literature.
-            </p>
+
+            <details className="group mt-5 border-t border-rule-soft pt-4">
+              <summary className="cursor-pointer list-none font-sans text-[0.78rem] uppercase tracking-[0.18em] text-mark marker:hidden">
+                <span className="group-open:hidden">
+                  ↳ what this is, and what it isn&apos;t
+                </span>
+                <span className="hidden group-open:inline">↑ hide</span>
+              </summary>
+              <p className="mt-4 font-serif text-[1.05rem] leading-7 text-ink-soft">
+                Only statements you affirm become premises (the starting points
+                the check reasons from). Rejections, uncertainty, and
+                qualifications are not treated as hidden opposite beliefs.
+                Consistency is a <em>floor</em>, not proof: the point is to see
+                your commitments clearly and hold them on purpose.
+              </p>
+            </details>
+
+            <details className="group mt-4 border-t border-rule-soft pt-4">
+              <summary className="cursor-pointer list-none font-sans text-[0.78rem] uppercase tracking-[0.18em] text-mark marker:hidden">
+                <span className="group-open:hidden">
+                  ↳ the name &amp; the Quine reference
+                </span>
+                <span className="hidden group-open:inline">↑ hide</span>
+              </summary>
+              <p className="mt-4 font-serif text-[0.92rem] italic leading-6 text-muted">
+                The name borrows W.&nbsp;V.&nbsp;Quine and
+                J.&nbsp;S.&nbsp;Ullian&apos;s metaphor (<em>The Web of Belief</em>,
+                1970): no belief stands alone. The engine itself is not Quinean
+                holism — just a small set of explicit rules, each one a
+                recognised move in the contemporary literature.
+              </p>
+            </details>
           </div>
         </div>
       </section>

@@ -61,6 +61,50 @@ const findingGlosses: Record<FindingKind, string> = {
 
 const BRAND = "Web of Belief";
 
+// Persist in-progress answers on the visitor's own device so an accidental
+// reload doesn't wipe their work. Versioned so a future schema change can be
+// ignored safely. Cleared only on "Start over" (see resetCheck). Nothing here
+// is ever sent to a server — this is purely local convenience.
+const STORAGE_KEY = "wob:state:v1";
+
+const validAnswers = new Set<Answer>(choices.map((choice) => choice.id));
+
+interface PersistedState {
+  answers: AnswerMap;
+  topicIndex: number;
+  showResults: boolean;
+}
+
+function loadPersistedState(): PersistedState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<PersistedState>;
+    const answers: AnswerMap = {};
+    if (parsed.answers && typeof parsed.answers === "object") {
+      for (const [id, value] of Object.entries(parsed.answers)) {
+        // Only restore known statement ids with valid answer values.
+        if (id in statementById && validAnswers.has(value as Answer)) {
+          answers[id as BeliefId] = value as Answer;
+        }
+      }
+    }
+    const maxTopic = categories.length - 1;
+    const topicIndex =
+      typeof parsed.topicIndex === "number"
+        ? Math.min(Math.max(0, Math.trunc(parsed.topicIndex)), maxTopic)
+        : 0;
+    return {
+      answers,
+      topicIndex,
+      showResults: parsed.showResults === true,
+    };
+  } catch {
+    return null;
+  }
+}
+
 const deityDependentStatementIds = new Set<BeliefId>([
   "perfectGod",
   "infallibleForeknowledge",
@@ -549,6 +593,34 @@ export function BeliefChecker() {
   const [topicIndex, setTopicIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [copyNotice, setCopyNotice] = useState("");
+  const [hydrated, setHydrated] = useState(false);
+
+  // Restore saved progress once, after mount. Running in an effect (not during
+  // render) keeps the server and first client render identical, so there's no
+  // hydration mismatch.
+  useEffect(() => {
+    const saved = loadPersistedState();
+    if (saved) {
+      setAnswers(saved.answers);
+      setTopicIndex(saved.topicIndex);
+      setShowResults(saved.showResults);
+    }
+    setHydrated(true);
+  }, []);
+
+  // Persist on change — but only after the restore above has run, so the
+  // initial empty state never overwrites saved answers.
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ answers, topicIndex, showResults }),
+      );
+    } catch {
+      // Private mode / quota exceeded — never break the app.
+    }
+  }, [hydrated, answers, topicIndex, showResults]);
 
   const answeredCount = Object.keys(answers).length;
   const unansweredCount = beliefStatements.length - answeredCount;
@@ -802,6 +874,11 @@ export function BeliefChecker() {
 
   function resetCheck() {
     trackEvent({ name: "check_reset" });
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Ignore — clearing in-memory state below is what matters.
+    }
     setAnswers({});
     setTopicIndex(0);
     setShowResults(false);
@@ -856,13 +933,24 @@ export function BeliefChecker() {
             unselected answers count as Not sure when you check. Your responses
             never leave the browser.
           </p>
-          <p className="mt-3 max-w-2xl font-serif text-[0.98rem] italic leading-7 text-muted">
-            Only &ldquo;I believe this&rdquo; is used as a premise. Rejecting,
-            being unsure, or marking a sentence as conditional/qualified is
-            never treated as belief in its opposite. If a claim is only
-            hypothetical for you (&ldquo;if God existed...&rdquo;), do not affirm it as
-            an actual belief.
+          <p className="mt-3 font-sans text-[0.7rem] uppercase tracking-[0.16em] text-muted">
+            <span className="section-mark" />
+            Saved on this device — a refresh won&apos;t lose your answers.
+            &ldquo;Start over&rdquo; clears them.
           </p>
+          <details className="group mt-4 max-w-2xl border-t border-rule-soft pt-3">
+            <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
+              <span className="group-open:hidden">↳ how answers are counted</span>
+              <span className="hidden group-open:inline">↑ hide</span>
+            </summary>
+            <p className="mt-3 font-serif text-[0.98rem] italic leading-7 text-muted">
+              Only &ldquo;I believe this&rdquo; is used as a premise (a starting
+              point the check reasons from). Rejecting, being unsure, or marking
+              a sentence as conditional/qualified is never treated as belief in
+              its opposite. If a claim is only hypothetical for you (&ldquo;if
+              God existed...&rdquo;), do not affirm it as an actual belief.
+            </p>
+          </details>
         </div>
         <div className="w-full max-w-sm border-l-2 border-mark pl-5">
           <div className="flex items-baseline justify-between font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
@@ -1222,7 +1310,7 @@ export function BeliefChecker() {
                 <span className="section-mark" />3 &middot; share
               </p>
               <h4 className="mt-3 font-serif text-2xl font-medium leading-tight tracking-tight text-ink">
-                A shareable broadside — counts &amp; structure only.
+                A shareable card — counts &amp; structure only.
               </h4>
               <p className="mt-3 max-w-xl font-serif text-[1rem] leading-7 text-ink-soft">
                 The image shows your finding counts and the shape of your

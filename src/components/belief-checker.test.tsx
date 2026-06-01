@@ -26,6 +26,9 @@ beforeAll(() => {
 
 afterEach(() => {
   cleanup();
+  // The checker now persists progress to localStorage; clear it so each test
+  // starts from a fresh, empty state.
+  window.localStorage.clear();
 });
 
 describe("BeliefChecker", () => {

@@ -40,17 +40,23 @@ export default function PrivacyPage() {
         <h2>Your answers stay in your browser</h2>
         <p>
           The belief check runs entirely on your device. The statements you mark
-          as believed, rejected, unsure, or qualified are held in your
-          browser&apos;s memory for the current page only. They are{" "}
+          as believed, rejected, unsure, or qualified are saved in your
+          browser&apos;s local storage, on your own device, so an accidental
+          reload doesn&apos;t lose your progress. They are{" "}
           <strong>never sent to any server</strong>, never stored remotely, and
-          never associated with you. Reload the page and they are gone.
+          never associated with you. They stay only until you press{" "}
+          <strong>&ldquo;Start over&rdquo;</strong> (which deletes them), or
+          until you clear your browser&apos;s site data.
         </p>
 
         <h2>No cookies, no accounts, no fingerprinting</h2>
         <p>
           Web of Belief sets no cookies, requires no login, and does not
-          fingerprint your device or browser. Because nothing identifying is
-          stored, there is no consent banner to dismiss.
+          fingerprint your device or browser. The only thing kept on your device
+          is the local storage entry described above — your own in-progress
+          answers, held purely for your convenience. It is never read by a
+          server, never shared, and is not a tracking identifier. Because
+          nothing identifying is stored, there is no consent banner to dismiss.
         </p>
 
         <h2>What analytics we collect</h2>
