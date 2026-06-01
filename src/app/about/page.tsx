@@ -6,6 +6,7 @@ import {
   contactEmail,
   githubUrl,
   linkedInUrl,
+  twitterUrl,
   operator,
   siteName,
   siteUrl,
@@ -40,7 +41,7 @@ export default function AboutPage() {
           name: siteName,
           url: siteUrl.toString(),
           founder: { "@type": "Person", name: operator.name },
-          sameAs: [githubUrl, linkedInUrl],
+          sameAs: [githubUrl, linkedInUrl, twitterUrl],
         }}
       />
       <Prose>
@@ -86,6 +87,11 @@ export default function AboutPage() {
           <li>
             <a href={linkedInUrl} target="_blank" rel="noreferrer">
               LinkedIn
+            </a>
+          </li>
+          <li>
+            <a href={twitterUrl} target="_blank" rel="noreferrer">
+              X / Twitter
             </a>
           </li>
           <li>

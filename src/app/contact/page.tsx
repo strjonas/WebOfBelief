@@ -6,6 +6,7 @@ import {
   feedbackMailto,
   githubUrl,
   linkedInUrl,
+  twitterUrl,
 } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -27,6 +28,13 @@ const channels = [
     value: "Connect on LinkedIn",
     href: linkedInUrl,
     note: "Happy to connect — say where you found Web of Belief.",
+    external: true,
+  },
+  {
+    label: "X / Twitter",
+    value: "@StrabelJonas",
+    href: twitterUrl,
+    note: "Occasional thoughts on belief, philosophy, and the project.",
     external: true,
   },
   {

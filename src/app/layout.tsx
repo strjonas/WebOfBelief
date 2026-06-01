@@ -9,6 +9,7 @@ import {
   feedbackMailto,
   githubUrl,
   linkedInUrl,
+  twitterUrl,
   siteName,
   siteUrl,
 } from "@/lib/site";
@@ -220,6 +221,16 @@ export default function RootLayout({
                       rel="noreferrer"
                     >
                       LinkedIn
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="transition hover:text-mark"
+                      href={twitterUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      X / Twitter
                     </a>
                   </li>
                   <li>

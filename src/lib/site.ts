@@ -25,12 +25,9 @@ export const feedbackMailto = `mailto:${contactEmail}?subject=${encodeURICompone
 /** Public GitHub repository. */
 export const githubUrl = "https://github.com/strjonas/consistent";
 
-/**
- * TODO(jonas): replace with your public LinkedIn *profile* URL, e.g.
- * https://www.linkedin.com/in/your-name. The value below is your logged-in
- * home feed and is not useful to visitors.
- */
 export const linkedInUrl = "https://www.linkedin.com/in/jonas-strabel/";
+
+export const twitterUrl = "https://x.com/StrabelJonas";
 
 /**
  * Operator details for the German Impressum (§ 5 DDG / § 18 MStV) and the
