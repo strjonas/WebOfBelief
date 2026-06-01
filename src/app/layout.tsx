@@ -145,7 +145,10 @@ export default function RootLayout({
                     </Link>
                   </li>
                   <li>
-                    <Link className="transition hover:text-mark" href="/compare">
+                    <Link
+                      className="transition hover:text-mark"
+                      href="/compare"
+                    >
                       Compare
                     </Link>
                   </li>
@@ -168,7 +171,10 @@ export default function RootLayout({
                 </p>
                 <ul className="mt-4 space-y-2.5 font-sans text-[0.82rem] text-ink-soft">
                   <li>
-                    <Link className="transition hover:text-mark" href="/privacy">
+                    <Link
+                      className="transition hover:text-mark"
+                      href="/privacy"
+                    >
                       Privacy
                     </Link>
                   </li>
@@ -204,14 +210,12 @@ export default function RootLayout({
                 </p>
                 <ul className="mt-4 space-y-2.5 font-sans text-[0.82rem] text-ink-soft">
                   <li>
-                    <Link className="transition hover:text-mark" href="/contact">
+                    <Link
+                      className="transition hover:text-mark"
+                      href="/contact"
+                    >
                       Contact
                     </Link>
-                  </li>
-                  <li>
-                    <a className="transition hover:text-mark" href={feedbackMailto}>
-                      Send feedback
-                    </a>
                   </li>
                   <li>
                     <a
