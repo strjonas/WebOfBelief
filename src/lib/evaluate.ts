@@ -12,7 +12,17 @@ export interface Finding {
   id: string;
   kind: FindingKind;
   title: string;
+  /** Beliefs that must all be affirmed for the finding to fire. */
   requires: BeliefId[];
+  /**
+   * Beliefs that must all be *explicitly rejected* (answer === "reject", not
+   * merely unaffirmed) for the finding to fire. Used only for hand-vetted
+   * rules where every reading of the denial still yields the tension — never
+   * as a blanket "treat rejection as the opposite" rule. "Unsure" and
+   * "qualify" never satisfy this: suspension and conditional readings are not
+   * commitments to the negation.
+   */
+  rejects?: BeliefId[];
   explanation: string;
   bridge?: string;
   nextQuestion: string;
@@ -150,6 +160,20 @@ const rules: Finding[] = [
     sourceIds: ["compatibilism", "freeWill"],
   },
   {
+    id: "determinism-and-responsibility-skepticism",
+    kind: "implication",
+    title: "A fork in the road about responsibility",
+    requires: ["determinism"],
+    rejects: ["responsibilityWithoutAlternatives"],
+    explanation:
+      "Two of your answers point the same way. You affirm that the past and the laws of nature fix a single possible future, and — by rejecting the previous statement — you hold that a person cannot be morally responsible without an alternative open to them. Put together, those say no one is ever morally responsible for anything. This is a fork, not a verdict on you, and almost everyone who reaches it keeps responsibility by revising a premise rather than abandoning it. Compatibilists drop the demand for alternative possibilities and locate responsibility in acting from one's own reasons, character, and capacity to respond to them; libertarians instead deny that the future is fixed in this way. Hard incompatibilism — accepting that no one is ever responsible — is a coherent position some philosophers defend, but it is the least-taken exit and the hardest to square with how we actually live, blame, and forgive.",
+    bridge:
+      "Moral responsibility requires the ability to do otherwise — the very alternative that a fixed future rules out. Compatibilists reject exactly this bridge.",
+    nextQuestion:
+      "Which do you actually hold more firmly: that the future is genuinely fixed, or that responsibility truly requires alternatives? Loosening either premise keeps responsibility intact — which one is the load-bearing belief for you?",
+    sourceIds: ["compatibilism", "freeWill"],
+  },
+  {
     id: "moral-grounding",
     kind: "compatible",
     title: "God and objective morality",
@@ -267,10 +291,22 @@ const kindOrder: Record<FindingKind, number> = {
 
 export function evaluateBeliefs(answers: AnswerMap): Finding[] {
   return rules
-    .filter((rule) =>
-      rule.requires.every((beliefId) => answers[beliefId] === "affirm"),
+    .filter(
+      (rule) =>
+        rule.requires.every((beliefId) => answers[beliefId] === "affirm") &&
+        (rule.rejects ?? []).every(
+          (beliefId) => answers[beliefId] === "reject",
+        ),
     )
     .sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind]);
+}
+
+/**
+ * Every belief a finding touches, affirmed and rejected alike — used to draw
+ * the triggered edge on the web and to list the statements at issue.
+ */
+export function findingBeliefs(finding: Finding): BeliefId[] {
+  return [...finding.requires, ...(finding.rejects ?? [])];
 }
 
 export function affirmedBeliefs(answers: AnswerMap): BeliefId[] {

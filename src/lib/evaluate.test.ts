@@ -138,6 +138,53 @@ describe("evaluateBeliefs", () => {
     ]);
   });
 
+  it("surfaces the responsibility-skepticism fork from determinism plus a denied responsibility-without-alternatives", () => {
+    const results = evaluateBeliefs({
+      determinism: "affirm",
+      responsibilityWithoutAlternatives: "reject",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "determinism-and-responsibility-skepticism",
+        kind: "implication",
+        bridge: expect.any(String),
+      }),
+    ]);
+  });
+
+  it("does not fire the responsibility fork when the denial is merely suspension or silence", () => {
+    const unsure = evaluateBeliefs({
+      determinism: "affirm",
+      responsibilityWithoutAlternatives: "unsure",
+    });
+    const blank = evaluateBeliefs({ determinism: "affirm" });
+    const qualified = evaluateBeliefs({
+      determinism: "affirm",
+      responsibilityWithoutAlternatives: "qualify",
+    });
+
+    for (const results of [unsure, blank, qualified]) {
+      expect(
+        results.some(
+          (r) => r.id === "determinism-and-responsibility-skepticism",
+        ),
+      ).toBe(false);
+    }
+  });
+
+  it("treats determinism plus affirmed responsibility as the compatibilist argument, not the skeptical fork", () => {
+    const results = evaluateBeliefs({
+      determinism: "affirm",
+      responsibilityWithoutAlternatives: "affirm",
+    });
+
+    expect(results.map((r) => r.id)).toContain("responsibility-and-determinism");
+    expect(results.map((r) => r.id)).not.toContain(
+      "determinism-and-responsibility-skepticism",
+    );
+  });
+
   it("orders findings with conflicts before softer relationships", () => {
     const results = evaluateBeliefs({
       consequencesOnly: "affirm",

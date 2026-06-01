@@ -6,7 +6,6 @@ import { SiteHeader } from "@/components/site-header";
 import { JsonLd } from "@/components/json-ld";
 import {
   contactEmail,
-  feedbackMailto,
   githubUrl,
   linkedInUrl,
   twitterUrl,
@@ -147,9 +146,17 @@ export default function RootLayout({
                   <li>
                     <Link
                       className="transition hover:text-mark"
+                      href="/compare-beliefs"
+                    >
+                      Compare with a friend
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className="transition hover:text-mark"
                       href="/compare"
                     >
-                      Compare
+                      Compare to other tools
                     </Link>
                   </li>
                   <li>

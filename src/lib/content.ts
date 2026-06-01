@@ -78,6 +78,15 @@ export const corePages: ContentEntry[] = [
     lastModified: REVISED,
   },
   {
+    path: "/compare-beliefs",
+    title: "Compare belief webs with a friend",
+    description:
+      "Open a friend's belief web and see exactly where yours pulls apart from theirs — and the premise on each fault line. Privacy-clean: answers ride in the link, never a server.",
+    changeFrequency: "monthly",
+    priority: 0.7,
+    lastModified: REVISED,
+  },
+  {
     path: "/guides",
     title: "Guides",
     description:

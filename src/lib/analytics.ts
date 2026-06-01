@@ -16,7 +16,10 @@ export type FunnelEvent =
   | { name: "results_viewed"; props?: never }
   | { name: "check_reset"; props?: never }
   | { name: "summary_copied"; props?: never }
-  | { name: "badge_shared"; props: { via: "share" | "download" | "copy" } };
+  | { name: "badge_shared"; props: { via: "share" | "download" | "copy" } }
+  | { name: "compare_link_created"; props?: never }
+  | { name: "compare_viewed"; props?: never }
+  | { name: "compare_completed"; props?: never };
 
 export function trackEvent(event: FunnelEvent): void {
   try {
