@@ -30,6 +30,18 @@ export function SiteHeader() {
             Start
           </Link>
           <Link
+            href="/compare"
+            className="hidden text-ink-soft transition hover:text-mark sm:inline"
+          >
+            Compare
+          </Link>
+          <Link
+            href="/guides"
+            className="text-ink-soft transition hover:text-mark"
+          >
+            Guides
+          </Link>
+          <Link
             href="/method"
             className="text-ink-soft transition hover:text-mark"
           >
@@ -39,7 +51,7 @@ export function SiteHeader() {
             href="https://github.com/strjonas/consistent"
             target="_blank"
             rel="noreferrer"
-            className="hidden text-muted transition hover:text-mark sm:inline"
+            className="hidden text-muted transition hover:text-mark md:inline"
           >
             GitHub
           </a>

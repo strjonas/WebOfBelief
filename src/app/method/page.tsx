@@ -255,8 +255,7 @@ export default function MethodPage() {
             stances. The image is rendered in your browser, not uploaded.
           </p>
           <p className="mt-3 font-serif text-[1rem] leading-7 text-ink-soft">
-            The only outbound signal is an anonymous, cookieless pageview
-            count via{" "}
+            The only outbound signal is anonymous, cookieless usage data via{" "}
             <a
               href="https://vercel.com/docs/analytics"
               target="_blank"
@@ -265,9 +264,18 @@ export default function MethodPage() {
             >
               Vercel Web Analytics
             </a>
-            : URL path, country, and device class — no IP storage, no
-            fingerprinting, and crucially no record of which statements you
-            affirmed.
+            : pageviews (URL path, country, device class) and a few progress
+            events — whether the check was started, roughly which step was
+            reached, and whether results were viewed or shared. There is no IP
+            storage, no fingerprinting, and crucially no record of which
+            statements you affirmed. Full detail is on the{" "}
+            <Link
+              href="/privacy"
+              className="text-mark underline decoration-mark/40 underline-offset-[3px] transition hover:decoration-mark"
+            >
+              privacy page
+            </Link>
+            .
           </p>
           <p className="mt-3 font-serif text-[1rem] leading-7 text-ink-soft">
             Results are invitations to revisit reasons, never judgments of

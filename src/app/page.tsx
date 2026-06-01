@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BeliefCheckerBoundary } from "@/components/belief-checker-boundary";
 import { BeliefChecker } from "@/components/belief-checker";
 import { BeliefWebDiagram } from "@/components/belief-web-diagram";
+import { BeginCheckLink } from "@/components/begin-check-link";
 
 export default function Home() {
   return (
@@ -39,16 +40,13 @@ export default function Home() {
             </div>
 
             <div className="flex flex-wrap items-baseline gap-x-8 gap-y-4">
-              <a
-                href="#check"
-                className="group inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink"
-              >
+              <BeginCheckLink className="group inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink">
                 <span className="font-mono text-[0.78rem] tracking-[0.18em] text-mark">
                   §1
                 </span>
                 Begin the check
                 <span className="transition group-hover:translate-x-1">→</span>
-              </a>
+              </BeginCheckLink>
               <Link
                 href="/method"
                 className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"

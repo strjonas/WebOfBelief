@@ -3,7 +3,15 @@ import Link from "next/link";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/site-header";
-import { siteUrl } from "@/lib/site";
+import { JsonLd } from "@/components/json-ld";
+import {
+  contactEmail,
+  feedbackMailto,
+  githubUrl,
+  linkedInUrl,
+  siteName,
+  siteUrl,
+} from "@/lib/site";
 import "./globals.css";
 
 const spectral = localFont({
@@ -91,6 +99,12 @@ export const metadata: Metadata = {
     description:
       "Reflect on worldview commitments with explicit logic and balanced philosophical sources.",
   },
+  // Set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION to the token Google Search Console
+  // gives you (HTML-tag method) to verify ownership. Optional once the DNS or
+  // sitemap-based verification is in place.
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export default function RootLayout({
@@ -108,28 +122,135 @@ export default function RootLayout({
         <SiteHeader />
         {children}
         <footer className="mt-auto border-t border-rule">
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-6 py-8 font-sans text-xs uppercase tracking-[0.16em] text-muted sm:flex-row sm:items-center sm:justify-between lg:px-8">
-            <p>
+          <div className="mx-auto w-full max-w-6xl px-6 py-12 lg:px-8">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
+              <div className="col-span-2 sm:col-span-1">
+                <p className="font-serif text-lg font-medium tracking-tight text-ink">
+                  Web of Belief
+                </p>
+                <p className="mt-2 max-w-xs font-serif text-[0.95rem] leading-6 text-muted">
+                  Reflection prompts, not a verdict on a person.
+                </p>
+              </div>
+
+              <nav aria-label="Explore">
+                <p className="font-sans text-[0.65rem] uppercase tracking-[0.22em] text-mark">
+                  Explore
+                </p>
+                <ul className="mt-4 space-y-2.5 font-sans text-[0.82rem] text-ink-soft">
+                  <li>
+                    <Link className="transition hover:text-mark" href="/method">
+                      Method &amp; sources
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="transition hover:text-mark" href="/compare">
+                      Compare
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="transition hover:text-mark" href="/guides">
+                      Guides
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="transition hover:text-mark" href="/about">
+                      About
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
+
+              <nav aria-label="Legal">
+                <p className="font-sans text-[0.65rem] uppercase tracking-[0.22em] text-mark">
+                  Trust
+                </p>
+                <ul className="mt-4 space-y-2.5 font-sans text-[0.82rem] text-ink-soft">
+                  <li>
+                    <Link className="transition hover:text-mark" href="/privacy">
+                      Privacy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="transition hover:text-mark" href="/terms">
+                      Terms
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className="transition hover:text-mark"
+                      href="/impressum"
+                    >
+                      Impressum
+                    </Link>
+                  </li>
+                  <li>
+                    <a
+                      className="transition hover:text-mark"
+                      href={githubUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Source on GitHub
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+
+              <nav aria-label="Connect">
+                <p className="font-sans text-[0.65rem] uppercase tracking-[0.22em] text-mark">
+                  Connect
+                </p>
+                <ul className="mt-4 space-y-2.5 font-sans text-[0.82rem] text-ink-soft">
+                  <li>
+                    <Link className="transition hover:text-mark" href="/contact">
+                      Contact
+                    </Link>
+                  </li>
+                  <li>
+                    <a className="transition hover:text-mark" href={feedbackMailto}>
+                      Send feedback
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="transition hover:text-mark"
+                      href={linkedInUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      LinkedIn
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="transition hover:text-mark"
+                      href={`mailto:${contactEmail}`}
+                    >
+                      {contactEmail}
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+
+            <p className="mt-10 border-t border-rule-soft pt-6 font-sans text-[0.68rem] uppercase tracking-[0.16em] text-muted">
               <span className="font-mono normal-case tracking-normal text-ink">
                 §
               </span>{" "}
-              Web of Belief — reflection prompts, not a verdict on a person.
+              © {new Date().getFullYear()} Web of Belief · A source-backed
+              belief consistency check.
             </p>
-            <div className="flex flex-wrap gap-5">
-              <Link className="transition hover:text-ink" href="/method">
-                Method &amp; sources
-              </Link>
-              <a
-                className="transition hover:text-ink"
-                href="https://github.com/strjonas/consistent"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Source on GitHub
-              </a>
-            </div>
           </div>
         </footer>
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: siteName,
+            url: siteUrl.toString(),
+          }}
+        />
         <Analytics />
       </body>
     </html>

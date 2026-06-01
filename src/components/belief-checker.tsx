@@ -24,6 +24,7 @@ import {
   beliefWebDiagramEdges,
   beliefWebDiagramNodes,
 } from "./belief-web-diagram";
+import { trackEvent } from "@/lib/analytics";
 
 const choices: Array<{ id: Answer; label: string; hint: string }> = [
   { id: "affirm", label: "I believe this", hint: "Affirm as worded." },
@@ -604,6 +605,7 @@ export function BeliefChecker() {
   const downloadBadge = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    trackEvent({ name: "badge_shared", props: { via: "download" } });
     canvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
@@ -618,6 +620,7 @@ export function BeliefChecker() {
   const copyBadge = useCallback(async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    trackEvent({ name: "badge_shared", props: { via: "copy" } });
     try {
       const blob = await new Promise<Blob | null>((resolve) =>
         canvas.toBlob(resolve, "image/png"),
@@ -637,6 +640,7 @@ export function BeliefChecker() {
   const shareBadge = useCallback(async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    trackEvent({ name: "badge_shared", props: { via: "share" } });
     const blob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob(resolve, "image/png"),
     );
@@ -716,11 +720,26 @@ export function BeliefChecker() {
   }
 
   function answerStatement(statementId: BeliefStatement["id"], answer: Answer) {
-    setAnswers((previous) => ({ ...previous, [statementId]: answer }));
+    setAnswers((previous) => {
+      // Fire "check_started" only on the very first recorded answer, so the
+      // event maps to "this visitor actually began the check" vs. bouncing.
+      if (Object.keys(previous).length === 0) {
+        trackEvent({ name: "check_started" });
+      }
+      return { ...previous, [statementId]: answer };
+    });
     setCopyNotice("");
   }
 
   function moveToTopic(nextIndex: number) {
+    // Only count forward progress, and report the step reached (not answers),
+    // so the dashboard shows how far people get before dropping off.
+    if (nextIndex > topicIndex && categories[nextIndex]) {
+      trackEvent({
+        name: "topic_advanced",
+        props: { topic: categories[nextIndex].name, step: nextIndex + 1 },
+      });
+    }
     setTopicIndex(nextIndex);
     window.requestAnimationFrame(() => {
       document
@@ -730,6 +749,7 @@ export function BeliefChecker() {
   }
 
   function reviewResults() {
+    trackEvent({ name: "results_viewed" });
     setShowResults(true);
     window.requestAnimationFrame(() => {
       document
@@ -739,6 +759,7 @@ export function BeliefChecker() {
   }
 
   function resetCheck() {
+    trackEvent({ name: "check_reset" });
     setAnswers({});
     setTopicIndex(0);
     setShowResults(false);
@@ -759,6 +780,7 @@ export function BeliefChecker() {
       `It is a discussion prompt, not a verdict. ${siteOrigin}`;
     try {
       await navigator.clipboard.writeText(summary);
+      trackEvent({ name: "summary_copied" });
       setCopyNotice("Summary copied. It includes counts only, not your choices.");
     } catch {
       setCopyNotice("Clipboard access was unavailable in this browser.");
