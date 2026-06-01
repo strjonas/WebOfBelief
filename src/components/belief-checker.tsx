@@ -15,6 +15,7 @@ import {
   affirmedBeliefs,
   countFindings,
   evaluateBeliefs,
+  findingBeliefs,
   type AnswerMap,
   type Finding,
   type FindingKind,
@@ -25,6 +26,13 @@ import {
   beliefWebDiagramNodes,
 } from "./belief-web-diagram";
 import { trackEvent } from "@/lib/analytics";
+import { encodeAnswers } from "@/lib/share-code";
+import {
+  findingAccents,
+  findingHex,
+  findingLabels,
+  findingMarks,
+} from "@/lib/findings";
 
 const choices: Array<{ id: Answer; label: string; hint: string }> = [
   { id: "affirm", label: "I believe this", hint: "Affirm as worded." },
@@ -37,27 +45,6 @@ const choices: Array<{ id: Answer; label: string; hint: string }> = [
       "Use for hypothetical, if-this-were-true, or otherwise qualified readings.",
   },
 ];
-
-const findingLabels: Record<FindingKind, string> = {
-  conflict: "Direct conflict",
-  argument: "Live argument",
-  implication: "Conditional implication",
-  compatible: "Coherent combination",
-};
-
-const findingMarks: Record<FindingKind, string> = {
-  conflict: "⊥",
-  implication: "⊢",
-  argument: "‡",
-  compatible: "≈",
-};
-
-const findingAccents: Record<FindingKind, { rule: string; ink: string }> = {
-  conflict: { rule: "border-mark", ink: "text-mark" },
-  implication: { rule: "border-indigo-ink", ink: "text-indigo-ink" },
-  argument: { rule: "border-amber-ink", ink: "text-amber-ink" },
-  compatible: { rule: "border-forest", ink: "text-forest" },
-};
 
 const BRAND = "Web of Belief";
 
@@ -179,12 +166,7 @@ function drawBadge(canvas: HTMLCanvasElement, data: BadgeData) {
   );
 
   const affirmedSet = new Set<BeliefId>(data.affirmedIds);
-  const edgeColor: Record<FindingKind, string> = {
-    conflict: "#7a1f1d",
-    implication: "#2b3672",
-    argument: "#8a5a14",
-    compatible: "#2d4a36",
-  };
+  const edgeColor = findingHex;
   const triggeredKey = (a: BeliefId, b: BeliefId) =>
     a < b ? `${a}|${b}` : `${b}|${a}`;
   const triggeredSet = new Set<string>(
@@ -241,18 +223,28 @@ function drawBadge(canvas: HTMLCanvasElement, data: BadgeData) {
     color: string;
     glyph: string;
   }> = [
-    { key: "conflicts", label: "Direct conflict", color: "#7a1f1d", glyph: "⊥" },
+    {
+      key: "conflicts",
+      label: "Direct conflict",
+      color: findingHex.conflict,
+      glyph: "⊥",
+    },
     {
       key: "implications",
       label: "Conditional implication",
-      color: "#2b3672",
+      color: findingHex.implication,
       glyph: "⊢",
     },
-    { key: "arguments", label: "Live argument", color: "#8a5a14", glyph: "‡" },
+    {
+      key: "arguments",
+      label: "Live argument",
+      color: findingHex.argument,
+      glyph: "‡",
+    },
     {
       key: "compatibles",
       label: "Coherent combination",
-      color: "#2d4a36",
+      color: findingHex.compatible,
       glyph: "≈",
     },
   ];
@@ -504,6 +496,15 @@ function FindingCard({ finding }: { finding: Finding }) {
               {statementById[beliefId].prompt}
             </li>
           ))}
+          {(finding.rejects ?? []).map((beliefId) => (
+            <li key={beliefId} className="relative">
+              <span className="absolute -left-4 top-2 inline-block h-1 w-2 border border-ink" />
+              {statementById[beliefId].prompt}{" "}
+              <span className="font-sans text-[0.7rem] uppercase tracking-[0.14em] text-muted">
+                — which you rejected
+              </span>
+            </li>
+          ))}
         </ul>
         {finding.bridge ? (
           <>
@@ -538,6 +539,15 @@ export function BeliefChecker() {
   const qualifiedCount = Object.values(answers).filter(
     (a) => a === "qualify",
   ).length;
+  const rejectedCount = Object.values(answers).filter(
+    (a) => a === "reject",
+  ).length;
+  const unsureCount = Object.values(answers).filter(
+    (a) => a === "unsure",
+  ).length;
+  // Suspension (unsure) and silence (unanswered) are both "not yet settled" —
+  // honest, but the place to move through, not to camp.
+  const openCount = unsureCount + unansweredCount;
   const findings = useMemo(() => evaluateBeliefs(answers), [answers]);
   const affirmed = useMemo(() => affirmedBeliefs(answers), [answers]);
   const activeTopic = categories[topicIndex];
@@ -552,8 +562,9 @@ export function BeliefChecker() {
   const triggeredEdges = useMemo<Array<[BeliefId, BeliefId, FindingKind]>>(() => {
     const out: Array<[BeliefId, BeliefId, FindingKind]> = [];
     for (const finding of findings) {
-      if (finding.requires.length >= 2) {
-        out.push([finding.requires[0], finding.requires[1], finding.kind]);
+      const beliefs = findingBeliefs(finding);
+      if (beliefs.length >= 2) {
+        out.push([beliefs[0], beliefs[1], finding.kind]);
       }
     }
     return out;
@@ -712,6 +723,21 @@ export function BeliefChecker() {
       setCopyNotice("Clipboard access was unavailable in this browser.");
     }
   }, [shareText, siteOrigin]);
+
+  const copyCompareLink = useCallback(async () => {
+    // The answers ride in the URL *fragment*, so they are never sent to the
+    // server — the comparison is computed entirely in each browser.
+    const link = `${siteOrigin}/compare-beliefs#${encodeAnswers(answers)}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      trackEvent({ name: "compare_link_created" });
+      setCopyNotice(
+        "Compare link copied. Send it to a friend — they'll see where your webs differ. Your answers ride in the link, never our server.",
+      );
+    } catch {
+      setCopyNotice("Clipboard access was unavailable in this browser.");
+    }
+  }, [answers, siteOrigin]);
 
   function answeredForCategory(categoryId: BeliefCategoryId) {
     return statementsForCategory(categoryId).filter(
@@ -1051,6 +1077,73 @@ export function BeliefChecker() {
             </p>
           ) : null}
 
+          {/* Socratic surfacing — the shape of commitment and of what is
+              still open. Framed as honest and edifying, never as a failing. */}
+          {affirmed.length > 0 ? (
+            <div className="mt-8 border-l-2 border-rule pl-5">
+              <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+                <span className="section-mark" />
+                the shape of your answers
+              </p>
+              <dl className="mt-3 flex flex-wrap gap-x-8 gap-y-3 font-serif">
+                <div>
+                  <dt className="font-sans text-[0.66rem] uppercase tracking-[0.16em] text-mark">
+                    affirmed
+                  </dt>
+                  <dd className="mt-0.5 text-2xl tabular text-ink">
+                    {affirmed.length}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-sans text-[0.66rem] uppercase tracking-[0.16em] text-muted">
+                    rejected
+                  </dt>
+                  <dd className="mt-0.5 text-2xl tabular text-ink">
+                    {rejectedCount}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-sans text-[0.66rem] uppercase tracking-[0.16em] text-muted">
+                    still open
+                  </dt>
+                  <dd className="mt-0.5 text-2xl tabular text-ink">
+                    {openCount}
+                  </dd>
+                </div>
+                {qualifiedCount > 0 ? (
+                  <div>
+                    <dt className="font-sans text-[0.66rem] uppercase tracking-[0.16em] text-muted">
+                      qualified
+                    </dt>
+                    <dd className="mt-0.5 text-2xl tabular text-ink">
+                      {qualifiedCount}
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
+              <p className="mt-4 max-w-2xl font-serif text-[0.97rem] leading-7 text-ink-soft">
+                The check reasons from what you affirm; a deliberate rejection
+                can sharpen a finding, but{" "}
+                {openCount > 0 ? (
+                  <>
+                    the {openCount} statement{openCount === 1 ? "" : "s"} you
+                    left open are where your web is still unsettled. Suspending
+                    judgement is honest, not a failing — Socrates began there.
+                    But it is a place to move through, not to live: the aim is a
+                    view you can hold on purpose.
+                  </>
+                ) : (
+                  <>
+                    you have taken a position on every statement. The work now
+                    is not to settle more, but to hold what you affirm on
+                    purpose — and to keep testing the bridges between your
+                    commitments.
+                  </>
+                )}
+              </p>
+            </div>
+          ) : null}
+
           {/* Personalised diagram showing affirmed nodes + triggered edges */}
           {affirmed.length > 0 ? (
             <figure className="mt-8 border border-rule bg-paper-soft p-5 sm:p-7">
@@ -1190,6 +1283,28 @@ export function BeliefChecker() {
                   Start over
                 </button>
               </div>
+
+              {affirmed.length > 0 ? (
+                <div className="mt-8 border-l-2 border-indigo-ink bg-paper-soft px-5 py-5">
+                  <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-indigo-ink">
+                    <span className="section-mark" />
+                    or compare with a friend
+                  </p>
+                  <p className="mt-2 max-w-xl font-serif text-[1rem] leading-7 text-ink-soft">
+                    Send someone a link and they&apos;ll see exactly where your
+                    two webs pull apart — and the premise on each fault line.
+                    Your answers travel inside the link itself; they never reach
+                    our server.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={copyCompareLink}
+                    className="mt-4 border border-indigo-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-indigo-ink transition hover:bg-indigo-ink hover:text-paper"
+                  >
+                    Copy compare link
+                  </button>
+                </div>
+              ) : null}
 
               <p className="mt-4 font-serif text-[0.92rem] italic leading-6 text-muted">
                 Image attachment for X / Reddit posts requires uploading the

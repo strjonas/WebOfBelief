@@ -74,10 +74,10 @@ export default function PrivacyPage() {
           <li>
             <strong>Anonymous usage events</strong> — coarse milestones that
             tell us whether visitors start the check, roughly how far through it
-            they get (which step), whether they reach the results, and whether
-            they share. These events carry <strong>only progress</strong> —
-            never which statements you affirmed, and never your individual
-            answers.
+            they get (which step), whether they reach the results, whether they
+            share, and whether they create or open a comparison link. These
+            events carry <strong>only progress</strong> — never which statements
+            you affirmed, and never your individual answers.
           </li>
         </ul>
         <p>
@@ -96,6 +96,20 @@ export default function PrivacyPage() {
           affirmations — never your individual stances — and the image is drawn
           locally and never uploaded. If you choose to share, your device&apos;s
           own share or social features handle it from there.
+        </p>
+        <p>
+          The <strong>&ldquo;compare with a friend&rdquo; link</strong> is
+          different in one honest respect, so it&apos;s worth being precise. To
+          let a friend compare their web against yours, your individual answers
+          are encoded into the part of the link <em>after the # sign</em> (the
+          URL fragment). Browsers never transmit that fragment to a web server,
+          so your answers still never reach us or anyone else&apos;s server —
+          the comparison is computed entirely inside each browser. But the link
+          itself now carries your answers: anyone you send it to can read your
+          web from it, and like any link it may persist in chat history or a
+          screenshot. Only share it with people you&apos;re happy to share your
+          answers with. Nothing is uploaded, and there is still no account,
+          cookie, or server-side record.
         </p>
 
         <h2>Hosting</h2>

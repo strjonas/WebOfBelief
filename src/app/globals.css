@@ -5,15 +5,19 @@
   --color-paper-soft: #e3dfd2;
   --color-paper-deep: #d6d1c1;
   --color-ink: #11131a;
-  --color-ink-soft: #2a2d36;
-  --color-muted: #545860;
-  --color-rule: #b1ad9f;
-  --color-rule-soft: #cbc8bb;
+  --color-ink-soft: #26282f;
+  /* muted darkened from #545860 for a bit more text contrast on paper */
+  --color-muted: #474a52;
+  --color-rule: #a8a495;
+  --color-rule-soft: #c4c0b2;
   --color-mark: #7a1f1d;
   --color-mark-soft: #a64a45;
-  --color-forest: #2d4a36;
-  --color-amber-ink: #8a5a14;
-  --color-indigo-ink: #2b3672;
+  /* The three non-brand finding hues — kept soft but pushed apart in hue and
+     lightness so they're easier to tell apart. MUST match findingHex in
+     src/lib/findings.ts. */
+  --color-forest: #2f6b43;
+  --color-amber-ink: #9a6515;
+  --color-indigo-ink: #33419b;
 }
 
 @theme inline {

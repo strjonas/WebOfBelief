@@ -1,5 +1,6 @@
 import type { BeliefId } from "@/lib/beliefs";
 import type { FindingKind } from "@/lib/evaluate";
+import { findingHex, webColors } from "@/lib/findings";
 
 interface NodePos {
   id: BeliefId;
@@ -91,14 +92,10 @@ const clusterLabels: ClusterLabel[] = [
   { text: "v. right action", x: 464, y: 350, anchor: "end" },
 ];
 
-// Pure colors (no Tailwind variables) so the SVG can be inlined
-// without depending on cascade — used in the badge canvas later too.
-const edgeColor: Record<FindingKind, string> = {
-  conflict: "#7a1f1d",
-  implication: "#2b3672",
-  argument: "#8a5a14",
-  compatible: "#2d4a36",
-};
+// Pure colors (no Tailwind variables) so the SVG can be inlined without
+// depending on cascade. Centralized in lib/findings so the diagram, the badge,
+// and the CSS tokens can't drift apart.
+const edgeColor: Record<FindingKind, string> = findingHex;
 
 const edgeDash: Record<FindingKind, string> = {
   conflict: "0",
@@ -110,6 +107,12 @@ const edgeDash: Record<FindingKind, string> = {
 export interface BeliefWebDiagramProps {
   /** Beliefs the viewer affirmed. Filled in mark color. */
   affirmed?: ReadonlySet<BeliefId>;
+  /**
+   * Second person's affirmed beliefs. When provided, the diagram switches to
+   * compare mode: nodes are colored by who affirms them (both / A-only /
+   * B-only / neither) rather than the single affirmed/not state.
+   */
+  affirmedB?: ReadonlySet<BeliefId>;
   /** Specific edges that actually fired — those are highlighted, others fade. */
   triggeredEdges?: ReadonlyArray<readonly [BeliefId, BeliefId]>;
   /** Hide written labels for the small share-badge use. */
@@ -129,6 +132,7 @@ function edgeKey(a: BeliefId, b: BeliefId) {
 
 export function BeliefWebDiagram({
   affirmed,
+  affirmedB,
   triggeredEdges,
   showLabels = true,
   showClusters = true,
@@ -139,6 +143,7 @@ export function BeliefWebDiagram({
   const triggered = triggeredEdges
     ? new Set<string>(triggeredEdges.map(([a, b]) => edgeKey(a, b)))
     : null;
+  const compareMode = affirmedB !== undefined;
 
   return (
     <svg
@@ -194,9 +199,69 @@ export function BeliefWebDiagram({
 
       {/* Nodes */}
       {nodes.map((n) => {
-        const isAffirmed = affirmed?.has(n.id) ?? false;
-        const fill = isAffirmed ? "#7a1f1d" : "#ece9e0";
-        const stroke = isAffirmed ? "#7a1f1d" : "#11131a";
+        const inA = affirmed?.has(n.id) ?? false;
+        const inB = affirmedB?.has(n.id) ?? false;
+        let fill: string;
+        let stroke: string;
+        let radius: number;
+        let labelOpacity: number;
+        if (compareMode) {
+          const divergent = inA !== inB; // exactly one affirms — the interesting case
+          if (inA && inB) {
+            fill = webColors.compareBoth;
+            stroke = webColors.compareBoth;
+            radius = 4;
+            labelOpacity = 0.85;
+          } else if (inA) {
+            fill = webColors.compareSharer;
+            stroke = webColors.compareSharer;
+            radius = 6;
+            labelOpacity = 1;
+          } else if (inB) {
+            fill = webColors.compareViewer;
+            stroke = webColors.compareViewer;
+            radius = 6;
+            labelOpacity = 1;
+          } else {
+            fill = webColors.nodeIdle;
+            stroke = webColors.nodeStroke;
+            radius = 2.4;
+            labelOpacity = 0.32;
+          }
+          // Divergent nodes carry a halo so the eye lands on the differences.
+          return (
+            <g key={n.id}>
+              {divergent ? (
+                <circle cx={n.x} cy={n.y} r={radius + 3} fill={fill} opacity={0.16} />
+              ) : null}
+              <circle
+                cx={n.x}
+                cy={n.y}
+                r={radius}
+                fill={fill}
+                stroke={stroke}
+                strokeWidth={divergent ? 1.4 : 1.1}
+              />
+              {showLabels ? (
+                <text
+                  x={n.x + radius + 2}
+                  y={n.y + 2.6}
+                  fontFamily="var(--font-mono), ui-monospace, monospace"
+                  fontSize={divergent ? 7.4 : 6.4}
+                  fontWeight={divergent ? 600 : 400}
+                  fill={divergent ? stroke : webColors.nodeStroke}
+                  opacity={labelOpacity}
+                  style={{ letterSpacing: "0.02em" }}
+                >
+                  {n.short}
+                </text>
+              ) : null}
+            </g>
+          );
+        }
+        const isAffirmed = inA;
+        fill = isAffirmed ? webColors.affirmed : webColors.nodeIdle;
+        stroke = isAffirmed ? webColors.affirmed : webColors.nodeStroke;
         return (
           <g key={n.id}>
             <circle
@@ -213,7 +278,7 @@ export function BeliefWebDiagram({
                 y={n.y + 2.6}
                 fontFamily="var(--font-mono), ui-monospace, monospace"
                 fontSize="6.5"
-                fill="#11131a"
+                fill={webColors.nodeStroke}
                 opacity={isAffirmed ? 1 : 0.72}
                 style={{ letterSpacing: "0.02em" }}
               >
