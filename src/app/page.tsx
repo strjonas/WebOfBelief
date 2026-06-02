@@ -24,18 +24,19 @@ export default function Home() {
                 </figcaption>
               </figure>
               <h1 className="mt-8 font-serif text-[2.65rem] font-medium leading-[1.05] tracking-tight text-ink sm:text-[3.4rem]">
-                Twenty-two beliefs.
+                Twenty-three beliefs.
                 <br />
                 <span className="text-ink-soft">
                   One web. Find out where it tears.
                 </span>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-[1.6] text-ink-soft">
-                Answer plain statements about morality, freedom, mind, and God.
-                The check shows where your beliefs flatly clash, where one
-                quietly commits you to another (a conditional implication), and
-                where they hold together. Every result cites the Stanford
-                Encyclopedia of Philosophy entry behind the call.
+                Answer plain statements about morality, freedom, mind, AI
+                consciousness, and God. The check shows where your beliefs
+                flatly clash, where one quietly commits you to another (a
+                conditional implication), and where they hold together. Every
+                result cites at least one Stanford Encyclopedia of Philosophy
+                entry behind the call.
               </p>
             </div>
 
@@ -55,7 +56,7 @@ export default function Home() {
               </div>
               <div className="flex flex-wrap items-baseline gap-x-6 gap-y-3">
                 <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-                  22 statements &middot; ~5 min &middot; no login
+                  23 statements &middot; ~5 min &middot; no login
                 </span>
                 <Link
                   href="/method"
@@ -74,11 +75,11 @@ export default function Home() {
                   <span className="font-mono text-mark">fig. 1</span>{" "}
                   &middot; the rule-graph — the map of checks it runs
                 </span>
-                <span>22 nodes / 20 edges</span>
+                <span>23 nodes / 22 edges</span>
               </figcaption>
               <BeliefWebDiagram
                 className="block h-auto w-full"
-                title="Diagram showing 22 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark conditional implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
+                title="Diagram showing 23 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark conditional implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
               />
               <div className="mt-5 border-t border-rule-soft pt-3 font-sans text-[0.7rem] leading-5 text-muted">
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
@@ -202,15 +203,15 @@ export default function Home() {
           </p>
           <div className="max-w-3xl">
             <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-ink">
-              Twenty-two statements drawn from the questions philosophers and
+              Twenty-three statements drawn from the questions philosophers and
               the public most disagree about.
             </h2>
             <p className="mt-4 font-serif text-[1.05rem] leading-7 text-ink-soft">
               Topic selection uses the PhilPapers 2020 survey of philosophers
               and Pew Research&apos;s 2023–24 Religious Landscape Study. Each
-              statement&apos;s explanation links to the relevant Stanford
-              Encyclopedia of Philosophy entry; nothing here treats one school
-              as obvious.
+              statement&apos;s explanation links to relevant Stanford
+              Encyclopedia of Philosophy entries and, where needed, focused
+              contemporary research; nothing here treats one school as obvious.
             </p>
             <Link
               href="/method"

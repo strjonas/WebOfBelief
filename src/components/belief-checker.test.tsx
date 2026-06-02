@@ -53,7 +53,7 @@ describe("BeliefChecker", () => {
 
     expect(godChoice.checked).toBe(true);
     expect(sufferingChoice.checked).toBe(true);
-    expect(screen.getByText("2 of 22 answered")).toBeDefined();
+    expect(screen.getByText("2 of 23 answered")).toBeDefined();
     expect(screen.getAllByText("Recorded: I believe this.")).toHaveLength(2);
 
     await user.click(
@@ -115,7 +115,7 @@ describe("BeliefChecker", () => {
     ).toBeDefined();
     expect(
       screen.getByText(
-        "Checked 0 beliefs you affirmed as true. This check treats 22 unselected statements as Not sure. Results report relationships in the rule set; they do not prove your complete worldview coherent or incoherent.",
+        "Checked 0 beliefs you affirmed as true. This check treats 23 unselected statements as Not sure. Results report relationships in the rule set; they do not prove your complete worldview coherent or incoherent.",
       ),
     ).toBeDefined();
   });

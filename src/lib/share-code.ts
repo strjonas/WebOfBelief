@@ -1,4 +1,4 @@
-import { beliefStatements, type Answer, type BeliefId } from "./beliefs";
+import type { Answer, BeliefId } from "./beliefs";
 import type { AnswerMap } from "./evaluate";
 
 /**
@@ -18,14 +18,13 @@ import type { AnswerMap } from "./evaluate";
  * conditional reading. Decoding `open` omits the statement from the map.
  */
 
-export const SHARE_CODE_VERSION = 1;
+export const SHARE_CODE_VERSION = 2;
 
 /**
- * The frozen statement order the encoding is defined against. Codes are
- * positional, so this MUST NOT be reordered or edited once links exist in the
- * wild — bump SHARE_CODE_VERSION and add a new order instead. A test asserts
- * this list stays in lockstep with the belief set, so adding or removing a
- * statement fails loudly rather than silently corrupting old links.
+ * Versioned frozen statement orders. Codes are positional, so an existing
+ * order MUST NOT be reordered or edited once links exist in the wild. Add a
+ * new order and bump SHARE_CODE_VERSION instead; old orders remain decodable
+ * with newer statements left open.
  */
 export const SHARE_CODE_ORDER_V1: readonly BeliefId[] = [
   "perfectGod",
@@ -51,6 +50,18 @@ export const SHARE_CODE_ORDER_V1: readonly BeliefId[] = [
   "minorConvenienceHarmWrong",
   "factoryFarmPermissible",
 ];
+
+export const SHARE_CODE_ORDER_V2: readonly BeliefId[] = [
+  ...SHARE_CODE_ORDER_V1,
+  "futureAiConscious",
+];
+
+const CURRENT_SHARE_CODE_ORDER = SHARE_CODE_ORDER_V2;
+
+const SHARE_CODE_ORDERS: Partial<Record<number, readonly BeliefId[]>> = {
+  1: SHARE_CODE_ORDER_V1,
+  2: SHARE_CODE_ORDER_V2,
+};
 
 // 2-bit code per statement. 0 is the default ("open") so absent statements and
 // trailing padding both read as open.
@@ -106,13 +117,15 @@ function base64urlToBytes(str: string, byteLength: number): Uint8Array | null {
   return bytes;
 }
 
-const STATEMENT_COUNT = SHARE_CODE_ORDER_V1.length;
-const BYTE_LENGTH = Math.ceil((STATEMENT_COUNT * 2) / 8);
+function byteLengthFor(statementCount: number): number {
+  return Math.ceil((statementCount * 2) / 8);
+}
 
 /** Encode an answer map into a versioned, URL-fragment-safe code. */
 export function encodeAnswers(answers: AnswerMap): string {
-  const bytes = new Uint8Array(BYTE_LENGTH);
-  SHARE_CODE_ORDER_V1.forEach((beliefId, index) => {
+  const byteLength = byteLengthFor(CURRENT_SHARE_CODE_ORDER.length);
+  const bytes = new Uint8Array(byteLength);
+  CURRENT_SHARE_CODE_ORDER.forEach((beliefId, index) => {
     const answer = answers[beliefId];
     const code = answer ? CODE_BY_ANSWER[answer] : 0;
     if (code === 0) return;
@@ -134,13 +147,14 @@ export function decodeAnswers(code: string): DecodeResult {
   if (!match) return { ok: false, reason: "format" };
 
   const version = Number(match[1]);
-  if (version !== SHARE_CODE_VERSION) return { ok: false, reason: "version" };
+  const order = SHARE_CODE_ORDERS[version];
+  if (!order) return { ok: false, reason: "version" };
 
-  const bytes = base64urlToBytes(match[2], BYTE_LENGTH);
+  const bytes = base64urlToBytes(match[2], byteLengthFor(order.length));
   if (!bytes) return { ok: false, reason: "format" };
 
   const answers: AnswerMap = {};
-  SHARE_CODE_ORDER_V1.forEach((beliefId, index) => {
+  order.forEach((beliefId, index) => {
     const bitPos = index * 2;
     const byteIndex = Math.floor(bitPos / 8);
     const shift = 6 - (bitPos % 8);
@@ -152,4 +166,4 @@ export function decodeAnswers(code: string): DecodeResult {
 }
 
 // Re-exported so callers and tests can guard the frozen order against drift.
-export const shareCodeBeliefIds = beliefStatements.map((s) => s.id);
+export const shareCodeBeliefIds = CURRENT_SHARE_CODE_ORDER;

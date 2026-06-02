@@ -5,18 +5,24 @@ import {
   decodeAnswers,
   encodeAnswers,
   SHARE_CODE_ORDER_V1,
+  SHARE_CODE_ORDER_V2,
   SHARE_CODE_VERSION,
 } from "./share-code";
 
 describe("share-code frozen order", () => {
   it("stays in lockstep with the belief set (add/remove a statement and this fails loudly)", () => {
     const fromBeliefs = [...beliefStatements.map((s) => s.id)].sort();
-    const fromOrder = [...SHARE_CODE_ORDER_V1].sort();
+    const fromOrder = [...SHARE_CODE_ORDER_V2].sort();
     expect(fromOrder).toEqual(fromBeliefs);
   });
 
   it("has no duplicates", () => {
-    expect(new Set(SHARE_CODE_ORDER_V1).size).toBe(SHARE_CODE_ORDER_V1.length);
+    expect(new Set(SHARE_CODE_ORDER_V2).size).toBe(SHARE_CODE_ORDER_V2.length);
+  });
+
+  it("keeps the legacy v1 order frozen for old comparison links", () => {
+    expect(SHARE_CODE_ORDER_V1).not.toContain("futureAiConscious");
+    expect(SHARE_CODE_ORDER_V2).toContain("futureAiConscious");
   });
 });
 
@@ -26,6 +32,7 @@ describe("encode / decode round-trip", () => {
       perfectGod: "affirm",
       noDeity: "reject",
       determinism: "affirm",
+      futureAiConscious: "affirm",
       responsibilityWithoutAlternatives: "reject",
       infallibleForeknowledge: "qualify",
     };
@@ -50,12 +57,21 @@ describe("encode / decode round-trip", () => {
     expect(decodeAnswers(encodeAnswers(all))).toEqual({ ok: true, answers: all });
   });
 
-  it("produces a short code (8 chars of payload for 22 statements)", () => {
+  it("produces a short code (8 chars of payload for 23 statements)", () => {
     const all: AnswerMap = {};
     for (const s of beliefStatements) all[s.id] = "qualify";
     const code = encodeAnswers(all);
     expect(code.startsWith(`v${SHARE_CODE_VERSION}.`)).toBe(true);
     expect(code.split(".")[1].length).toBeLessThanOrEqual(8);
+  });
+
+  it("decodes legacy v1 links with newer statements left open", () => {
+    const currentCode = encodeAnswers({ perfectGod: "affirm" });
+    const legacyCode = currentCode.replace(/^v\d+\./, "v1.");
+    expect(decodeAnswers(legacyCode)).toEqual({
+      ok: true,
+      answers: { perfectGod: "affirm" },
+    });
   });
 
   it("fuzz: 500 random maps survive a round-trip", () => {

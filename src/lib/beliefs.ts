@@ -14,6 +14,11 @@ export type SourceId =
   | "foreknowledge"
   | "physicalism"
   | "dualism"
+  | "computationalMind"
+  | "consciousness"
+  | "chineseRoom"
+  | "aiConsciousness"
+  | "llmConsciousness"
   | "animals"
   | "consequentialism"
   | "deontology"
@@ -46,6 +51,7 @@ export type BeliefId =
   | "responsibilityWithoutAlternatives"
   | "physicalClosure"
   | "zombieWorld"
+  | "futureAiConscious"
   | "animalsMatter"
   | "minorConvenienceHarmWrong"
   | "factoryFarmPermissible";
@@ -92,7 +98,7 @@ export const sources: Record<SourceId, Source> = {
     title: "The 2020 PhilPapers Survey",
     publisher: "PhilPeople / PhilPapers",
     url: "https://survey2020.philpeople.org/",
-    use: "Topic selection: its 100 questions include God, meta-ethics, meaning, mind, free will, trolley cases, and eating animals.",
+    use: "Topic selection: its 100 questions include God, meta-ethics, meaning, mind, other minds, free will, trolley cases, and eating animals.",
   },
   pew: {
     id: "pew",
@@ -192,6 +198,42 @@ export const sources: Record<SourceId, Source> = {
     url: "https://plato.stanford.edu/entries/dualism/",
     use: "Covers mental/physical distinction and arguments from consciousness.",
   },
+  computationalMind: {
+    id: "computationalMind",
+    title: "The Computational Theory of Mind",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/computational-mind/",
+    use: "Surveys views on which mental processes are computational and could be implemented in different physical systems.",
+  },
+  consciousness: {
+    id: "consciousness",
+    title: "Consciousness",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/consciousness/",
+    use: "Frames phenomenal consciousness, its explanation, functional role, and zombie-style debates.",
+  },
+  chineseRoom: {
+    id: "chineseRoom",
+    title: "The Chinese Room Argument",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/chinese-room/",
+    use: "Presents Searle's argument, replies, and later discussion of artificial understanding and consciousness.",
+  },
+  aiConsciousness: {
+    id: "aiConsciousness",
+    title:
+      "Consciousness in Artificial Intelligence: Insights from the Science of Consciousness",
+    publisher: "arXiv",
+    url: "https://arxiv.org/abs/2308.08708",
+    use: "Applies scientific theories of consciousness to AI systems and discusses how future systems might implement relevant indicators.",
+  },
+  llmConsciousness: {
+    id: "llmConsciousness",
+    title: "Could a Large Language Model be Conscious?",
+    publisher: "David J. Chalmers / arXiv",
+    url: "https://arxiv.org/abs/2303.07103",
+    use: "Argues that current LLMs face serious obstacles while successors may become serious candidates for consciousness.",
+  },
   animals: {
     id: "animals",
     title: "The Moral Status of Animals",
@@ -236,7 +278,8 @@ export const categories: BeliefCategory[] = [
   {
     id: "mind",
     name: "Mind and consciousness",
-    description: "Physical completeness and subjective experience.",
+    description:
+      "Physical completeness, artificial minds, and subjective experience.",
   },
   {
     id: "religion",
@@ -509,6 +552,27 @@ export const beliefStatements: BeliefStatement[] = [
       "Conceivability is not possibility: a priori imaginability can outrun what is metaphysically possible (Type-B physicalists), and illusionists (Frankish, Dennett) deny we even conceive a coherent zombie. Affirm this only if you mean genuine metaphysical possibility, not merely that the scenario seems imaginable.",
     oppositePole: true,
     sourceIds: ["physicalism", "dualism"],
+  },
+  {
+    id: "futureAiConscious",
+    category: "mind",
+    prompt:
+      "Some future non-biological artificial intelligence systems could have conscious experience.",
+    plain:
+      "Some future AI systems, even if not made of living tissue, could really be conscious.",
+    clarify:
+      "This concerns possible future systems and genuine subjective experience, not whether current chatbots are conscious or merely persuasive.",
+    caseFor:
+      "Functionalist and computationalist approaches leave room for mentality realized in different physical materials, and recent AI-consciousness work treats future systems as serious candidates under some theories.",
+    caseAgainst:
+      "Biological or non-computational views may hold that consciousness depends on living neural systems, or that behavior and functional organization do not settle whether experience is present.",
+    sourceIds: [
+      "philpapers",
+      "computationalMind",
+      "consciousness",
+      "aiConsciousness",
+      "llmConsciousness",
+    ],
   },
   {
     id: "consequencesOnly",

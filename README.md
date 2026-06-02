@@ -8,8 +8,8 @@ right action. A small, inspectable rule engine then shows you where your stated
 beliefs **contradict**, what they **may commit you to under stated premises**,
 and which "obviously incompatible" pairs are in fact **coherent**. Every result
 links to the relevant [Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/)
-entry. It's a mirror you can argue with — not a score, a label, or a verdict on
-you.
+entry, with focused research sources added where needed. It's a mirror you can
+argue with — not a score, a label, or a verdict on you.
 
 Named after Quine and Ullian's *The Web of Belief* (1970): no belief stands
 alone; they hang together, and a strain in one place is felt across the web.
@@ -41,7 +41,8 @@ only ever reasons from statements you explicitly mark "I believe this."
 - **Sourced.** Topic selection is grounded in the
   [PhilPapers 2020 Survey](https://survey2020.philpeople.org/) and
   [Pew's Religious Landscape Study](https://www.pewresearch.org/rls/); every
-  position summary and rule cites an SEP entry.
+  finding cites at least one SEP entry, with additional focused sources where
+  the question needs them.
 - **Private by default.** Answers live only in browser memory. The shareable
   badge and summary contain counts and graph shape only — never your
   individual answers — and nothing is uploaded.

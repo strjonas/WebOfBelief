@@ -32,7 +32,7 @@ const comparisons = [
   {
     name: "Asking an AI chatbot",
     them: "A chatbot will happily analyse your beliefs — but its reasoning is opaque, non-reproducible, and prone to confident invention. Ask twice and you may get two different verdicts.",
-    us: "This is a small, fixed, inspectable rule engine. The same answers always produce the same findings, every rule is visible in the source, and each one cites a Stanford Encyclopedia of Philosophy entry. No model, no guessing.",
+    us: "This is a small, fixed, inspectable rule engine. The same answers always produce the same findings, every rule is visible in the source, and each one cites at least one Stanford Encyclopedia of Philosophy entry. No model, no guessing.",
     when: "For open-ended discussion, a chatbot is more flexible. For a transparent, repeatable, sourced check, this is built for exactly that.",
   },
   {

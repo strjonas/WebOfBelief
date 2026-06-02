@@ -128,6 +128,21 @@ const rules: Finding[] = [
     sourceIds: ["physicalism", "dualism"],
   },
   {
+    id: "future-ai-and-zombie-evidence",
+    kind: "argument",
+    title: "Future AI consciousness and the evidence problem",
+    requires: ["zombieWorld", "futureAiConscious"],
+    gist:
+      "You allow future AI consciousness, but also allow a perfect physical duplicate with no experience. That is not a contradiction; it means behavior and physical structure may not settle the issue by themselves.",
+    explanation:
+      "This is not a contradiction. Views that take philosophical zombies seriously can still allow artificial consciousness. The pressure is epistemic: if a physically and functionally matching duplicate of a conscious being could lack experience, then attributing experience to a future AI needs an account of the extra facts or evidence that would make the attribution responsible.",
+    bridge:
+      "Behavioral, functional, and physical similarity to conscious beings is sufficient evidence for attributing consciousness to a future AI system.",
+    nextQuestion:
+      "Do you accept that evidence standard, or do you think AI consciousness would require something more, such as biology, phenomenal grounding, or a further non-physical fact?",
+    sourceIds: ["dualism", "consciousness", "chineseRoom", "aiConsciousness"],
+  },
+  {
     id: "avoidable-animal-harm",
     kind: "argument",
     title: "Causing harm is wrong, yet buying into it is permitted",
@@ -241,6 +256,24 @@ const rules: Finding[] = [
     nextQuestion:
       "Which goods make lives meaningful, and why are they objectively worthwhile?",
     sourceIds: ["meaning", "atheism"],
+  },
+  {
+    id: "future-ai-and-physicalism",
+    kind: "compatible",
+    title: "Physicalism and future artificial consciousness",
+    requires: ["physicalClosure", "futureAiConscious"],
+    gist:
+      "If experience is fixed by physical facts, artificial consciousness is not ruled out merely by the word “artificial.” The real question is which physical or functional organization would be enough.",
+    explanation:
+      "This pair is coherent. The physical-closure claim says consciousness facts are fixed by physical facts; the AI claim says some future non-biological system could have the relevant consciousness-making facts. That still leaves the hard question: which organization, dynamics, embodiment, or information processing would make experience present?",
+    nextQuestion:
+      "What physical or functional features would be enough for consciousness, and would a future AI system have them?",
+    sourceIds: [
+      "physicalism",
+      "computationalMind",
+      "consciousness",
+      "aiConsciousness",
+    ],
   },
   {
     id: "animals-and-practice",

@@ -64,8 +64,9 @@ export default function AboutPage() {
           browser — no model, no database, no account, no server-side scoring.
           Topic selection draws on the PhilPapers 2020 Survey of philosophers
           and Pew Research&apos;s Religious Landscape Study; every finding cites
-          a Stanford Encyclopedia of Philosophy entry. The full method, the
-          classification standard, and the complete source library are{" "}
+          at least one Stanford Encyclopedia of Philosophy entry. The full
+          method, the classification standard, and the complete source library
+          are{" "}
           <Link href="/method">published on the method page</Link>, and the
           entire source code is{" "}
           <a href={githubUrl} target="_blank" rel="noreferrer">

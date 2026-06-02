@@ -19,7 +19,7 @@ export interface ContentEntry {
   readingTime?: string;
 }
 
-const REVISED = "2026-06-01";
+const REVISED = "2026-06-02";
 
 export const guides: ContentEntry[] = [
   {

@@ -119,9 +119,9 @@ export default function Guide() {
         </p>
 
         <p className="!mt-10 border-l-2 border-mark pl-5 font-serif text-[1rem] italic leading-7 text-muted">
-          Web of Belief is one such check. It examines 22 statements you mark as
+          Web of Belief is one such check. It examines 23 statements you mark as
           true and reports only the relationships it can actually support, each
-          one citing a Stanford Encyclopedia of Philosophy entry.{" "}
+          one citing at least one Stanford Encyclopedia of Philosophy entry.{" "}
           <Link href="/#check">Take the check →</Link>
         </p>
       </Prose>

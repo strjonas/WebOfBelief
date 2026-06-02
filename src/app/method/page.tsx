@@ -203,11 +203,11 @@ export default function MethodPage() {
           <p className="mt-4 font-serif text-[1rem] leading-7 text-ink-soft">
             The initial domains come from the official PhilPapers 2020 Survey,
             which asked philosophers 100 questions, including God, meta-ethics,
-            meaning of life, mind, free will, and eating animals. Public
-            importance of religious-worldview questions is checked against Pew
-            Research Center&apos;s 2023–24 Religious Landscape Study. These
-            sources justify salience; they do not determine which answer is
-            correct.
+            meaning of life, mind, other minds, free will, and eating animals.
+            Public importance of religious-worldview questions is checked
+            against Pew Research Center&apos;s 2023–24 Religious Landscape Study.
+            These sources justify salience; they do not determine which answer
+            is correct.
           </p>
         </section>
 
@@ -217,12 +217,12 @@ export default function MethodPage() {
             source library
           </p>
           <h2 className="mt-3 font-serif text-2xl font-medium leading-snug tracking-tight text-ink">
-            Every finding cites a Stanford entry.
+            Every finding cites at least one Stanford entry.
           </h2>
           <p className="mt-3 font-serif text-[0.94rem] italic leading-6 text-muted">
-            Source review completed 27 May 2026. Position summaries in the
-            checker are paraphrases; follow the original entries for full
-            arguments and bibliographies.
+            Source review completed 2 June 2026. Position summaries in the
+            checker are paraphrases; follow the original entries and linked
+            research for full arguments and bibliographies.
           </p>
           <ol className="mt-6 border-t border-rule-soft">
             {Object.values(sources).map((source, index) => (

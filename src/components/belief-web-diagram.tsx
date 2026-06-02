@@ -40,6 +40,7 @@ const nodes: NodePos[] = [
   // Mind (lower-right)
   { id: "physicalClosure", x: 280, y: 282, short: "physical" },
   { id: "zombieWorld", x: 360, y: 298, short: "zombie" },
+  { id: "futureAiConscious", x: 418, y: 330, short: "future AI" },
   // Right action & animals (low-left)
   { id: "consequencesOnly", x: 30, y: 252, short: "consequences" },
   { id: "sideConstraints", x: 30, y: 310, short: "constraints" },
@@ -76,12 +77,14 @@ const edges: Edge[] = [
   { a: "infallibleForeknowledge", b: "samePastAlternative", kind: "argument" },
   { a: "determinism", b: "responsibilityWithoutAlternatives", kind: "argument" },
   { a: "beliefNeedsEvidence", b: "perfectGod", kind: "argument" },
+  { a: "zombieWorld", b: "futureAiConscious", kind: "argument" },
   { a: "minorConvenienceHarmWrong", b: "factoryFarmPermissible", kind: "argument" },
   { a: "animalsMatter", b: "factoryFarmPermissible", kind: "argument" },
   // coherent combinations
   { a: "perfectGod", b: "moralFacts", kind: "compatible" },
   { a: "noDeity", b: "moralFacts", kind: "compatible" },
   { a: "noDeity", b: "naturalMeaning", kind: "compatible" },
+  { a: "physicalClosure", b: "futureAiConscious", kind: "compatible" },
 ];
 
 const clusterLabels: ClusterLabel[] = [
@@ -138,7 +141,7 @@ export function BeliefWebDiagram({
   showClusters = true,
   decorative = false,
   className,
-  title = "A diagram of the belief web this tool checks. Twenty-two statements are connected by edges representing direct conflicts, conditional implications, live arguments, and coherent combinations.",
+  title = "A diagram of the belief web this tool checks. Twenty-three statements are connected by edges representing direct conflicts, conditional implications, live arguments, and coherent combinations.",
 }: BeliefWebDiagramProps) {
   const triggered = triggeredEdges
     ? new Set<string>(triggeredEdges.map(([a, b]) => edgeKey(a, b)))

@@ -70,6 +70,35 @@ describe("evaluateBeliefs", () => {
     );
   });
 
+  it("treats physicalism and future AI consciousness as a coherent combination", () => {
+    const results = evaluateBeliefs({
+      physicalClosure: "affirm",
+      futureAiConscious: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "future-ai-and-physicalism",
+        kind: "compatible",
+      }),
+    ]);
+  });
+
+  it("treats zombies plus future AI consciousness as an evidence problem, not a flat conflict", () => {
+    const results = evaluateBeliefs({
+      zombieWorld: "affirm",
+      futureAiConscious: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "future-ai-and-zombie-evidence",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+  });
+
   it("treats causing-versus-buying animal harm as an argument, not a flat conflict", () => {
     const results = evaluateBeliefs({
       minorConvenienceHarmWrong: "affirm",

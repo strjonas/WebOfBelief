@@ -133,7 +133,7 @@ export default function OpenGraphImage() {
                   lineHeight: 1.06,
                 }}
               >
-                <div style={{ display: "flex" }}>Twenty-two beliefs.</div>
+                <div style={{ display: "flex" }}>Twenty-three beliefs.</div>
                 <div style={{ color: "#545860", display: "flex" }}>
                   One web. Where does it tear?
                 </div>
@@ -149,8 +149,8 @@ export default function OpenGraphImage() {
                 }}
               >
                 Direct conflicts, conditional implications, live arguments, and
-                coherent combinations — every finding cites the Stanford
-                Encyclopedia of Philosophy.
+                coherent combinations — every finding cites philosophical
+                sources.
               </div>
             </div>
 
@@ -213,7 +213,7 @@ export default function OpenGraphImage() {
             }}
           >
             <div style={{ display: "flex" }}>
-              22 statements &middot; ~5 minutes
+              23 statements &middot; ~5 minutes
             </div>
             <div style={{ color: "#7a1f1d", display: "flex" }}>
               webofbelief.app
