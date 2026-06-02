@@ -158,6 +158,38 @@ const rules: Finding[] = [
     sourceIds: ["animals"],
   },
   {
+    id: "animal-harm-without-status",
+    kind: "argument",
+    title: "Harming animals is wrong, yet they get no direct standing",
+    requires: ["minorConvenienceHarmWrong"],
+    rejects: ["animalsMatter"],
+    gist:
+      "You hold it is wrong to cause an animal severe suffering for taste, yet — by rejecting the previous statement — deny that its suffering counts for its own sake. That can hold together, but only if the wrong is grounded in something other than the animal.",
+    explanation:
+      "This is not a contradiction. You affirm that causing severe avoidable animal suffering for a minor interest is wrong, and — by rejecting that animals deserve direct moral consideration — you locate the wrong somewhere other than the animal's own interests. Kantian indirect-duty views do exactly this: cruelty to animals is wrong because of what it does to us, or to our character, not because the animal's suffering matters in its own right. The pressure is to say what carries the wrongness once the animal's own interests are set aside.",
+    bridge:
+      "The wrongness of causing an animal severe suffering is best explained by the animal's own interests (direct consideration), not only by indirect effects on humans or on the agent's character.",
+    nextQuestion:
+      "What grounds the wrong if not the animal's suffering itself — your character, effects on other people, or something else? And does that grounding still condemn the harm when no one is watching and no human is affected?",
+    sourceIds: ["animals"],
+  },
+  {
+    id: "physicalism-without-ai",
+    kind: "argument",
+    title: "Physical facts fix consciousness, yet only biology could be conscious",
+    requires: ["physicalClosure"],
+    rejects: ["futureAiConscious"],
+    gist:
+      "If the physical facts fully fix consciousness, yet no non-biological system could ever be conscious, you are committed to consciousness depending on specifically biological physics. That is a real position, but it needs defending.",
+    explanation:
+      "This is not a contradiction. You hold that fixing all the physical facts fixes the facts about experience, and — by rejecting the AI statement — that no future non-biological system could be conscious. Together these commit you to the view that what makes consciousness present is something special about biological matter rather than the organization or information processing it implements. That is biological naturalism (Searle), a serious position; the opposing pressure is multiple realizability — that if experience is fixed by physical facts, the same consciousness-making organization could in principle be built from other materials.",
+    bridge:
+      "If consciousness is fixed by physical facts, what fixes it is functional or organizational structure that could be realized in non-biological materials, not the biological substrate itself.",
+    nextQuestion:
+      "Do you think consciousness requires specifically biological matter, or that the right functional organization would suffice — and if the latter, why couldn't a non-biological system ever have it?",
+    sourceIds: ["physicalism", "computationalMind", "consciousness"],
+  },
+  {
     id: "divine-hiddenness",
     kind: "argument",
     title: "Perfect love and nonresistant nonbelief",

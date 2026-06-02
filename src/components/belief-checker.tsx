@@ -25,6 +25,7 @@ import {
   beliefWebDiagramNodes,
 } from "./belief-web-diagram";
 import { InteractiveBeliefWeb } from "./interactive-belief-web";
+import { GeneralFeedback, StatementFeedback } from "./belief-feedback";
 import Link from "next/link";
 import { trackEvent } from "@/lib/analytics";
 import { encodeAnswers } from "@/lib/share-code";
@@ -500,6 +501,7 @@ function StatementCard({
             </div>
           </div>
         </div>
+        <StatementFeedback beliefId={statement.id} />
       </details>
     </fieldset>
   );
@@ -972,10 +974,33 @@ export function BeliefChecker() {
                 Choose what you believe.
               </h2>
               <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
-                Answer only the statements you want to examine — skip the rest.
-                Your answers stay in this browser, so a refresh won&apos;t lose
-                them.
+                Answer only the statements you want to examine. This is a
+                source-backed prompt, not a verdict, and your answers stay in
+                this browser.
               </p>
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <span className="font-sans text-[0.68rem] uppercase tracking-[0.18em] text-muted">
+                  start with
+                </span>
+                {categories.map((item, index) => {
+                  const active = index === topicIndex;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => moveToTopic(index)}
+                      aria-pressed={active}
+                      className={`border px-3 py-1.5 font-sans text-[0.68rem] uppercase tracking-[0.16em] transition ${
+                        active
+                          ? "border-ink bg-ink text-paper"
+                          : "border-rule text-ink-soft hover:border-ink hover:text-ink"
+                      }`}
+                    >
+                      {item.name}
+                    </button>
+                  );
+                })}
+              </div>
               <details className="group mt-5 max-w-2xl">
                 <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
                   <span className="group-open:hidden">
@@ -989,7 +1014,11 @@ export function BeliefChecker() {
                   unsure, or marking a sentence as conditional/qualified is
                   never treated as belief in its opposite. If a claim is only
                   hypothetical for you (&ldquo;if God existed...&rdquo;), do not
-                  affirm it as an actual belief.
+                  affirm it as an actual belief. You can affirm both sides of a
+                  pair, reject both, or qualify either — nothing forces you onto
+                  one side, and a finding only appears for combinations that
+                  genuinely pull against each other. The point is to surface
+                  real pressure between beliefs, not to grade your worldview.
                 </p>
               </details>
             </div>
@@ -1413,6 +1442,8 @@ export function BeliefChecker() {
               </div>
             </div>
           ) : null}
+
+          <GeneralFeedback />
         </section>
       ) : null}
     </section>

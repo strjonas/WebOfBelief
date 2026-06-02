@@ -214,6 +214,68 @@ describe("evaluateBeliefs", () => {
     );
   });
 
+  it("raises the indirect-duty argument when harming animals is wrong but they get no direct standing", () => {
+    const results = evaluateBeliefs({
+      minorConvenienceHarmWrong: "affirm",
+      animalsMatter: "reject",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "animal-harm-without-status",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+  });
+
+  it("does not fire the indirect-duty argument when direct standing is merely unsure or unanswered", () => {
+    const unsure = evaluateBeliefs({
+      minorConvenienceHarmWrong: "affirm",
+      animalsMatter: "unsure",
+    });
+    const blank = evaluateBeliefs({ minorConvenienceHarmWrong: "affirm" });
+    const qualified = evaluateBeliefs({
+      minorConvenienceHarmWrong: "affirm",
+      animalsMatter: "qualify",
+    });
+
+    for (const results of [unsure, blank, qualified]) {
+      expect(
+        results.some((r) => r.id === "animal-harm-without-status"),
+      ).toBe(false);
+    }
+  });
+
+  it("raises the biological-naturalism argument when physical closure holds but no AI could be conscious", () => {
+    const results = evaluateBeliefs({
+      physicalClosure: "affirm",
+      futureAiConscious: "reject",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "physicalism-without-ai",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+  });
+
+  it("does not fire the biological-naturalism argument when AI consciousness is merely unsure or unanswered", () => {
+    const unsure = evaluateBeliefs({
+      physicalClosure: "affirm",
+      futureAiConscious: "unsure",
+    });
+    const blank = evaluateBeliefs({ physicalClosure: "affirm" });
+
+    for (const results of [unsure, blank]) {
+      expect(
+        results.some((r) => r.id === "physicalism-without-ai"),
+      ).toBe(false);
+    }
+  });
+
   it("orders findings with conflicts before softer relationships", () => {
     const results = evaluateBeliefs({
       consequencesOnly: "affirm",

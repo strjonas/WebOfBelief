@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { categories } from "@/lib/beliefs";
+import { categories, statementById } from "@/lib/beliefs";
 import { isAuthed, isConfigured } from "@/lib/admin-auth";
 import { readStats, type CountedEvent, type StatsSnapshot } from "@/lib/stats-store";
+import { readFeedback, type FeedbackEntry } from "@/lib/feedback-store";
 
 export const metadata: Metadata = {
   title: "Analytics",
@@ -37,7 +38,7 @@ export default async function AnalyticsPage({
     );
   }
 
-  const stats = await readStats();
+  const [stats, feedback] = await Promise.all([readStats(), readFeedback()]);
   return (
     <Shell authed>
       {stats ? (
@@ -50,6 +51,9 @@ export default async function AnalyticsPage({
           variables are present.
         </Notice>
       )}
+      <div className="mt-12">
+        <FeedbackSection entries={feedback} />
+      </div>
     </Shell>
   );
 }
@@ -179,6 +183,84 @@ function Section({
       ) : null}
       <div className="mt-4">{children}</div>
     </section>
+  );
+}
+
+const FEEDBACK_KIND_LABEL: Record<FeedbackEntry["kind"], string> = {
+  rephrase: "Wording",
+  "missing-position": "Missing position",
+  general: "General",
+};
+
+function relativeTime(at: number): string {
+  const diff = Date.now() - at;
+  const mins = Math.round(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  return `${days}d ago`;
+}
+
+function FeedbackSection({ entries }: { entries: FeedbackEntry[] | null }) {
+  if (entries === null) {
+    return (
+      <Section title="Visitor feedback">
+        <p className="font-sans text-[0.8rem] text-muted">
+          Feedback store unavailable — check the WOB_STORAGE_ variables.
+        </p>
+      </Section>
+    );
+  }
+  if (entries.length === 0) {
+    return (
+      <Section
+        title="Visitor feedback"
+        hint="Rephrasing and missing-position suggestions from the check."
+      >
+        <p className="font-sans text-[0.8rem] text-muted">
+          No feedback yet.
+        </p>
+      </Section>
+    );
+  }
+  return (
+    <Section
+      title={`Visitor feedback (${entries.length})`}
+      hint="Newest first. Text only — visitor answers are never attached."
+    >
+      <ul className="space-y-2.5">
+        {entries.map((entry, i) => {
+          const statement = entry.beliefId
+            ? statementById[entry.beliefId as keyof typeof statementById]
+            : undefined;
+          return (
+            <li
+              key={`${entry.at}-${i}`}
+              className="border border-rule bg-paper-soft px-4 py-3"
+            >
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="font-sans text-[0.62rem] uppercase tracking-[0.16em] text-mark">
+                  {FEEDBACK_KIND_LABEL[entry.kind]}
+                </span>
+                {statement ? (
+                  <span className="font-sans text-[0.7rem] text-ink-soft">
+                    {statement.plain}
+                  </span>
+                ) : null}
+                <span className="ml-auto font-mono text-[0.68rem] text-muted">
+                  {relativeTime(entry.at)}
+                </span>
+              </div>
+              <p className="mt-1.5 whitespace-pre-wrap font-serif text-[0.95rem] leading-6 text-ink">
+                {entry.text}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    </Section>
   );
 }
 

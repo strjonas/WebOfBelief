@@ -72,18 +72,24 @@ describe("BeliefChecker", () => {
     render(<BeliefChecker />);
 
     await user.click(
+      screen.getByRole("button", {
+        name: "Morality and meaning. 0 of 6 answered.",
+      }),
+    );
+
+    await user.click(
       screen.getByRole("radio", {
         name: `I believe this: ${moralFacts}`,
       }),
     );
     await user.click(
       screen.getByRole("button", {
-        name: "Next topic: Freedom and responsibility (optional)",
+        name: "Next topic: Mind and consciousness (optional)",
       }),
     );
 
     expect(
-      screen.getByRole("heading", { name: "Freedom and responsibility" }),
+      screen.getByRole("heading", { name: "Mind and consciousness" }),
     ).toBeDefined();
 
     await user.click(

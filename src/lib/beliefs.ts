@@ -266,20 +266,9 @@ export const sources: Record<SourceId, Source> = {
 
 export const categories: BeliefCategory[] = [
   {
-    id: "value",
-    name: "Morality and meaning",
-    description: "Objective value, moral grounding, and meaningful lives.",
-  },
-  {
     id: "freedom",
     name: "Freedom and responsibility",
     description: "Determinism, alternatives, and accountability.",
-  },
-  {
-    id: "mind",
-    name: "Mind and consciousness",
-    description:
-      "Physical completeness, artificial minds, and subjective experience.",
   },
   {
     id: "religion",
@@ -293,6 +282,17 @@ export const categories: BeliefCategory[] = [
     description:
       "Consequences, moral limits, and what we owe sentient animals.",
   },
+  {
+    id: "value",
+    name: "Morality and meaning",
+    description: "Objective value, moral grounding, and meaningful lives.",
+  },
+  {
+    id: "mind",
+    name: "Mind and consciousness",
+    description:
+      "Physical completeness, artificial minds, and subjective experience.",
+  },
 ];
 
 export const beliefStatements: BeliefStatement[] = [
@@ -304,7 +304,7 @@ export const beliefStatements: BeliefStatement[] = [
     plain:
       "There is one God who knows everything, can do anything, and is perfectly good and loving.",
     clarify:
-      "This is classical personal theism, not merely a first cause, spirit, or impersonal ground of reality.",
+      "This is classical personal theism, not merely a first cause, spirit, or impersonal ground of reality. If you regard talk of God as literally meaningless rather than true or false (theological non-cognitivism), neither this statement nor its denial captures your view — mark unsure.",
     caseFor:
       "Arguments from contingency, moral reality, religious experience, and other evidence are taken by theists to support such a being.",
     caseAgainst:
@@ -408,7 +408,7 @@ export const beliefStatements: BeliefStatement[] = [
     plain:
       "Right and wrong are only a matter of what people or societies happen to approve of.",
     clarify:
-      "Affirm this only if no moral truth is independent of all human or social approval.",
+      "Affirm this only if no moral truth is independent of all human or social approval. This covers individual subjectivism and cultural or intersubjective relativism alike. Sophisticated constructivist and quasi-realist views sit nearby but may decline both poles, since they earn ordinary moral talk without grounding it in bare approval.",
     caseFor:
       "Subjectivist and relativist approaches can explain moral practice through attitudes, cultures, or commitments.",
     caseAgainst:
@@ -451,9 +451,9 @@ export const beliefStatements: BeliefStatement[] = [
     prompt:
       "A finite human life can be objectively meaningful through worthwhile activity even if no God or immortal soul exists.",
     plain:
-      "A human life can truly matter because of worthwhile things in this world, even without God or an afterlife.",
+      "A human life can be objectively meaningful through worthwhile activity in this world, even without God or an afterlife.",
     clarify:
-      "Objective naturalism says meaning can depend on real value in this world rather than transcendence.",
+      "Objective naturalism says meaning can depend on real value in this world rather than transcendence. This is about objective meaning, not whether things can matter to you: a subjectivist can hold that family and projects genuinely matter to them while denying any objective meaning.",
     caseFor:
       "Objective naturalists point to knowledge, creativity, love, and improving lives as genuinely worthwhile.",
     caseAgainst:
@@ -484,7 +484,7 @@ export const beliefStatements: BeliefStatement[] = [
     plain:
       "If the whole past and the laws of nature were exactly the same, only one future action could happen.",
     clarify:
-      "This is causal or nomological determinism as applied to choices.",
+      "This is causal or nomological determinism as applied to choices: a metaphysical claim about whether the past and laws fix a unique future. It is not a claim about quantum mechanics, relativity, or whether anyone could in practice predict the outcome.",
     caseFor:
       "Determinists treat actions as part of a world fully fixed by past conditions and natural laws.",
     caseAgainst:
