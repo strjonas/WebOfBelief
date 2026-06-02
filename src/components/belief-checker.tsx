@@ -25,6 +25,7 @@ import {
   beliefWebDiagramEdges,
   beliefWebDiagramNodes,
 } from "./belief-web-diagram";
+import Link from "next/link";
 import { trackEvent } from "@/lib/analytics";
 import { encodeAnswers } from "@/lib/share-code";
 import {
@@ -593,17 +594,21 @@ export function BeliefChecker() {
   const [topicIndex, setTopicIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [copyNotice, setCopyNotice] = useState("");
+  const [compareNotice, setCompareNotice] = useState("");
   const [hydrated, setHydrated] = useState(false);
 
-  // Restore saved progress once, after mount. Running in an effect (not during
-  // render) keeps the server and first client render identical, so there's no
-  // hydration mismatch.
+  // Restore saved progress once, after mount. Doing this in an effect (rather
+  // than a lazy useState initializer that reads localStorage) keeps the server
+  // and first client render identical, so there's no hydration mismatch — which
+  // is exactly why setting state from the effect is correct here.
   useEffect(() => {
     const saved = loadPersistedState();
     if (saved) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setAnswers(saved.answers);
       setTopicIndex(saved.topicIndex);
       setShowResults(saved.showResults);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
     setHydrated(true);
   }, []);
@@ -819,11 +824,11 @@ export function BeliefChecker() {
     try {
       await navigator.clipboard.writeText(link);
       trackEvent({ name: "compare_link_created" });
-      setCopyNotice(
+      setCompareNotice(
         "Compare link copied. Send it to a friend — they'll see where your webs differ. Your answers ride in the link, never our server.",
       );
     } catch {
-      setCopyNotice("Clipboard access was unavailable in this browser.");
+      setCompareNotice("Clipboard access was unavailable in this browser.");
     }
   }, [answers, siteOrigin]);
 
@@ -883,6 +888,7 @@ export function BeliefChecker() {
     setTopicIndex(0);
     setShowResults(false);
     setCopyNotice("");
+    setCompareNotice("");
   }
 
   async function copyPrivateSummary() {
@@ -951,6 +957,15 @@ export function BeliefChecker() {
               God existed...&rdquo;), do not affirm it as an actual belief.
             </p>
           </details>
+          <p className="mt-4 font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
+            Have a compare link from someone?{" "}
+            <Link
+              href="/compare-beliefs"
+              className="text-indigo-ink underline decoration-indigo-ink/40 underline-offset-[5px] transition hover:decoration-indigo-ink"
+            >
+              Open it here →
+            </Link>
+          </p>
         </div>
         <div className="w-full max-w-sm border-l-2 border-mark pl-5">
           <div className="flex items-baseline justify-between font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
@@ -1318,11 +1333,11 @@ export function BeliefChecker() {
                 shown. It is rendered in your browser and never uploaded.
               </p>
 
-              <div className="mt-6 flex flex-wrap items-baseline gap-x-5 gap-y-3">
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <button
                   type="button"
                   onClick={shareBadge}
-                  className="border border-ink bg-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
+                  className="border border-ink bg-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
                 >
                   System share sheet
                 </button>
@@ -1330,7 +1345,7 @@ export function BeliefChecker() {
                   href={tweetUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="border border-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
+                  className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
                 >
                   Share on X
                 </a>
@@ -1338,7 +1353,7 @@ export function BeliefChecker() {
                   href={blueskyUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="border border-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
+                  className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
                 >
                   Share on Bluesky
                 </a>
@@ -1346,7 +1361,7 @@ export function BeliefChecker() {
                   href={redditUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="border border-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
+                  className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
                 >
                   Post to Reddit
                 </a>
@@ -1390,28 +1405,6 @@ export function BeliefChecker() {
                 </button>
               </div>
 
-              {affirmed.length > 0 ? (
-                <div className="mt-8 border-l-2 border-indigo-ink bg-paper-soft px-5 py-5">
-                  <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-indigo-ink">
-                    <span className="section-mark" />
-                    or compare with a friend
-                  </p>
-                  <p className="mt-2 max-w-xl font-serif text-[1rem] leading-7 text-ink-soft">
-                    Send someone a link and they&apos;ll see exactly where your
-                    two webs pull apart — and the premise on each fault line.
-                    Your answers travel inside the link itself; they never reach
-                    our server.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={copyCompareLink}
-                    className="mt-4 border border-indigo-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-indigo-ink transition hover:bg-indigo-ink hover:text-paper"
-                  >
-                    Copy compare link
-                  </button>
-                </div>
-              ) : null}
-
               <p className="mt-4 font-serif text-[0.92rem] italic leading-6 text-muted">
                 Image attachment for X / Reddit posts requires uploading the
                 downloaded or copied image manually — the intent links open with
@@ -1439,6 +1432,49 @@ export function BeliefChecker() {
               />
             ) : null}
           </div>
+
+          {/* Compare — its own prominent step at the end of the result. */}
+          {affirmed.length > 0 ? (
+            <div className="mt-12 border-t border-rule pt-10">
+              <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-indigo-ink">
+                <span className="section-mark" />4 &middot; compare
+              </p>
+              <div className="mt-4 border-l-[3px] border-indigo-ink bg-paper-soft px-5 py-6 sm:px-7">
+                <h4 className="font-serif text-2xl font-medium leading-tight tracking-tight text-ink">
+                  Compare your web with a friend&apos;s.
+                </h4>
+                <p className="mt-3 max-w-xl font-serif text-[1rem] leading-7 text-ink-soft">
+                  Send someone a link and they&apos;ll see exactly where your two
+                  webs pull apart — and the premise on each fault line. Your
+                  answers travel inside the link itself; they never reach our
+                  server.
+                </p>
+                <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+                  <button
+                    type="button"
+                    onClick={copyCompareLink}
+                    className="border border-indigo-ink bg-indigo-ink px-6 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:border-ink hover:bg-ink"
+                  >
+                    Copy compare link
+                  </button>
+                  <Link
+                    href="/compare-beliefs"
+                    className="font-sans text-[0.75rem] uppercase tracking-[0.16em] text-indigo-ink underline decoration-indigo-ink/40 underline-offset-[5px] transition hover:decoration-indigo-ink"
+                  >
+                    Or open a link someone sent you →
+                  </Link>
+                </div>
+                {compareNotice ? (
+                  <p
+                    aria-live="polite"
+                    className="mt-4 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-indigo-ink"
+                  >
+                    {compareNotice}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </section>
       ) : null}
     </section>
