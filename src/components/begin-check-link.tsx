@@ -1,13 +1,15 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { trackEvent } from "@/lib/analytics";
 
 /**
- * The hero "Begin the check" call to action. It's a plain anchor to #check
- * (so it still works without JS), with a click event that lets you see, in
- * Vercel Analytics, how many visitors click to begin vs. bounce off the hero —
- * and, combined with `check_started`, how many click but never answer.
+ * The "Begin the check" call to action. It links to the dedicated /check page
+ * (the propositions live there, apart from the home page's engine explanation),
+ * with a click event that lets you see, in Vercel Analytics, how many visitors
+ * click to begin vs. bounce — and, combined with `check_started`, how many
+ * click but never answer.
  */
 export function BeginCheckLink({
   className,
@@ -17,12 +19,12 @@ export function BeginCheckLink({
   children: ReactNode;
 }) {
   return (
-    <a
-      href="#check"
+    <Link
+      href="/check"
       className={className}
       onClick={() => trackEvent({ name: "begin_cta_click" })}
     >
       {children}
-    </a>
+    </Link>
   );
 }

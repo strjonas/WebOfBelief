@@ -155,9 +155,22 @@ export const homeEntry: ContentEntry = {
   lastModified: REVISED,
 };
 
+/** The check itself, on its own page so the propositions stand apart from the
+ * engine explanation that lives on the home page. */
+export const checkEntry: ContentEntry = {
+  path: "/check",
+  title: "Take the check — answer 23 statements about what you believe",
+  description:
+    "Answer 23 plain statements on morality, freedom, mind, AI consciousness, and God, then see where your beliefs clash, imply one another, or hold together.",
+  changeFrequency: "weekly",
+  priority: 0.9,
+  lastModified: REVISED,
+};
+
 /** Every indexable route, deduplicated, for the sitemap. */
 export const allContent: ContentEntry[] = [
   homeEntry,
+  checkEntry,
   ...corePages,
   ...guides,
   ...legalPages,

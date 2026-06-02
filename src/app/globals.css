@@ -21,6 +21,8 @@
 }
 
 @theme inline {
+  --breakpoint-xs: 26rem;
+
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);

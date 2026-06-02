@@ -122,10 +122,14 @@ export function StatementFeedback({ beliefId }: { beliefId: string }) {
   ];
 
   return (
-    <details className="group mt-5 border-t border-rule-soft pt-4">
+    <details className="group/suggest mt-5 border-t border-rule-soft pt-4">
       <summary className="cursor-pointer list-none font-sans text-[0.74rem] uppercase tracking-[0.18em] text-muted marker:hidden transition hover:text-ink">
-        <span className="group-open:hidden">↳ suggest a fix for this one</span>
-        <span className="hidden group-open:inline">↑ hide suggestion box</span>
+        <span className="group-open/suggest:hidden">
+          ↳ suggest a fix for this one
+        </span>
+        <span className="hidden group-open/suggest:inline">
+          ↑ hide suggestion box
+        </span>
       </summary>
       <div className="mt-4">
         <div

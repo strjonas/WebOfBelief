@@ -36,11 +36,8 @@ describe("BeliefChecker", () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);
 
-    // God topics no longer lead; open that topic before answering them.
-    await user.click(
-      screen.getByRole("button", { name: "God and evidence. 0 of 6 answered." }),
-    );
-
+    // Every statement renders at once now, so the conflicting pair can be
+    // answered without opening a topic first.
     const godChoice = screen.getByRole("radio", {
       name: `I believe this: ${perfectGod}`,
     }) as HTMLInputElement;
@@ -53,11 +50,11 @@ describe("BeliefChecker", () => {
 
     expect(godChoice.checked).toBe(true);
     expect(sufferingChoice.checked).toBe(true);
-    expect(screen.getByText("2 of 23 answered")).toBeDefined();
+    expect(
+      screen.getByRole("progressbar").getAttribute("aria-valuenow"),
+    ).toBe("2");
 
-    await user.click(
-      screen.getByRole("button", { name: "Check affirmed beliefs" }),
-    );
+    await user.click(screen.getByRole("button", { name: "See my results" }));
 
     expect(
       screen.getByRole("heading", { name: "1 direct conflict to examine" }),
@@ -67,36 +64,22 @@ describe("BeliefChecker", () => {
     ).toBeDefined();
   });
 
-  it("keeps answers while navigating between topics", async () => {
+  it("keeps answers when moving to results and back to edit", async () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);
-
-    await user.click(
-      screen.getByRole("button", {
-        name: "Morality and meaning. 0 of 6 answered.",
-      }),
-    );
 
     await user.click(
       screen.getByRole("radio", {
         name: `I believe this: ${moralFacts}`,
       }),
     );
-    await user.click(
-      screen.getByRole("button", {
-        name: "Next topic: Mind and consciousness (optional)",
-      }),
-    );
 
+    await user.click(screen.getByRole("button", { name: "See my results" }));
     expect(
-      screen.getByRole("heading", { name: "Mind and consciousness" }),
+      screen.getByRole("heading", { name: "Your selection" }),
     ).toBeDefined();
 
-    await user.click(
-      screen.getByRole("button", {
-        name: "Morality and meaning. 1 of 6 answered.",
-      }),
-    );
+    await user.click(screen.getByRole("button", { name: "Edit selection" }));
 
     const restoredChoice = screen.getByRole("radio", {
       name: `I believe this: ${moralFacts}`,
@@ -109,7 +92,7 @@ describe("BeliefChecker", () => {
     render(<BeliefChecker />);
 
     const reviewButton = screen.getByRole("button", {
-      name: "Check affirmed beliefs",
+      name: "See my results",
     }) as HTMLButtonElement;
 
     expect(reviewButton.disabled).toBe(false);
@@ -130,10 +113,6 @@ describe("BeliefChecker", () => {
     render(<BeliefChecker />);
 
     await user.click(
-      screen.getByRole("button", { name: "God and evidence. 0 of 6 answered." }),
-    );
-
-    await user.click(
       screen.getByRole("radio", {
         name: `I believe this: ${noDeity}`,
       }),
@@ -151,9 +130,7 @@ describe("BeliefChecker", () => {
       }),
     );
 
-    await user.click(
-      screen.getByRole("button", { name: "Check affirmed beliefs" }),
-    );
+    await user.click(screen.getByRole("button", { name: "See my results" }));
 
     expect(
       screen.getByRole("heading", { name: "No direct conflict detected" }),

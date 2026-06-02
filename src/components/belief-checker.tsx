@@ -453,12 +453,12 @@ function StatementCard({
         })}
       </div>
 
-      <details className="group mt-5 border-t border-rule-soft pt-4">
+      <details className="group/bg mt-5 border-t border-rule-soft pt-4">
         <summary className="cursor-pointer list-none font-sans text-[0.78rem] uppercase tracking-[0.18em] text-mark marker:hidden">
-          <span className="group-open:hidden">
+          <span className="group-open/bg:hidden">
             ↳ exact wording, arguments, sources
           </span>
-          <span className="hidden group-open:inline">↑ hide background</span>
+          <span className="hidden group-open/bg:inline">↑ hide background</span>
         </summary>
         <div className="mt-5 grid gap-5 font-serif text-[0.98rem] leading-7 text-ink-soft md:grid-cols-2">
           <div className="md:col-span-2 border-l border-rule-soft pl-4">
@@ -595,7 +595,6 @@ function FindingCard({ finding }: { finding: Finding }) {
 
 export function BeliefChecker() {
   const [answers, setAnswers] = useState<AnswerMap>({});
-  const [topicIndex, setTopicIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [copyNotice, setCopyNotice] = useState("");
   const [compareNotice, setCompareNotice] = useState("");
@@ -610,7 +609,6 @@ export function BeliefChecker() {
     if (saved) {
       /* eslint-disable react-hooks/set-state-in-effect */
       setAnswers(saved.answers);
-      setTopicIndex(saved.topicIndex);
       setShowResults(saved.showResults);
       /* eslint-enable react-hooks/set-state-in-effect */
     }
@@ -621,8 +619,8 @@ export function BeliefChecker() {
   // initial empty state never overwrites saved answers.
   useEffect(() => {
     if (!hydrated) return;
-    savePersistedState({ answers, topicIndex, showResults });
-  }, [hydrated, answers, topicIndex, showResults]);
+    savePersistedState({ answers, showResults });
+  }, [hydrated, answers, showResults]);
 
   const answeredCount = Object.keys(answers).length;
   const unansweredCount = beliefStatements.length - answeredCount;
@@ -631,8 +629,6 @@ export function BeliefChecker() {
   ).length;
   const findings = useMemo(() => evaluateBeliefs(answers), [answers]);
   const affirmed = useMemo(() => affirmedBeliefs(answers), [answers]);
-  const activeTopic = categories[topicIndex];
-  const visibleStatements = statementsForCategory(activeTopic.id);
   const conflictCount = countFindings(findings, "conflict");
   const argumentCount = countFindings(findings, "argument");
   const implicationCount = countFindings(findings, "implication");
@@ -842,23 +838,6 @@ export function BeliefChecker() {
     setCopyNotice("");
   }
 
-  function moveToTopic(nextIndex: number) {
-    // Only count forward progress, and report the step reached (not answers),
-    // so the dashboard shows how far people get before dropping off.
-    if (nextIndex > topicIndex && categories[nextIndex]) {
-      trackEvent({
-        name: "topic_advanced",
-        props: { topic: categories[nextIndex].name, step: nextIndex + 1 },
-      });
-    }
-    setTopicIndex(nextIndex);
-    window.requestAnimationFrame(() => {
-      document
-        .getElementById("active-topic")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }
-
   function reviewResults() {
     trackEvent({ name: "results_viewed" });
     setShowResults(true);
@@ -883,10 +862,14 @@ export function BeliefChecker() {
     trackEvent({ name: "check_reset" });
     clearPersistedState();
     setAnswers({});
-    setTopicIndex(0);
     setShowResults(false);
     setCopyNotice("");
     setCompareNotice("");
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById("check")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   async function copyPrivateSummary() {
@@ -965,223 +948,213 @@ export function BeliefChecker() {
       ) : (
         <>
           {/* Section title */}
-          <div className="flex flex-col gap-6 border-b border-rule pb-8 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
-                <span className="section-mark" />1 &middot; the check
-              </p>
-              <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
-                Choose what you believe.
-              </h2>
-              <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
-                Answer only the statements you want to examine. This is a
-                source-backed prompt, not a verdict, and your answers stay in
-                this browser.
-              </p>
-              <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="font-sans text-[0.68rem] uppercase tracking-[0.18em] text-muted">
-                  start with
+          <div className="border-b border-rule pb-8">
+            <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
+              <span className="section-mark" />1 &middot; the check
+            </p>
+            <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
+              Choose what you believe.
+            </h2>
+            <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
+              Go through the statements below and mark the ones you want to
+              examine. Answer as many or as few as you like — there&apos;s no
+              login, and your answers stay in this browser. When you reach the
+              bottom, see your results.
+            </p>
+            <details className="group mt-5 max-w-2xl">
+              <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
+                <span className="group-open:hidden">
+                  ↳ how answers are counted
                 </span>
-                {categories.map((item, index) => {
-                  const active = index === topicIndex;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => moveToTopic(index)}
-                      aria-pressed={active}
-                      className={`border px-3 py-1.5 font-sans text-[0.68rem] uppercase tracking-[0.16em] transition ${
-                        active
-                          ? "border-ink bg-ink text-paper"
-                          : "border-rule text-ink-soft hover:border-ink hover:text-ink"
-                      }`}
-                    >
-                      {item.name}
-                    </button>
-                  );
-                })}
-              </div>
-              <details className="group mt-5 max-w-2xl">
-                <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
-                  <span className="group-open:hidden">
-                    ↳ how answers are counted
-                  </span>
-                  <span className="hidden group-open:inline">↑ hide</span>
-                </summary>
-                <p className="mt-3 font-serif text-[0.98rem] italic leading-7 text-muted">
-                  Only &ldquo;I believe this&rdquo; is used as a premise (a
-                  starting point the check reasons from). Rejecting, being
-                  unsure, or marking a sentence as conditional/qualified is
-                  never treated as belief in its opposite. If a claim is only
-                  hypothetical for you (&ldquo;if God existed...&rdquo;), do not
-                  affirm it as an actual belief. You can affirm both sides of a
-                  pair, reject both, or qualify either — nothing forces you onto
-                  one side, and a finding only appears for combinations that
-                  genuinely pull against each other. The point is to surface
-                  real pressure between beliefs, not to grade your worldview.
-                </p>
-              </details>
-            </div>
-            <div className="w-full max-w-sm border-l-2 border-mark pl-5">
-              <div className="flex items-baseline justify-between font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
-                <span>progress</span>
-                <span className="tabular text-ink">
-                  {answeredCount} of {beliefStatements.length} answered
-                </span>
-              </div>
-              <div
-                role="progressbar"
-                aria-label="Statements answered"
-                aria-valuemin={0}
-                aria-valuemax={beliefStatements.length}
-                aria-valuenow={answeredCount}
-                className="mt-3 h-[3px] w-full overflow-hidden bg-rule-soft"
-              >
-                <div
-                  className="h-full bg-mark transition-all"
-                  style={{
-                    width: `${(answeredCount / beliefStatements.length) * 100}%`,
-                  }}
-                />
-              </div>
-            </div>
+                <span className="hidden group-open:inline">↑ hide</span>
+              </summary>
+              <p className="mt-3 font-serif text-[0.98rem] italic leading-7 text-muted">
+                A <em>belief</em>
+                {" here is a claim you take to be true — not a hope, a guess, or something you’d entertain only in theory ("}
+                <a
+                  href="https://plato.stanford.edu/entries/belief/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="not-italic underline decoration-rule underline-offset-[3px] transition hover:text-ink hover:decoration-ink"
+                >
+                  the philosophers’ sense, on the SEP
+                </a>
+                {"). So only “I believe this” becomes a premise. Being unsure, rejecting, or marking something conditional is never read as believing its opposite — a hypothetical like “if God existed…” isn’t an affirmation. A finding appears only where two beliefs you affirmed genuinely pull against each other; the aim is to surface that pressure, not to score your worldview."}
+              </p>
+            </details>
           </div>
 
-          <div className="mt-8 grid gap-10 lg:grid-cols-[14rem_minmax(0,1fr)]">
-            {/* Sidebar — numbered topic list */}
-            <aside className="h-fit lg:sticky lg:top-6">
-              <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-muted">
-                topics
-              </p>
-              <nav aria-label="Belief topics" className="mt-3">
-                <ol className="border-t border-rule-soft">
-                  {categories.map((item, index) => {
-                    const categoryCount = statementsForCategory(item.id).length;
-                    const answered = answeredForCategory(item.id);
-                    const active = index === topicIndex;
-                    const roman =
-                      ["i", "ii", "iii", "iv", "v"][index] ?? `${index + 1}`;
-                    return (
-                      <li key={item.id} className="border-b border-rule-soft">
-                        <button
-                          type="button"
-                          onClick={() => moveToTopic(index)}
-                          aria-label={`${item.name}. ${answered} of ${categoryCount} answered.`}
-                          aria-current={active ? "step" : undefined}
-                          className={`flex w-full items-baseline gap-3 py-3 text-left transition ${
-                            active ? "text-ink" : "text-ink-soft hover:text-ink"
-                          }`}
-                        >
-                          <span
-                            className={`font-mono text-[0.72rem] uppercase tracking-[0.18em] ${
-                              active ? "text-mark" : "text-muted"
-                            }`}
-                          >
-                            {roman}.
-                          </span>
-                          <span className="flex-1 font-serif text-[0.98rem] leading-snug">
-                            {item.name}
-                          </span>
-                          <span className="font-mono tabular text-[0.72rem] text-muted">
-                            {answered}/{categoryCount}
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </nav>
-              <div className="mt-6 border-l-2 border-mark pl-4">
-                <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
-                  when ready
-                </p>
-                <p className="mt-2 font-serif text-[0.95rem] leading-6 text-ink-soft">
-                  Partial answers are fine — skipped statements count as Not
-                  sure, and only affirmed ones can trigger a finding.
-                </p>
+          {/* Sticky progress + topic jump links — the only navigation for the
+              single scrolling list, so it can't pull anyone out of the survey.
+              "See results" rides here too, so no one has to scroll to the very
+              end to finish. Per-topic counts stay hidden until a topic actually
+              has answers, so the bar reads clean on first sight and fills in as
+              you go. */}
+          <div className="sticky top-0 z-10 -mx-6 border-b border-rule bg-paper/95 px-6 py-3 backdrop-blur lg:-mx-8 lg:px-8">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-baseline gap-2.5 font-sans text-[0.7rem] uppercase tracking-[0.16em] text-muted">
+                <span>progress</span>
+                <span className="tabular text-ink">
+                  {answeredCount}
+                  <span className="text-muted">
+                    {" "}
+                    / {beliefStatements.length}
+                  </span>
+                </span>
+              </div>
+              {answeredCount > 0 ? (
                 <button
                   type="button"
                   onClick={reviewResults}
-                  aria-label="Check affirmed beliefs"
-                  className="mt-4 w-full border border-ink bg-ink px-4 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
+                  className="group inline-flex shrink-0 items-center gap-2 border border-ink bg-ink px-4 py-1.5 font-sans text-[0.68rem] uppercase tracking-[0.16em] text-paper transition hover:border-mark hover:bg-mark"
                 >
-                  Check affirmed beliefs <span aria-hidden="true">→</span>
+                  See results
+                  <span
+                    aria-hidden="true"
+                    className="transition group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
                 </button>
-              </div>
-            </aside>
-
-            {/* Main column — current topic & its statements */}
-            <div id="active-topic" className="scroll-mt-6">
-              <div className="border-b border-rule pb-6">
-                <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-muted">
-                  topic {topicIndex + 1} of {categories.length}
-                </p>
-                <h3 className="mt-2 font-serif text-[1.85rem] font-medium leading-tight tracking-tight text-ink sm:text-3xl">
-                  {activeTopic.name}
-                </h3>
-                <p className="mt-3 max-w-2xl font-serif text-[1rem] italic leading-7 text-ink-soft">
-                  {activeTopic.description}
-                </p>
-              </div>
-
-              <div className="mt-7 space-y-1">
-                {visibleStatements.map((statement, localIdx) => {
-                  const startIdx = categoryStartIndex.get(activeTopic.id) ?? 0;
-                  const contextNote =
-                    answers.noDeity === "affirm" &&
-                    deityDependentStatementIds.has(statement.id)
-                      ? deityDependentContextNote
-                      : undefined;
-                  return (
-                    <StatementCard
-                      key={statement.id}
-                      statement={statement}
-                      index={startIdx + localIdx}
-                      answer={answers[statement.id]}
-                      onAnswer={(answer) =>
-                        answerStatement(statement.id, answer)
-                      }
-                      contextNote={contextNote}
-                      explainPole={statement.id === firstOppositePoleId}
-                    />
-                  );
-                })}
-              </div>
-
-              <div className="mt-8 flex flex-wrap items-baseline justify-between gap-4 border-t border-rule pt-6">
-                {topicIndex > 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => moveToTopic(topicIndex - 1)}
-                    aria-label="Previous topic"
-                    className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+              ) : null}
+            </div>
+            <div
+              role="progressbar"
+              aria-label="Statements answered"
+              aria-valuemin={0}
+              aria-valuemax={beliefStatements.length}
+              aria-valuenow={answeredCount}
+              className="mt-2 h-[3px] w-full overflow-hidden bg-rule-soft"
+            >
+              <div
+                className="h-full bg-mark transition-all"
+                style={{
+                  width: `${(answeredCount / beliefStatements.length) * 100}%`,
+                }}
+              />
+            </div>
+            <nav
+              aria-label="Jump to topic"
+              className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5"
+            >
+              {categories.map((item) => {
+                const categoryCount = statementsForCategory(item.id).length;
+                const answered = answeredForCategory(item.id);
+                const done = answered === categoryCount;
+                const started = answered > 0;
+                return (
+                  <a
+                    key={item.id}
+                    href={`#topic-${item.id}`}
+                    className={`font-sans text-[0.68rem] uppercase tracking-[0.14em] underline decoration-rule/50 underline-offset-[5px] transition hover:text-ink hover:decoration-ink ${
+                      started ? "text-ink-soft" : "text-muted"
+                    }`}
                   >
-                    <span aria-hidden="true">←</span> previous topic
-                  </button>
-                ) : (
-                  <span />
-                )}
-                {topicIndex < categories.length - 1 ? (
-                  <button
-                    type="button"
-                    onClick={() => moveToTopic(topicIndex + 1)}
-                    aria-label={`Next topic: ${categories[topicIndex + 1].name} (optional)`}
-                    className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink underline decoration-mark decoration-2 underline-offset-[5px] transition hover:decoration-ink"
-                  >
-                    Next topic: {categories[topicIndex + 1].name} (optional){" "}
-                    <span aria-hidden="true">→</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={reviewResults}
-                    aria-label="Check affirmed beliefs"
-                    className="border border-ink bg-ink px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
-                  >
-                    Check affirmed beliefs <span aria-hidden="true">→</span>
-                  </button>
-                )}
-              </div>
+                    {item.name}
+                    {started ? (
+                      <span
+                        className={`ml-1.5 font-mono tabular ${
+                          done ? "text-mark" : "text-muted"
+                        }`}
+                      >
+                        {answered}/{categoryCount}
+                      </span>
+                    ) : null}
+                  </a>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* The full set of statements, in one scroll, grouped by topic. */}
+          <div className="mt-10 space-y-14">
+            {categories.map((cat, ci) => {
+              const startIdx = categoryStartIndex.get(cat.id) ?? 0;
+              const topicStatements = statementsForCategory(cat.id);
+              const answered = answeredForCategory(cat.id);
+              return (
+                <section
+                  key={cat.id}
+                  id={`topic-${cat.id}`}
+                  aria-label={cat.name}
+                  className="scroll-mt-28"
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-rule pb-6">
+                    <div>
+                      <p className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted">
+                        topic {ci + 1} of {categories.length}
+                      </p>
+                      <h3 className="mt-2 font-serif text-[1.85rem] font-medium leading-tight tracking-tight text-ink sm:text-3xl">
+                        {cat.name}
+                      </h3>
+                      <p className="mt-3 max-w-2xl font-serif text-[1rem] italic leading-7 text-ink-soft">
+                        {cat.description}
+                      </p>
+                    </div>
+                    <span className="font-mono tabular text-[0.72rem] uppercase tracking-[0.16em] text-muted">
+                      {answered}/{topicStatements.length} answered
+                    </span>
+                  </div>
+
+                  <div className="mt-7 space-y-1">
+                    {topicStatements.map((statement, localIdx) => {
+                      const contextNote =
+                        answers.noDeity === "affirm" &&
+                        deityDependentStatementIds.has(statement.id)
+                          ? deityDependentContextNote
+                          : undefined;
+                      return (
+                        <StatementCard
+                          key={statement.id}
+                          statement={statement}
+                          index={startIdx + localIdx}
+                          answer={answers[statement.id]}
+                          onAnswer={(answer) =>
+                            answerStatement(statement.id, answer)
+                          }
+                          contextNote={contextNote}
+                          explainPole={statement.id === firstOppositePoleId}
+                        />
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+
+          {/* One prominent finish action at the very end — the overview, share,
+              and compare only appear after this. */}
+          <div className="mt-14 border-t border-rule pt-8">
+            <p className="max-w-2xl font-serif text-[1rem] leading-7 text-ink-soft">
+              That&apos;s all of them. Skipped statements count as &ldquo;Not
+              sure,&rdquo; and only the ones you affirm can trigger a finding —
+              so partial answers are fine.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-4">
+              <button
+                type="button"
+                onClick={reviewResults}
+                aria-label="See my results"
+                className="group inline-flex items-center gap-3 border border-ink bg-ink px-8 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark"
+              >
+                See my results
+                <span
+                  aria-hidden="true"
+                  className="transition group-hover:translate-x-1"
+                >
+                  →
+                </span>
+              </button>
+              {answeredCount > 0 ? (
+                <button
+                  type="button"
+                  onClick={resetCheck}
+                  className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+                >
+                  Start over
+                </button>
+              ) : null}
             </div>
           </div>
         </>
@@ -1192,7 +1165,7 @@ export function BeliefChecker() {
           id="results"
           aria-live="polite"
           aria-label="Reflection results"
-          className="mt-14 scroll-mt-6 border-t border-rule pt-10"
+          className="mt-12 scroll-mt-6"
         >
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
             <div>

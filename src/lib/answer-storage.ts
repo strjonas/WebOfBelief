@@ -1,4 +1,4 @@
-import { categories, statementById, type Answer, type BeliefId } from "./beliefs";
+import { statementById, type Answer, type BeliefId } from "./beliefs";
 import type { AnswerMap } from "./evaluate";
 
 // Persist in-progress answers on the visitor's own device so an accidental
@@ -17,9 +17,9 @@ const validAnswers = new Set<Answer>([
 
 export interface PersistedState {
   answers: AnswerMap;
-  topicIndex: number;
-  // Whether the visitor has clicked "Check" and seen their results, vs. only
-  // started answering. Lets callers tell a finished web from an exploratory one.
+  // Whether the visitor has clicked "See my results" and seen their results, vs.
+  // only started answering. Lets callers tell a finished web from an exploratory
+  // one.
   showResults: boolean;
 }
 
@@ -39,14 +39,8 @@ export function loadPersistedState(): PersistedState | null {
         }
       }
     }
-    const maxTopic = categories.length - 1;
-    const topicIndex =
-      typeof parsed.topicIndex === "number"
-        ? Math.min(Math.max(0, Math.trunc(parsed.topicIndex)), maxTopic)
-        : 0;
     return {
       answers,
-      topicIndex,
       showResults: parsed.showResults === true,
     };
   } catch {

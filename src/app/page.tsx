@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { BeliefCheckerBoundary } from "@/components/belief-checker-boundary";
-import { BeliefChecker } from "@/components/belief-checker";
 import { BeliefWebDiagram } from "@/components/belief-web-diagram";
 import { BeginCheckLink } from "@/components/begin-check-link";
 import { HomeViewTracker } from "@/components/home-view-tracker";
@@ -41,28 +39,20 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col gap-5">
-              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-                <BeginCheckLink className="group inline-flex w-fit items-center gap-3 border border-ink bg-ink px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark">
-                  Begin the check
-                  <span className="transition group-hover:translate-x-1">→</span>
-                </BeginCheckLink>
-                <Link
-                  href="/compare-beliefs"
-                  className="group inline-flex w-fit items-center gap-3 border border-rule px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-ink transition hover:border-ink"
-                >
-                  Have a friend&apos;s link?
-                  <span className="transition group-hover:translate-x-1">→</span>
-                </Link>
-              </div>
+              <BeginCheckLink className="group inline-flex w-fit items-center gap-3 border border-ink bg-ink px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark">
+                Begin the check
+                <span className="transition group-hover:translate-x-1">→</span>
+              </BeginCheckLink>
               <div className="flex flex-wrap items-baseline gap-x-6 gap-y-3">
                 <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
                   23 statements &middot; ~5 min &middot; no login
                 </span>
+
                 <Link
-                  href="/method"
+                  href="/compare-beliefs"
                   className="font-sans text-[0.72rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
                 >
-                  How the engine reasons
+                  Have a friend&apos;s link?
                 </Link>
               </div>
             </div>
@@ -72,8 +62,8 @@ export default function Home() {
             <figure className="border border-rule bg-paper-soft p-5 sm:p-7">
               <figcaption className="mb-3 flex items-baseline justify-between font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
                 <span>
-                  <span className="font-mono text-mark">fig. 1</span>{" "}
-                  &middot; the rule-graph — the map of checks it runs
+                  <span className="font-mono text-mark">fig. 1</span> &middot;
+                  the rule-graph — the map of checks it runs
                 </span>
                 <span>23 nodes / 22 edges</span>
               </figcaption>
@@ -153,7 +143,7 @@ export default function Home() {
             <details className="group mt-5 border-t border-rule-soft pt-4">
               <summary className="cursor-pointer list-none font-sans text-[0.78rem] uppercase tracking-[0.18em] text-mark marker:hidden">
                 <span className="group-open:hidden">
-                  ↳ what this is, and what it isn&apos;t
+                  ↳ what it isn&apos;t, and where the name comes from
                 </span>
                 <span className="hidden group-open:inline">↑ hide</span>
               </summary>
@@ -164,35 +154,18 @@ export default function Home() {
                 Consistency is a <em>floor</em>, not proof: the point is to see
                 your commitments clearly and hold them on purpose.
               </p>
-            </details>
-
-            <details className="group mt-4 border-t border-rule-soft pt-4">
-              <summary className="cursor-pointer list-none font-sans text-[0.78rem] uppercase tracking-[0.18em] text-mark marker:hidden">
-                <span className="group-open:hidden">
-                  ↳ the name &amp; the Quine reference
-                </span>
-                <span className="hidden group-open:inline">↑ hide</span>
-              </summary>
               <p className="mt-4 font-serif text-[0.92rem] italic leading-6 text-muted">
                 The name borrows W.&nbsp;V.&nbsp;Quine and
-                J.&nbsp;S.&nbsp;Ullian&apos;s metaphor (<em>The Web of Belief</em>,
-                1970): no belief stands alone. The engine itself is not Quinean
-                holism — just a small set of explicit rules, each one a
-                recognised move in the contemporary literature.
+                J.&nbsp;S.&nbsp;Ullian&apos;s metaphor (
+                <em>The Web of Belief</em>, 1970): no belief stands alone. The
+                engine itself is not Quinean holism — just a small set of
+                explicit rules, each one a recognised move in the contemporary
+                literature.
               </p>
             </details>
           </div>
         </div>
       </section>
-
-      <div className="mx-auto w-full max-w-6xl px-6 lg:px-8">
-        <noscript>
-          <p className="mt-12 border-l-2 border-mark bg-paper-soft px-5 py-4 font-serif text-[1rem] leading-7 text-ink-soft">This checker needs JavaScript enabled; you can still read the method and sources <a href="/method" className="underline decoration-mark decoration-2 underline-offset-[5px]">here</a>.</p>
-        </noscript>
-        <BeliefCheckerBoundary>
-          <BeliefChecker />
-        </BeliefCheckerBoundary>
-      </div>
 
       {/* Why these questions — restrained, type-led */}
       <section className="border-t border-rule">
@@ -221,6 +194,25 @@ export default function Home() {
               standard, and the full source library
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Closing call to action — the check lives on its own page. */}
+      <section className="border-t border-rule bg-paper-soft">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-14 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+          <div>
+            <h2 className="font-serif text-2xl font-medium leading-tight tracking-tight text-ink sm:text-3xl">
+              Ready to map your own web?
+            </h2>
+            <p className="mt-2 font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+              23 statements &middot; ~5 min &middot; no login &middot; answers
+              stay in your browser
+            </p>
+          </div>
+          <BeginCheckLink className="group inline-flex w-fit shrink-0 items-center gap-3 border border-ink bg-ink px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark">
+            Begin the check
+            <span className="transition group-hover:translate-x-1">→</span>
+          </BeginCheckLink>
         </div>
       </section>
     </main>
