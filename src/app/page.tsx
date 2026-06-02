@@ -3,10 +3,12 @@ import { BeliefCheckerBoundary } from "@/components/belief-checker-boundary";
 import { BeliefChecker } from "@/components/belief-checker";
 import { BeliefWebDiagram } from "@/components/belief-web-diagram";
 import { BeginCheckLink } from "@/components/begin-check-link";
+import { HomeViewTracker } from "@/components/home-view-tracker";
 
 export default function Home() {
   return (
     <main className="flex-1">
+      <HomeViewTracker />
       {/* Masthead — a single horizontal page-wide bar like a journal header */}
       <section className="border-b border-rule">
         <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-12 px-6 pt-12 pb-14 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pt-16 lg:pb-20">

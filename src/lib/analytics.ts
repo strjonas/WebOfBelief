@@ -10,6 +10,7 @@ import { track } from "@vercel/analytics";
  * made on /privacy and /method. Do not add answer-derived fields here.
  */
 export type FunnelEvent =
+  | { name: "home_viewed"; props?: never }
   | { name: "begin_cta_click"; props?: never }
   | { name: "check_started"; props?: never }
   | { name: "topic_advanced"; props: { topic: string; step: number } }
@@ -30,5 +31,30 @@ export function trackEvent(event: FunnelEvent): void {
     }
   } catch {
     // Analytics must never break the app.
+  }
+  sendToStore(event);
+}
+
+/**
+ * Mirror the event to our own ingest endpoint (/api/stat) so the protected
+ * dashboard at /admin/analytics can compute funnel conversion rates — Vercel's
+ * dashboard records the same events but won't do the funnel math. Fire-and-
+ * forget with keepalive so it survives the page unloading on the last step.
+ */
+function sendToStore(event: FunnelEvent): void {
+  if (typeof window === "undefined") return;
+  try {
+    const payload =
+      "props" in event && event.props
+        ? { name: event.name, props: event.props }
+        : { name: event.name };
+    void fetch("/api/stat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // Never let analytics break the app.
   }
 }
