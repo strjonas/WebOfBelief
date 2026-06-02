@@ -3,7 +3,7 @@
 **See whether your beliefs actually fit together.**
 [webofbelief.app](https://webofbelief.app) · [Method &amp; sources](https://webofbelief.app/method)
 
-![Web of Belief — twenty-three beliefs, one web: where does it tear? A consistency check whose every finding cites a philosophical source.](docs/social-card.png)
+<img width="1200" height="630" alt="image" src="https://github.com/user-attachments/assets/5e5121a3-0cd9-4e8d-82b5-7508cefb16f6" />
 
 You answer twenty-three plain statements about morality, freedom, mind, AI
 consciousness, God, and right action. A small, inspectable rule engine then
