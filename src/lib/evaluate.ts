@@ -23,6 +23,12 @@ export interface Finding {
    * commitments to the negation.
    */
   rejects?: BeliefId[];
+  /**
+   * One or two plain sentences on *why* the pair pulls against each other —
+   * short enough to read inside the hover/tap overlay on the web's edges,
+   * before the visitor decides to open the full {@link explanation} below.
+   */
+  gist: string;
   explanation: string;
   bridge?: string;
   nextQuestion: string;
@@ -35,6 +41,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "A deity exists and no deity exists",
     requires: ["perfectGod", "noDeity"],
+    gist:
+      "A personal God is itself a deity — so “God exists” and “no deity exists” can’t both be true. One of the two has to give.",
     explanation:
       "The personal God affirmed in the first statement is a deity. It cannot both exist and fall under the claim that no deity exists.",
     nextQuestion:
@@ -46,6 +54,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "Perfect goodness and unjustifiable suffering",
     requires: ["perfectGod", "gratuitousSuffering"],
+    gist:
+      "A perfectly good, all-knowing, all-powerful God would always have a morally sufficient reason for any suffering it allows. Calling some suffering genuinely pointless says there is suffering with no such reason — so both can’t stand as worded.",
     explanation:
       "As phrased, a perfectly good, omniscient, omnipotent God would not permit suffering for which that being could have no morally sufficient reason. You affirmed both that God and such suffering.",
     nextQuestion:
@@ -57,6 +67,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "Mind-independent and attitude-only morality",
     requires: ["moralFacts", "attitudeOnlyMorality"],
+    gist:
+      "One says at least one moral truth holds no matter what anyone approves; the other says every moral truth is only a matter of approval. Those are straight negations of each other.",
     explanation:
       "One answer affirms at least one moral truth independent of approval; the other says every moral truth depends only on approval. They directly negate one another.",
     nextQuestion:
@@ -68,6 +80,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "Sole divine source and command-independent duty",
     requires: ["divineCommandOnly", "independentDuty"],
+    gist:
+      "If duties exist only because God commands them, then no duty can hold independently of any divine command — which is exactly what the other statement asserts.",
     explanation:
       "If every obligation is true solely because of God's commands, no obligation remains true independently of any divine command.",
     nextQuestion:
@@ -79,6 +93,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "Finite meaning with and without a transcendent requirement",
     requires: ["naturalMeaning", "meaningNeedsTranscendent"],
+    gist:
+      "One allows a finite life to carry objective meaning without God or an afterlife; the other says meaning is impossible without them. They can’t both be right.",
     explanation:
       "The first statement affirms possible objective meaning without God or immortality; the second denies that possibility.",
     nextQuestion:
@@ -90,6 +106,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "One possible future and a different possible choice",
     requires: ["determinism", "samePastAlternative"],
+    gist:
+      "Holding the whole past and the laws of nature fixed, one statement says only a single action can follow; the other says a different action was still possible in those very conditions. Same setup, opposite verdicts.",
     explanation:
       "Both statements hold the complete past and laws fixed. One allows only one resulting action; the other says another action is possible in those same conditions.",
     nextQuestion:
@@ -101,6 +119,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "Physical facts fix consciousness, yet a physical duplicate lacks it",
     requires: ["physicalClosure", "zombieWorld"],
+    gist:
+      "If the physical facts fully fix consciousness, then a perfect physical copy of you couldn’t be missing consciousness. The zombie case claims exactly such a copy is possible.",
     explanation:
       "If all physical facts fix every consciousness fact, a physically identical world cannot differ by entirely lacking consciousness.",
     nextQuestion:
@@ -112,6 +132,8 @@ const rules: Finding[] = [
     kind: "argument",
     title: "Causing harm is wrong, yet buying into it is permitted",
     requires: ["minorConvenienceHarmWrong", "factoryFarmPermissible"],
+    gist:
+      "Causing severe avoidable harm is wrong, yet buying from a system that inflicts it is called fine. These collide only if your purchase counts as taking part in the harm — which is genuinely disputed, so it’s a real tension, not a flat contradiction.",
     explanation:
       "One statement is about causing severe avoidable suffering; the other about buying from a system that inflicts it. These collide only if purchasing counts as morally relevant participation in the harm. The causal-inefficacy objection denies that a single purchase changes how many animals suffer, so this is a serious tension rather than a flat contradiction.",
     bridge:
@@ -125,6 +147,8 @@ const rules: Finding[] = [
     kind: "argument",
     title: "Perfect love and nonresistant nonbelief",
     requires: ["perfectGod", "nonresistantNonbelief"],
+    gist:
+      "A perfectly loving God open to relationship would seem to make itself findable to sincere, non-resisting seekers. That some such seekers still cannot believe is the hiddenness problem — pressure on the pair, not a flat contradiction.",
     explanation:
       "This is the divine hiddenness problem: sincere seekers who lack belief appear difficult to reconcile with a perfectly loving personal God.",
     bridge:
@@ -138,6 +162,8 @@ const rules: Finding[] = [
     kind: "argument",
     title: "Infallible foreknowledge and alternative possibilities",
     requires: ["infallibleForeknowledge", "samePastAlternative"],
+    gist:
+      "If an infallible mind already knew your choice before you made it, it’s hard to see how you could still have chosen otherwise. That’s the foreknowledge puzzle — a hard question, not an automatic clash.",
     explanation:
       "Theological fatalism asks how a different choice remains possible when an earlier divine belief cannot be wrong.",
     bridge:
@@ -151,6 +177,8 @@ const rules: Finding[] = [
     kind: "argument",
     title: "Determinism and responsibility",
     requires: ["determinism", "responsibilityWithoutAlternatives"],
+    gist:
+      "If the past and the laws fix every act, what makes an act yours to be praised or blamed for? Holding both isn’t a contradiction — it’s the central question compatibilism sets out to answer.",
     explanation:
       "This is a central compatibilist position rather than a detected contradiction. It invites an account of why fixed actions can still be owned by an agent.",
     bridge:
@@ -165,6 +193,8 @@ const rules: Finding[] = [
     title: "A fork in the road about responsibility",
     requires: ["determinism"],
     rejects: ["responsibilityWithoutAlternatives"],
+    gist:
+      "You hold the future is fixed and that responsibility needs a genuine alternative — together those imply no one is ever responsible for anything. It’s a fork, not a verdict: most people keep responsibility by loosening one of the two premises.",
     explanation:
       "Two of your answers point the same way. You affirm that the past and the laws of nature fix a single possible future, and — by rejecting the previous statement — you hold that a person cannot be morally responsible without an alternative open to them. Put together, those say no one is ever morally responsible for anything. This is a fork, not a verdict on you, and almost everyone who reaches it keeps responsibility by revising a premise rather than abandoning it. Compatibilists drop the demand for alternative possibilities and locate responsibility in acting from one's own reasons, character, and capacity to respond to them; libertarians instead deny that the future is fixed in this way. Hard incompatibilism — accepting that no one is ever responsible — is a coherent position some philosophers defend, but it is the least-taken exit and the hardest to square with how we actually live, blame, and forgive.",
     bridge:
@@ -178,6 +208,8 @@ const rules: Finding[] = [
     kind: "compatible",
     title: "God and objective morality",
     requires: ["perfectGod", "moralFacts"],
+    gist:
+      "Believing in God and in objective morality fit together fine — this is the standard theistic moral-realist view, not a tension. The only open question is what grounds the moral facts.",
     explanation:
       "This pairing is coherent and is the standard theistic moral-realist view; it is not a tension in your beliefs. The open question is only what grounds the moral facts: God's nature, God's commands, or reasons that hold independently.",
     nextQuestion:
@@ -189,6 +221,8 @@ const rules: Finding[] = [
     kind: "compatible",
     title: "No deity and objective moral facts",
     requires: ["noDeity", "moralFacts"],
+    gist:
+      "Denying any deity while holding that some things are really right or wrong is a live, consistent position. The remaining task is just explaining what those moral facts rest on.",
     explanation:
       "This pair is not internally inconsistent. Non-theistic moral realism is a live position; the further task is explaining the nature and knowledge of moral facts.",
     nextQuestion:
@@ -200,6 +234,8 @@ const rules: Finding[] = [
     kind: "compatible",
     title: "No deity and objective meaning in finite life",
     requires: ["noDeity", "naturalMeaning"],
+    gist:
+      "No God and real meaning in a finite life is a recognized position — objective naturalism — not a contradiction. The open question is which goods make a life meaningful.",
     explanation:
       "This is objective naturalism about meaning, an established position: finite lives may connect with objectively worthwhile goods without transcendence.",
     nextQuestion:
@@ -211,6 +247,8 @@ const rules: Finding[] = [
     kind: "argument",
     title: "Animal consideration and everyday choices",
     requires: ["animalsMatter", "factoryFarmPermissible"],
+    gist:
+      "Granting that animals matter morally doesn’t by itself settle every meal — but severe, avoidable harm for easily replaced interests makes buying into it a demanding thing to justify.",
     explanation:
       "Direct animal consideration does not by itself settle every food choice, but severe avoidable harm for replaceable interests creates a demanding practical question.",
     bridge:
@@ -224,6 +262,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "Only consequences matter, yet some acts are off-limits",
     requires: ["consequencesOnly", "sideConstraints"],
+    gist:
+      "If only consequences matter, the act with the best outcome is always the right one. Saying some best-outcome act is still wrong means something other than consequences counts — both can’t hold.",
     explanation:
       "If rightness depends only on consequences, then the act with the best consequences is right and cannot be wrong. The other statement says some such act is nonetheless wrong. Both cannot hold.",
     nextQuestion:
@@ -235,6 +275,8 @@ const rules: Finding[] = [
     kind: "conflict",
     title: "An infallible divine belief, but no deity to hold it",
     requires: ["infallibleForeknowledge", "noDeity"],
+    gist:
+      "An infallible divine belief needs a divine believer to hold it. Affirming such foreknowledge while denying any deity removes the very mind the claim depends on.",
     explanation:
       "The foreknowledge statement asserts that an infallible divine belief already exists about your choices. A belief requires a believer, so this presupposes a deity. Affirming it together with the claim that no deity exists is inconsistent.",
     nextQuestion:
@@ -246,6 +288,8 @@ const rules: Finding[] = [
     kind: "implication",
     title: "A fork in the road about meaning",
     requires: ["noDeity", "meaningNeedsTranscendent"],
+    gist:
+      "You hold that meaning needs God or a soul, and that no God exists — together (with no soul) those point to a finite life having no objective meaning. It’s a fork: drop the requirement, or accept that meaning is something we confer rather than find.",
     explanation:
       "Two of your answers point in the same direction: you hold that objective meaning requires God or an immortal soul, and that no deity exists. If there is also no immortal soul, those premises lead to the conclusion that finite lives lack objective meaning. That is not a verdict on you — it is a fork. Most who reach it keep one of two well-developed paths: drop the requirement (objective naturalists argue that love, knowledge, and creativity make a finite life genuinely meaningful), or accept that meaning is something we confer rather than discover.",
     bridge:
@@ -259,6 +303,8 @@ const rules: Finding[] = [
     kind: "implication",
     title: "A fork in the road about moral obligation",
     requires: ["noDeity", "divineCommandOnly"],
+    gist:
+      "If obligations exist only because God commands them, and there’s no God to issue commands, then nothing is obligatory. It’s a fork: most people keep their morality by letting some duties hold without any divine command.",
     explanation:
       "Two of your answers point the same way: if every moral obligation holds solely because God commands it, and no God exists to issue commands, then nothing is obligatory. This is a fork, not a sentence. Many who notice it keep their morality by loosening the first premise — holding that some duties (against cruelty, say) hold on grounds that do not depend on a divine command at all.",
     bridge:
@@ -272,6 +318,8 @@ const rules: Finding[] = [
     kind: "argument",
     title: "Evidence-only belief and belief in God",
     requires: ["beliefNeedsEvidence", "perfectGod"],
+    gist:
+      "You hold that belief requires adequate evidence, and you believe God exists — so by your own standard, that belief needs adequate evidence. That’s the classic evidentialist challenge, and theists answer it in several ways.",
     explanation:
       "You hold that belief requires adequate evidence, and you believe God exists. By your own standard, theistic belief is justified only if there is adequate evidence for it. This is the classic evidentialist challenge to religious belief, and theists answer it in different ways.",
     bridge:

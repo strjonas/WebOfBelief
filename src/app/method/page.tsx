@@ -93,9 +93,9 @@ export default function MethodPage() {
               <span>
                 <span className="font-medium text-ink">Your selections </span>
                 are held in browser memory for this page only. Only &ldquo;I
-                believe this&rdquo; is used as a premise; rejection, uncertainty,
-                and qualification are not treated as belief in the opposite
-                sentence.
+                believe this&rdquo; is used as a premise; rejection,
+                uncertainty, and qualification are not treated as belief in the
+                opposite sentence.
               </span>
             </li>
             <li className="flex gap-4">
@@ -104,9 +104,9 @@ export default function MethodPage() {
               </span>
               <span>
                 <span className="font-medium text-ink">Explicit rules </span>
-                in custom TypeScript check the statements marked &ldquo;I believe
-                this&rdquo; against reviewed relationships — every edge in the
-                diagram on the home page.
+                in custom TypeScript check the statements marked &ldquo;I
+                believe this&rdquo; against reviewed relationships — every edge
+                in the diagram on the home page.
               </span>
             </li>
             <li className="flex gap-4">
@@ -177,17 +177,18 @@ export default function MethodPage() {
             why no Z3 verdict
           </p>
           <h2 className="mt-3 font-serif text-2xl font-medium leading-snug tracking-tight text-ink">
-            Because the hard problem isn&apos;t solving — it&apos;s translating.
+            Why automatic solvers do not suffice here.
           </h2>
           <p className="mt-4 font-serif text-[1rem] leading-7 text-ink-soft">
-            A SAT or SMT tool such as Z3 can find inconsistency once propositions
-            and implications have been formalized. The hard part here is whether
-            a natural-language commitment entails a bridge premise: for example,
-            whether perfect love entails unmistakable divine availability, or
-            whether responsibility requires alternate possibilities. Those are
-            disputed philosophical questions, not solver failures. This app
-            therefore keeps a small inspectable rule set and exposes each premise
-            instead of disguising interpretation as proof.
+            A SAT or SMT tool such as Z3 can find inconsistency once
+            propositions and implications have been formalized. The hard part
+            here is whether a natural-language commitment entails a bridge
+            premise: for example, whether perfect love entails unmistakable
+            divine availability, or whether responsibility requires alternate
+            possibilities. Those are disputed philosophical questions, not
+            solver failures. This app therefore keeps a small inspectable rule
+            set and exposes each premise instead of disguising interpretation as
+            proof.
           </p>
         </section>
 
@@ -259,8 +260,8 @@ export default function MethodPage() {
             privacy &amp; wellbeing
           </p>
           <p className="mt-3 font-serif text-[1rem] leading-7 text-ink-soft">
-            Your answers stay in browser memory for the current page and are
-            not sent to any server. The share action only emits counts and the
+            Your answers stay in browser memory for the current page and are not
+            sent to any server. The share action only emits counts and the
             structural shape of your affirmations — never your individual
             stances. The image is rendered in your browser, not uploaded.
           </p>
@@ -288,9 +289,8 @@ export default function MethodPage() {
             .
           </p>
           <p className="mt-3 font-serif text-[1rem] leading-7 text-ink-soft">
-            A result just sends you back to the reasons behind a belief. It
-            says nothing about your intelligence, your character, or who you
-            are.
+            A result just sends you back to the reasons behind a belief. It says
+            nothing about your intelligence, your character, or who you are.
           </p>
         </section>
       </div>

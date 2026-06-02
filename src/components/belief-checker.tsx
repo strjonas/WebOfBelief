@@ -76,6 +76,16 @@ const deityDependentStatementIds = new Set<BeliefId>([
 const deityDependentContextNote =
   "You have already affirmed that no god or deity exists. Choose “I believe this” only if you also take this deity-dependent sentence to be actually true; choose “Conditional / qualify” for a hypothetical reading, or reject it as worded.";
 
+// Shown once, on the first statement marked as an opposite pole, so the device
+// reads as deliberate rather than a repeated question. It says nothing about
+// whether the poles clash — that is for the result to reveal.
+const oppositePoleExplainer =
+  "A few statements turn an earlier one around to face the other way. Answer each on its own — you needn’t simply flip your previous answer, and sometimes neither side is yours.";
+
+const firstOppositePoleId: BeliefId | undefined = categories
+  .flatMap((category) => statementsForCategory(category.id))
+  .find((statement) => statement.oppositePole)?.id;
+
 interface BadgeData {
   conflicts: number;
   implications: number;
@@ -335,26 +345,42 @@ function StatementCard({
   answer,
   onAnswer,
   contextNote,
+  explainPole,
 }: {
   statement: BeliefStatement;
   index: number;
   answer?: Answer;
   onAnswer: (answer: Answer) => void;
   contextNote?: string;
+  explainPole?: boolean;
 }) {
   const selectedLabel = choices.find((choice) => choice.id === answer)?.label;
 
   return (
     <fieldset className="relative border-l-2 border-rule-soft pl-5 pb-7 pt-1 sm:pl-7">
       <legend className="sr-only">{statement.prompt}</legend>
-      <p className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted">
-        prop. {String(index + 1).padStart(2, "0")}
-      </p>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <p className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted">
+          prop. {String(index + 1).padStart(2, "0")}
+        </p>
+        {statement.oppositePole ? (
+          <span className="font-sans text-[0.66rem] uppercase tracking-[0.18em] text-indigo-ink">
+            <span aria-hidden="true">⇄ </span>opposite pole
+          </span>
+        ) : null}
+      </div>
+      {statement.oppositePole && explainPole ? (
+        <div className="mt-2.5 border-l-2 border-indigo-ink bg-paper-soft px-4 py-3">
+          <p className="font-sans text-[0.64rem] uppercase tracking-[0.18em] text-indigo-ink">
+            <span aria-hidden="true">⇄ </span>what the opposite-pole mark means
+          </p>
+          <p className="mt-1.5 font-serif text-[0.9rem] italic leading-6 text-ink-soft">
+            {oppositePoleExplainer}
+          </p>
+        </div>
+      ) : null}
       <p className="mt-2 font-serif text-[1.18rem] leading-7 text-ink sm:text-[1.22rem]">
         {statement.plain}
-      </p>
-      <p className="mt-2 font-serif text-[0.95rem] italic leading-6 text-muted">
-        Precisely: {statement.prompt}
       </p>
 
       {contextNote ? (
@@ -439,11 +465,20 @@ function StatementCard({
       <details className="group mt-5 border-t border-rule-soft pt-4">
         <summary className="cursor-pointer list-none font-sans text-[0.78rem] uppercase tracking-[0.18em] text-mark marker:hidden">
           <span className="group-open:hidden">
-            ↳ meaning, arguments, sources
+            ↳ exact wording, arguments, sources
           </span>
           <span className="hidden group-open:inline">↑ hide background</span>
         </summary>
         <div className="mt-5 grid gap-5 font-serif text-[0.98rem] leading-7 text-ink-soft md:grid-cols-2">
+          <div className="md:col-span-2 border-l border-rule-soft pl-4">
+            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+              <span className="section-mark" />
+              exact wording used by the check
+            </p>
+            <p className="mt-2 font-serif italic text-ink">
+              {statement.prompt}
+            </p>
+          </div>
           <div className="md:col-span-2 border-l border-rule-soft pl-4">
             <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
               <span className="section-mark" />
@@ -483,7 +518,10 @@ function StatementCard({
 function FindingCard({ finding }: { finding: Finding }) {
   const accent = findingAccents[finding.kind];
   return (
-    <article className={`border-l-[3px] ${accent.rule} bg-paper-soft px-5 py-6 sm:px-7`}>
+    <article
+      id={`finding-${finding.id}`}
+      className={`scroll-mt-24 border-l-[3px] ${accent.rule} bg-paper-soft px-5 py-6 sm:px-7`}
+    >
       <div className="flex flex-wrap items-baseline gap-3">
         <span
           className={`font-mono text-2xl leading-none ${accent.ink}`}
@@ -928,7 +966,7 @@ export function BeliefChecker() {
             Answer only the statements you want to examine — skip the rest. Your
             answers stay in this browser, so a refresh won&apos;t lose them.
           </p>
-          <details className="group mt-4 max-w-2xl border-t border-rule-soft pt-3">
+          <details className="group mt-5 max-w-2xl">
             <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
               <span className="group-open:hidden">↳ how answers are counted</span>
               <span className="hidden group-open:inline">↑ hide</span>
@@ -1059,6 +1097,7 @@ export function BeliefChecker() {
                   answer={answers[statement.id]}
                   onAnswer={(answer) => answerStatement(statement.id, answer)}
                   contextNote={contextNote}
+                  explainPole={statement.id === firstOppositePoleId}
                 />
               );
             })}
@@ -1191,6 +1230,7 @@ export function BeliefChecker() {
               <InteractiveBeliefWeb
                 affirmed={affirmedSet}
                 triggered={triggeredPairs}
+                findings={findings}
               />
             </figure>
           ) : null}
