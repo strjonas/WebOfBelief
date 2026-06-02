@@ -47,8 +47,7 @@ const choices: Array<{ id: Answer; label: string; hint: string }> = [
   {
     id: "qualify",
     label: "Conditional / qualify",
-    hint:
-      "Use for hypothetical, if-this-were-true, or otherwise qualified readings.",
+    hint: "Use for hypothetical, if-this-were-true, or otherwise qualified readings.",
   },
 ];
 
@@ -59,10 +58,12 @@ const choices: Array<{ id: Answer; label: string; hint: string }> = [
 // used in this file's FindingCard.
 const findingGlosses: Record<FindingKind, string> = {
   conflict: "As worded, both can't be true at once.",
-  implication: "Together, with one added premise, they entail a further conclusion.",
+  implication:
+    "Together, with one added premise, they entail a further conclusion.",
   argument:
     "No outright clash — but they're in real tension, and the step connecting them is one people still argue over.",
-  compatible: "Often called incompatible, yet a recognized view holds them together.",
+  compatible:
+    "Often called incompatible, yet a recognized view holds them together.",
 };
 
 const BRAND = "Web of Belief";
@@ -123,8 +124,7 @@ function drawBadge(canvas: HTMLCanvasElement, data: BadgeData) {
     "'Spectral', 'Source Serif Pro', Georgia, 'Times New Roman', serif";
   const sans =
     "'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, sans-serif";
-  const mono =
-    "'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace";
+  const mono = "'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace";
 
   const contentX = 96;
   const contentRight = w - 96;
@@ -315,7 +315,9 @@ function drawBadge(canvas: HTMLCanvasElement, data: BadgeData) {
 }
 
 function statementsForCategory(categoryId: BeliefCategoryId) {
-  return beliefStatements.filter((statement) => statement.category === categoryId);
+  return beliefStatements.filter(
+    (statement) => statement.category === categoryId,
+  );
 }
 
 function SourceLinks({ ids }: { ids: BeliefStatement["sourceIds"] }) {
@@ -354,8 +356,6 @@ function StatementCard({
   contextNote?: string;
   explainPole?: boolean;
 }) {
-  const selectedLabel = choices.find((choice) => choice.id === answer)?.label;
-
   return (
     <fieldset className="relative border-l-2 border-rule-soft pl-5 pb-7 pt-1 sm:pl-7">
       <legend className="sr-only">{statement.prompt}</legend>
@@ -406,8 +406,7 @@ function StatementCard({
                 : choice.id === "unsure"
                   ? "border-amber-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-amber-ink)]"
                   : "border-indigo-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-indigo-ink)]";
-          const idleClasses =
-            "text-muted hover:border-ink hover:text-ink";
+          const idleClasses = "text-muted hover:border-ink hover:text-ink";
           const idleGlyph =
             choice.id === "affirm"
               ? "+"
@@ -452,15 +451,6 @@ function StatementCard({
           );
         })}
       </div>
-
-      {selectedLabel ? (
-        <p
-          aria-live="polite"
-          className="mt-3 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-muted"
-        >
-          Recorded: {selectedLabel}.
-        </p>
-      ) : null}
 
       <details className="group mt-5 border-t border-rule-soft pt-4">
         <summary className="cursor-pointer list-none font-sans text-[0.78rem] uppercase tracking-[0.18em] text-mark marker:hidden">
@@ -517,74 +507,87 @@ function StatementCard({
 
 function FindingCard({ finding }: { finding: Finding }) {
   const accent = findingAccents[finding.kind];
+  // Direct conflicts are the reason most people ran the check, so they open by
+  // default; the softer findings collapse to a scannable row so the share and
+  // compare steps below aren't buried under every explanation at once.
+  const startsOpen = finding.kind === "conflict";
   return (
-    <article
+    <details
       id={`finding-${finding.id}`}
-      className={`scroll-mt-24 border-l-[3px] ${accent.rule} bg-paper-soft px-5 py-6 sm:px-7`}
+      open={startsOpen}
+      className={`group scroll-mt-24 border-l-[3px] ${accent.rule} bg-paper-soft`}
     >
-      <div className="flex flex-wrap items-baseline gap-3">
-        <span
-          className={`font-mono text-2xl leading-none ${accent.ink}`}
-          aria-hidden="true"
-        >
-          {findingMarks[finding.kind]}
-        </span>
-        <span
-          className={`font-sans text-[0.7rem] uppercase tracking-[0.22em] ${accent.ink}`}
-        >
-          {findingLabels[finding.kind]}
-        </span>
-        <h4 className="font-serif text-[1.25rem] font-medium leading-snug text-ink">
-          {finding.title}
-        </h4>
-      </div>
-      <p className="mt-2 font-serif text-[0.9rem] italic leading-6 text-muted">
-        {findingGlosses[finding.kind]}
-      </p>
-      <p className="mt-4 font-serif text-[1rem] leading-7 text-ink-soft">
-        {finding.explanation}
-      </p>
-      <div className="mt-5 border-t border-rule-soft pt-4 font-serif text-[0.97rem] leading-7 text-ink-soft">
-        <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-          <span className="section-mark" />
-          your beliefs at issue
+      <summary className="cursor-pointer list-none px-5 py-5 marker:hidden sm:px-7">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span
+            className={`font-mono text-2xl leading-none ${accent.ink}`}
+            aria-hidden="true"
+          >
+            {findingMarks[finding.kind]}
+          </span>
+          <span
+            className={`font-sans text-[0.7rem] uppercase tracking-[0.22em] ${accent.ink}`}
+          >
+            {findingLabels[finding.kind]}
+          </span>
+          <h4 className="font-serif text-[1.25rem] font-medium leading-snug text-ink">
+            {finding.title}
+          </h4>
+          <span className="ml-auto self-center font-sans text-[0.68rem] uppercase tracking-[0.16em] text-muted">
+            <span className="group-open:hidden">read →</span>
+            <span className="hidden group-open:inline">hide</span>
+          </span>
+        </div>
+        <p className="mt-2 font-serif text-[0.9rem] italic leading-6 text-muted">
+          {findingGlosses[finding.kind]}
         </p>
-        <ul className="mt-2 space-y-1.5 pl-4">
-          {finding.requires.map((beliefId) => (
-            <li key={beliefId} className="relative">
-              <span className="absolute -left-4 top-2 inline-block h-1 w-2 bg-ink" />
-              {statementById[beliefId].prompt}
-            </li>
-          ))}
-          {(finding.rejects ?? []).map((beliefId) => (
-            <li key={beliefId} className="relative">
-              <span className="absolute -left-4 top-2 inline-block h-1 w-2 border border-ink" />
-              {statementById[beliefId].prompt}{" "}
-              <span className="font-sans text-[0.7rem] uppercase tracking-[0.14em] text-muted">
-                — which you rejected
-              </span>
-            </li>
-          ))}
-        </ul>
-        {finding.bridge ? (
-          <>
-            <p className="mt-5 font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-              <span className="section-mark" />
-              additional premise required
-            </p>
-            <p className="mt-2 italic">{finding.bridge}</p>
-          </>
-        ) : null}
-        <p className="mt-5 font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-          <span className="section-mark" />
-          question to revisit
+      </summary>
+      <div className="px-5 pb-6 sm:px-7">
+        <p className="font-serif text-[1rem] leading-7 text-ink-soft">
+          {finding.explanation}
         </p>
-        <p className="mt-2">{finding.nextQuestion}</p>
+        <div className="mt-5 border-t border-rule-soft pt-4 font-serif text-[0.97rem] leading-7 text-ink-soft">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+            <span className="section-mark" />
+            your beliefs at issue
+          </p>
+          <ul className="mt-2 space-y-1.5 pl-4">
+            {finding.requires.map((beliefId) => (
+              <li key={beliefId} className="relative">
+                <span className="absolute -left-4 top-2 inline-block h-1 w-2 bg-ink" />
+                {statementById[beliefId].prompt}
+              </li>
+            ))}
+            {(finding.rejects ?? []).map((beliefId) => (
+              <li key={beliefId} className="relative">
+                <span className="absolute -left-4 top-2 inline-block h-1 w-2 border border-ink" />
+                {statementById[beliefId].prompt}{" "}
+                <span className="font-sans text-[0.7rem] uppercase tracking-[0.14em] text-muted">
+                  — which you rejected
+                </span>
+              </li>
+            ))}
+          </ul>
+          {finding.bridge ? (
+            <>
+              <p className="mt-5 font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+                <span className="section-mark" />
+                additional premise required
+              </p>
+              <p className="mt-2 italic">{finding.bridge}</p>
+            </>
+          ) : null}
+          <p className="mt-5 font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+            <span className="section-mark" />
+            question to revisit
+          </p>
+          <p className="mt-2">{finding.nextQuestion}</p>
+        </div>
+        <div className="mt-5 border-t border-rule-soft pt-4">
+          <SourceLinks ids={finding.sourceIds} />
+        </div>
       </div>
-      <div className="mt-5 border-t border-rule-soft pt-4">
-        <SourceLinks ids={finding.sourceIds} />
-      </div>
-    </article>
+    </details>
   );
 }
 
@@ -635,7 +638,9 @@ export function BeliefChecker() {
   const noDirectConflict = conflictCount === 0 && affirmed.length > 0;
 
   const affirmedSet = useMemo(() => new Set(affirmed), [affirmed]);
-  const triggeredEdges = useMemo<Array<[BeliefId, BeliefId, FindingKind]>>(() => {
+  const triggeredEdges = useMemo<
+    Array<[BeliefId, BeliefId, FindingKind]>
+  >(() => {
     const out: Array<[BeliefId, BeliefId, FindingKind]> = [];
     for (const finding of findings) {
       const beliefs = findingBeliefs(finding);
@@ -768,7 +773,9 @@ export function BeliefChecker() {
   }, [conflictCount, noDirectConflict]);
 
   const siteOrigin =
-    typeof window === "undefined" ? "https://webofbelief.app" : window.location.origin;
+    typeof window === "undefined"
+      ? "https://webofbelief.app"
+      : window.location.origin;
 
   const tweetUrl = useMemo(() => {
     const params = new URLSearchParams({
@@ -895,7 +902,9 @@ export function BeliefChecker() {
     try {
       await navigator.clipboard.writeText(summary);
       trackEvent({ name: "summary_copied" });
-      setCopyNotice("Summary copied. It includes counts only, not your choices.");
+      setCopyNotice(
+        "Summary copied. It includes counts only, not your choices.",
+      );
     } catch {
       setCopyNotice("Clipboard access was unavailable in this browser.");
     }
@@ -953,192 +962,199 @@ export function BeliefChecker() {
         </div>
       ) : (
         <>
-      {/* Section title */}
-      <div className="flex flex-col gap-6 border-b border-rule pb-8 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
-            <span className="section-mark" />1 &middot; the check
-          </p>
-          <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
-            Choose what you believe.
-          </h2>
-          <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
-            Answer only the statements you want to examine — skip the rest. Your
-            answers stay in this browser, so a refresh won&apos;t lose them.
-          </p>
-          <details className="group mt-5 max-w-2xl">
-            <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
-              <span className="group-open:hidden">↳ how answers are counted</span>
-              <span className="hidden group-open:inline">↑ hide</span>
-            </summary>
-            <p className="mt-3 font-serif text-[0.98rem] italic leading-7 text-muted">
-              Only &ldquo;I believe this&rdquo; is used as a premise (a starting
-              point the check reasons from). Rejecting, being unsure, or marking
-              a sentence as conditional/qualified is never treated as belief in
-              its opposite. If a claim is only hypothetical for you (&ldquo;if
-              God existed...&rdquo;), do not affirm it as an actual belief.
-            </p>
-          </details>
-        </div>
-        <div className="w-full max-w-sm border-l-2 border-mark pl-5">
-          <div className="flex items-baseline justify-between font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
-            <span>progress</span>
-            <span className="tabular text-ink">
-              {answeredCount} of {beliefStatements.length} answered
-            </span>
-          </div>
-          <div
-            role="progressbar"
-            aria-label="Statements answered"
-            aria-valuemin={0}
-            aria-valuemax={beliefStatements.length}
-            aria-valuenow={answeredCount}
-            className="mt-3 h-[3px] w-full overflow-hidden bg-rule-soft"
-          >
-            <div
-              className="h-full bg-mark transition-all"
-              style={{
-                width: `${(answeredCount / beliefStatements.length) * 100}%`,
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-8 grid gap-10 lg:grid-cols-[14rem_minmax(0,1fr)]">
-        {/* Sidebar — numbered topic list */}
-        <aside className="h-fit lg:sticky lg:top-6">
-          <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-muted">
-            topics
-          </p>
-          <nav aria-label="Belief topics" className="mt-3">
-            <ol className="border-t border-rule-soft">
-              {categories.map((item, index) => {
-                const categoryCount = statementsForCategory(item.id).length;
-                const answered = answeredForCategory(item.id);
-                const active = index === topicIndex;
-                const roman = ["i", "ii", "iii", "iv", "v"][index] ?? `${index + 1}`;
-                return (
-                  <li key={item.id} className="border-b border-rule-soft">
-                    <button
-                      type="button"
-                      onClick={() => moveToTopic(index)}
-                      aria-label={`${item.name}. ${answered} of ${categoryCount} answered.`}
-                      aria-current={active ? "step" : undefined}
-                      className={`flex w-full items-baseline gap-3 py-3 text-left transition ${
-                        active ? "text-ink" : "text-ink-soft hover:text-ink"
-                      }`}
-                    >
-                      <span
-                        className={`font-mono text-[0.72rem] uppercase tracking-[0.18em] ${
-                          active ? "text-mark" : "text-muted"
-                        }`}
-                      >
-                        {roman}.
-                      </span>
-                      <span className="flex-1 font-serif text-[0.98rem] leading-snug">
-                        {item.name}
-                      </span>
-                      <span className="font-mono tabular text-[0.72rem] text-muted">
-                        {answered}/{categoryCount}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-          </nav>
-          <div className="mt-6 border-l-2 border-mark pl-4">
-            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
-              when ready
-            </p>
-            <p className="mt-2 font-serif text-[0.95rem] leading-6 text-ink-soft">
-              Partial answers are fine — skipped statements count as Not sure,
-              and only affirmed ones can trigger a finding.
-            </p>
-            <button
-              type="button"
-              onClick={reviewResults}
-              aria-label="Check affirmed beliefs"
-              className="mt-4 w-full border border-ink bg-ink px-4 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
-            >
-              Check affirmed beliefs <span aria-hidden="true">→</span>
-            </button>
-          </div>
-        </aside>
-
-        {/* Main column — current topic & its statements */}
-        <div id="active-topic" className="scroll-mt-6">
-          <div className="border-b border-rule pb-6">
-            <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-muted">
-              topic {topicIndex + 1} of {categories.length}
-            </p>
-            <h3 className="mt-2 font-serif text-[1.85rem] font-medium leading-tight tracking-tight text-ink sm:text-3xl">
-              {activeTopic.name}
-            </h3>
-            <p className="mt-3 max-w-2xl font-serif text-[1rem] italic leading-7 text-ink-soft">
-              {activeTopic.description}
-            </p>
-          </div>
-
-          <div className="mt-7 space-y-1">
-            {visibleStatements.map((statement, localIdx) => {
-              const startIdx = categoryStartIndex.get(activeTopic.id) ?? 0;
-              const contextNote =
-                answers.noDeity === "affirm" &&
-                deityDependentStatementIds.has(statement.id)
-                  ? deityDependentContextNote
-                  : undefined;
-              return (
-                <StatementCard
-                  key={statement.id}
-                  statement={statement}
-                  index={startIdx + localIdx}
-                  answer={answers[statement.id]}
-                  onAnswer={(answer) => answerStatement(statement.id, answer)}
-                  contextNote={contextNote}
-                  explainPole={statement.id === firstOppositePoleId}
+          {/* Section title */}
+          <div className="flex flex-col gap-6 border-b border-rule pb-8 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
+                <span className="section-mark" />1 &middot; the check
+              </p>
+              <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
+                Choose what you believe.
+              </h2>
+              <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
+                Answer only the statements you want to examine — skip the rest.
+                Your answers stay in this browser, so a refresh won&apos;t lose
+                them.
+              </p>
+              <details className="group mt-5 max-w-2xl">
+                <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
+                  <span className="group-open:hidden">
+                    ↳ how answers are counted
+                  </span>
+                  <span className="hidden group-open:inline">↑ hide</span>
+                </summary>
+                <p className="mt-3 font-serif text-[0.98rem] italic leading-7 text-muted">
+                  Only &ldquo;I believe this&rdquo; is used as a premise (a
+                  starting point the check reasons from). Rejecting, being
+                  unsure, or marking a sentence as conditional/qualified is
+                  never treated as belief in its opposite. If a claim is only
+                  hypothetical for you (&ldquo;if God existed...&rdquo;), do not
+                  affirm it as an actual belief.
+                </p>
+              </details>
+            </div>
+            <div className="w-full max-w-sm border-l-2 border-mark pl-5">
+              <div className="flex items-baseline justify-between font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
+                <span>progress</span>
+                <span className="tabular text-ink">
+                  {answeredCount} of {beliefStatements.length} answered
+                </span>
+              </div>
+              <div
+                role="progressbar"
+                aria-label="Statements answered"
+                aria-valuemin={0}
+                aria-valuemax={beliefStatements.length}
+                aria-valuenow={answeredCount}
+                className="mt-3 h-[3px] w-full overflow-hidden bg-rule-soft"
+              >
+                <div
+                  className="h-full bg-mark transition-all"
+                  style={{
+                    width: `${(answeredCount / beliefStatements.length) * 100}%`,
+                  }}
                 />
-              );
-            })}
+              </div>
+            </div>
           </div>
 
-          <div className="mt-8 flex flex-wrap items-baseline justify-between gap-4 border-t border-rule pt-6">
-            {topicIndex > 0 ? (
-              <button
-                type="button"
-                onClick={() => moveToTopic(topicIndex - 1)}
-                aria-label="Previous topic"
-                className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-              >
-                <span aria-hidden="true">←</span> previous topic
-              </button>
-            ) : (
-              <span />
-            )}
-            {topicIndex < categories.length - 1 ? (
-              <button
-                type="button"
-                onClick={() => moveToTopic(topicIndex + 1)}
-                aria-label={`Next topic: ${categories[topicIndex + 1].name} (optional)`}
-                className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink underline decoration-mark decoration-2 underline-offset-[5px] transition hover:decoration-ink"
-              >
-                Next topic: {categories[topicIndex + 1].name} (optional){" "}
-                <span aria-hidden="true">→</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={reviewResults}
-                aria-label="Check affirmed beliefs"
-                className="border border-ink bg-ink px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
-              >
-                Check affirmed beliefs <span aria-hidden="true">→</span>
-              </button>
-            )}
+          <div className="mt-8 grid gap-10 lg:grid-cols-[14rem_minmax(0,1fr)]">
+            {/* Sidebar — numbered topic list */}
+            <aside className="h-fit lg:sticky lg:top-6">
+              <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-muted">
+                topics
+              </p>
+              <nav aria-label="Belief topics" className="mt-3">
+                <ol className="border-t border-rule-soft">
+                  {categories.map((item, index) => {
+                    const categoryCount = statementsForCategory(item.id).length;
+                    const answered = answeredForCategory(item.id);
+                    const active = index === topicIndex;
+                    const roman =
+                      ["i", "ii", "iii", "iv", "v"][index] ?? `${index + 1}`;
+                    return (
+                      <li key={item.id} className="border-b border-rule-soft">
+                        <button
+                          type="button"
+                          onClick={() => moveToTopic(index)}
+                          aria-label={`${item.name}. ${answered} of ${categoryCount} answered.`}
+                          aria-current={active ? "step" : undefined}
+                          className={`flex w-full items-baseline gap-3 py-3 text-left transition ${
+                            active ? "text-ink" : "text-ink-soft hover:text-ink"
+                          }`}
+                        >
+                          <span
+                            className={`font-mono text-[0.72rem] uppercase tracking-[0.18em] ${
+                              active ? "text-mark" : "text-muted"
+                            }`}
+                          >
+                            {roman}.
+                          </span>
+                          <span className="flex-1 font-serif text-[0.98rem] leading-snug">
+                            {item.name}
+                          </span>
+                          <span className="font-mono tabular text-[0.72rem] text-muted">
+                            {answered}/{categoryCount}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </nav>
+              <div className="mt-6 border-l-2 border-mark pl-4">
+                <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
+                  when ready
+                </p>
+                <p className="mt-2 font-serif text-[0.95rem] leading-6 text-ink-soft">
+                  Partial answers are fine — skipped statements count as Not
+                  sure, and only affirmed ones can trigger a finding.
+                </p>
+                <button
+                  type="button"
+                  onClick={reviewResults}
+                  aria-label="Check affirmed beliefs"
+                  className="mt-4 w-full border border-ink bg-ink px-4 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
+                >
+                  Check affirmed beliefs <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </aside>
+
+            {/* Main column — current topic & its statements */}
+            <div id="active-topic" className="scroll-mt-6">
+              <div className="border-b border-rule pb-6">
+                <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-muted">
+                  topic {topicIndex + 1} of {categories.length}
+                </p>
+                <h3 className="mt-2 font-serif text-[1.85rem] font-medium leading-tight tracking-tight text-ink sm:text-3xl">
+                  {activeTopic.name}
+                </h3>
+                <p className="mt-3 max-w-2xl font-serif text-[1rem] italic leading-7 text-ink-soft">
+                  {activeTopic.description}
+                </p>
+              </div>
+
+              <div className="mt-7 space-y-1">
+                {visibleStatements.map((statement, localIdx) => {
+                  const startIdx = categoryStartIndex.get(activeTopic.id) ?? 0;
+                  const contextNote =
+                    answers.noDeity === "affirm" &&
+                    deityDependentStatementIds.has(statement.id)
+                      ? deityDependentContextNote
+                      : undefined;
+                  return (
+                    <StatementCard
+                      key={statement.id}
+                      statement={statement}
+                      index={startIdx + localIdx}
+                      answer={answers[statement.id]}
+                      onAnswer={(answer) =>
+                        answerStatement(statement.id, answer)
+                      }
+                      contextNote={contextNote}
+                      explainPole={statement.id === firstOppositePoleId}
+                    />
+                  );
+                })}
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-baseline justify-between gap-4 border-t border-rule pt-6">
+                {topicIndex > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => moveToTopic(topicIndex - 1)}
+                    aria-label="Previous topic"
+                    className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+                  >
+                    <span aria-hidden="true">←</span> previous topic
+                  </button>
+                ) : (
+                  <span />
+                )}
+                {topicIndex < categories.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => moveToTopic(topicIndex + 1)}
+                    aria-label={`Next topic: ${categories[topicIndex + 1].name} (optional)`}
+                    className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink underline decoration-mark decoration-2 underline-offset-[5px] transition hover:decoration-ink"
+                  >
+                    Next topic: {categories[topicIndex + 1].name} (optional){" "}
+                    <span aria-hidden="true">→</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={reviewResults}
+                    aria-label="Check affirmed beliefs"
+                    className="border border-ink bg-ink px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
+                  >
+                    Check affirmed beliefs <span aria-hidden="true">→</span>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
         </>
       )}
 
@@ -1235,25 +1251,6 @@ export function BeliefChecker() {
             </figure>
           ) : null}
 
-          {noDirectConflict ? (
-            <div className="mt-8 border-l-[3px] border-forest bg-paper-soft px-5 py-5">
-              <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-forest">
-                <span className="section-mark" />
-                no direct conflict across the checks
-              </p>
-              <p className="mt-3 font-serif text-[1.05rem] leading-7 text-ink">
-                No direct contradictions among the beliefs you affirmed.
-              </p>
-              <p className="mt-2 font-serif text-[0.97rem] italic leading-7 text-ink-soft">
-                {argumentCount + implicationCount > 0
-                  ? "The conditional implications and live arguments below are not charges of inconsistency. They name consequences, bridge premises, or pressure points worth checking."
-                  : compatibleCount > 0
-                    ? "The coherent combinations below are recognized positions, not exceptions you need to explain away."
-                    : "On every relationship this version checks, your affirmed statements trigger no finding. That leaves plenty untested, but avoids the flat conflicts this engine is designed to catch."}
-              </p>
-            </div>
-          ) : null}
-
           {findings.length === 0 && !noDirectConflict ? (
             <p className="mt-8 border-l-2 border-rule-soft px-5 py-4 font-serif text-[1rem] italic leading-7 text-ink-soft">
               None of the explicit relationships in this version was triggered.
@@ -1348,9 +1345,8 @@ export function BeliefChecker() {
               </div>
 
               <p className="mt-4 font-serif text-[0.92rem] italic leading-6 text-muted">
-                Image attachment for X / Reddit posts requires uploading the
-                downloaded or copied image manually — the intent links open with
-                the caption prefilled.
+                X and Reddit open with the caption ready — attach the downloaded
+                image yourself.
               </p>
 
               {copyNotice ? (
@@ -1386,8 +1382,8 @@ export function BeliefChecker() {
                   Compare your web with a friend&apos;s.
                 </h4>
                 <p className="mt-3 max-w-xl font-serif text-[1rem] leading-7 text-ink-soft">
-                  Send someone a link and they&apos;ll see exactly where your two
-                  webs pull apart — and the premise on each fault line. Your
+                  Send someone a link and they&apos;ll see exactly where your
+                  two webs pull apart — and the premise on each fault line. Your
                   answers travel inside the link itself; they never reach our
                   server.
                 </p>

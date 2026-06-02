@@ -101,9 +101,11 @@ export function InteractiveBeliefWeb({
 
   const scrollToFinding = (id: string) => {
     setPinnedEdge(null);
-    document
-      .getElementById(`finding-${id}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const el = document.getElementById(`finding-${id}`);
+    // The finding card is a collapsible <details>; open it before scrolling so
+    // the explanation is visible on arrival, not folded shut.
+    if (el instanceof HTMLDetailsElement) el.open = true;
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const triggeredSet = useMemo(

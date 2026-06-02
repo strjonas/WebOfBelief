@@ -3,16 +3,35 @@
 **See whether your beliefs actually fit together.**
 [webofbelief.app](https://webofbelief.app) · [Method &amp; sources](https://webofbelief.app/method)
 
-You answer plain statements about morality, meaning, free will, mind, God, and
-right action. A small, inspectable rule engine then shows you where your stated
-beliefs **contradict**, what they **may commit you to under stated premises**,
-and which "obviously incompatible" pairs are in fact **coherent**. Every result
-links to the relevant [Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/)
-entry, with focused research sources added where needed. It's a mirror you can
-argue with — not a score, a label, or a verdict on you.
+![Web of Belief — twenty-three beliefs, one web: where does it tear? A consistency check whose every finding cites a philosophical source.](docs/social-card.png)
+
+You answer twenty-three plain statements about morality, freedom, mind, AI
+consciousness, God, and right action. A small, inspectable rule engine then
+shows where your stated beliefs **flatly clash**, where one quietly **commits
+you to another** under a stated premise, and which "obviously incompatible"
+pairs are in fact **coherent**. Every result names the exact pair of statements
+you affirmed and links to the relevant
+[Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/) entry, with
+focused research sources added where a question needs them.
+
+It's a mirror you can argue with — not a score, a label, or a verdict on you.
+Nothing is uploaded: your answers live only in your browser.
 
 Named after Quine and Ullian's *The Web of Belief* (1970): no belief stands
 alone; they hang together, and a strain in one place is felt across the web.
+
+## Try it in two minutes
+
+1. Open [webofbelief.app](https://webofbelief.app) (or run it locally, below).
+2. Answer only the statements you want to examine — skip the rest. Mark each one
+   "I believe this," "I reject this," "Not sure," or "Conditional / qualify."
+   Only affirmations are ever reasoned from.
+3. Hit **Check**. You get an interactive map of your web — affirmed beliefs lit
+   up, the rules your answers triggered drawn between them — and a written
+   finding for each tension, sourced.
+4. **Share** a card with your counts and graph shape (never your answers), or
+   **send a friend a compare link** to see exactly where your two webs pull
+   apart.
 
 ## What it tells you
 
@@ -26,6 +45,12 @@ only ever reasons from statements you explicitly mark "I believe this."
 | ‡ &nbsp;**Live argument** | A serious tension that turns on a disputed bridge premise, which the result names and leaves open. *Example:* divine hiddenness; the evidentialist challenge to theism. |
 | ≈ &nbsp;**Coherent combination** | A pairing often dismissed as incoherent that has a recognized philosophical home. *Example:* atheism + objective meaning. |
 
+The twenty-three statements span five topics — **morality and meaning**,
+**freedom and responsibility**, **mind and consciousness**, **God and
+evidence**, and **right action**. Topic selection is grounded in the
+[PhilPapers 2020 Survey](https://survey2020.philpeople.org/) of philosophers and
+[Pew's Religious Landscape Study](https://www.pewresearch.org/rls/).
+
 ## Design principles
 
 - **A mirror, not a judge.** Every result is framed as a fork you decide,
@@ -38,14 +63,12 @@ only ever reasons from statements you explicitly mark "I believe this."
   entails a contested bridge premise — a philosophical question, not a solver
   bug — so the app exposes each premise instead of disguising interpretation
   as proof.
-- **Sourced.** Topic selection is grounded in the
-  [PhilPapers 2020 Survey](https://survey2020.philpeople.org/) and
-  [Pew's Religious Landscape Study](https://www.pewresearch.org/rls/); every
-  finding cites at least one SEP entry, with additional focused sources where
-  the question needs them.
+- **Sourced.** Every finding cites at least one SEP entry, with additional
+  focused sources where the question needs them.
 - **Private by default.** Answers live only in browser memory. The shareable
-  badge and summary contain counts and graph shape only — never your
-  individual answers — and nothing is uploaded.
+  card and the compare link carry counts and graph shape — or, for compare, the
+  answers themselves encoded in the URL *fragment*, which browsers never send to
+  a server. Nothing is uploaded.
 
 ## Run locally
 
@@ -63,11 +86,16 @@ npm run build  # production build
 - `src/lib/evaluate.ts` — the deterministic finding rules (the whole "engine").
 - `src/lib/evaluate.test.ts` — guards the line between contradiction,
   implication, disputed argument, and coherent combination.
-- `src/components/belief-web-diagram.tsx` — the SVG rule-graph used on the
-  home page, results page, and as the share badge.
+- `src/lib/share-code.ts` — encodes/decodes the answer map for compare links,
+  entirely in the URL fragment so the server never sees it.
+- `src/components/belief-web-diagram.tsx` — the SVG rule-graph used on the home
+  page and drawn into the share card.
+- `src/components/interactive-belief-web.tsx` — the results map: trace any
+  belief's relationships, or tap a line to read why a pair pulls apart.
 - `src/components/belief-checker.tsx` — the browser-only questionnaire,
   results, edifying framing, and the client-side share badge (drawn with
   Canvas, no deps).
+- `src/components/belief-compare.tsx` — the two-web comparison view.
 - `src/app/method/page.tsx` — published method, limits, and full source
   library.
 
@@ -78,3 +106,5 @@ never sent anywhere.
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
+</content>
+</invoke>

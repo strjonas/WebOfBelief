@@ -54,7 +54,6 @@ describe("BeliefChecker", () => {
     expect(godChoice.checked).toBe(true);
     expect(sufferingChoice.checked).toBe(true);
     expect(screen.getByText("2 of 23 answered")).toBeDefined();
-    expect(screen.getAllByText("Recorded: I believe this.")).toHaveLength(2);
 
     await user.click(
       screen.getByRole("button", { name: "Check affirmed beliefs" }),

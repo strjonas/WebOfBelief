@@ -121,8 +121,7 @@ export default function MethodPage() {
             </li>
           </ol>
           <p className="mt-7 border-t border-rule-soft pt-4 font-serif text-[0.95rem] italic leading-7 text-muted">
-            No Z3 solver, no LLM call, no database, no account, no server-side
-            scoring.
+            No LLM call, no database, no account, no server-side scoring.
           </p>
         </section>
 
@@ -205,9 +204,9 @@ export default function MethodPage() {
             which asked philosophers 100 questions, including God, meta-ethics,
             meaning of life, mind, other minds, free will, and eating animals.
             Public importance of religious-worldview questions is checked
-            against Pew Research Center&apos;s 2023–24 Religious Landscape Study.
-            These sources justify salience; they do not determine which answer
-            is correct.
+            against Pew Research Center&apos;s 2023–24 Religious Landscape
+            Study. These sources justify salience; they do not determine which
+            answer is correct.
           </p>
         </section>
 
