@@ -104,7 +104,7 @@ export default function PrivacyPage() {
           own share or social features handle it from there.
         </p>
         <p>
-          The <strong>&ldquo;compare with a friend&rdquo; link</strong> is
+          The <strong>&ldquo;friends compare&rdquo; link</strong> is
           different in one honest respect, so it&apos;s worth being precise. To
           let a friend compare their web against yours, your individual answers
           are encoded into the part of the link <em>after the # sign</em> (the

@@ -30,7 +30,7 @@ export function SiteHeader() {
             Start
           </Link>
           <Link
-            href="/compare"
+            href="/compare-beliefs"
             className="hidden text-ink-soft transition hover:text-mark sm:inline"
           >
             Compare

@@ -21,10 +21,10 @@ import {
   type FindingKind,
 } from "@/lib/evaluate";
 import {
-  BeliefWebDiagram,
   beliefWebDiagramEdges,
   beliefWebDiagramNodes,
 } from "./belief-web-diagram";
+import { InteractiveBeliefWeb } from "./interactive-belief-web";
 import Link from "next/link";
 import { trackEvent } from "@/lib/analytics";
 import { encodeAnswers } from "@/lib/share-code";
@@ -34,6 +34,11 @@ import {
   findingLabels,
   findingMarks,
 } from "@/lib/findings";
+import {
+  clearPersistedState,
+  loadPersistedState,
+  savePersistedState,
+} from "@/lib/answer-storage";
 
 const choices: Array<{ id: Answer; label: string; hint: string }> = [
   { id: "affirm", label: "I believe this", hint: "Affirm as worded." },
@@ -61,50 +66,6 @@ const findingGlosses: Record<FindingKind, string> = {
 };
 
 const BRAND = "Web of Belief";
-
-// Persist in-progress answers on the visitor's own device so an accidental
-// reload doesn't wipe their work. Versioned so a future schema change can be
-// ignored safely. Cleared only on "Start over" (see resetCheck). Nothing here
-// is ever sent to a server — this is purely local convenience.
-const STORAGE_KEY = "wob:state:v1";
-
-const validAnswers = new Set<Answer>(choices.map((choice) => choice.id));
-
-interface PersistedState {
-  answers: AnswerMap;
-  topicIndex: number;
-  showResults: boolean;
-}
-
-function loadPersistedState(): PersistedState | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<PersistedState>;
-    const answers: AnswerMap = {};
-    if (parsed.answers && typeof parsed.answers === "object") {
-      for (const [id, value] of Object.entries(parsed.answers)) {
-        // Only restore known statement ids with valid answer values.
-        if (id in statementById && validAnswers.has(value as Answer)) {
-          answers[id as BeliefId] = value as Answer;
-        }
-      }
-    }
-    const maxTopic = categories.length - 1;
-    const topicIndex =
-      typeof parsed.topicIndex === "number"
-        ? Math.min(Math.max(0, Math.trunc(parsed.topicIndex)), maxTopic)
-        : 0;
-    return {
-      answers,
-      topicIndex,
-      showResults: parsed.showResults === true,
-    };
-  } catch {
-    return null;
-  }
-}
 
 const deityDependentStatementIds = new Set<BeliefId>([
   "perfectGod",
@@ -617,14 +578,7 @@ export function BeliefChecker() {
   // initial empty state never overwrites saved answers.
   useEffect(() => {
     if (!hydrated) return;
-    try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ answers, topicIndex, showResults }),
-      );
-    } catch {
-      // Private mode / quota exceeded — never break the app.
-    }
+    savePersistedState({ answers, topicIndex, showResults });
   }, [hydrated, answers, topicIndex, showResults]);
 
   const answeredCount = Object.keys(answers).length;
@@ -632,15 +586,6 @@ export function BeliefChecker() {
   const qualifiedCount = Object.values(answers).filter(
     (a) => a === "qualify",
   ).length;
-  const rejectedCount = Object.values(answers).filter(
-    (a) => a === "reject",
-  ).length;
-  const unsureCount = Object.values(answers).filter(
-    (a) => a === "unsure",
-  ).length;
-  // Suspension (unsure) and silence (unanswered) are both "not yet settled" —
-  // honest, but the place to move through, not to camp.
-  const openCount = unsureCount + unansweredCount;
   const findings = useMemo(() => evaluateBeliefs(answers), [answers]);
   const affirmed = useMemo(() => affirmedBeliefs(answers), [answers]);
   const activeTopic = categories[topicIndex];
@@ -877,13 +822,19 @@ export function BeliefChecker() {
     });
   }
 
+  // Reopen the questionnaire from the results view, keeping all answers.
+  function editSelection() {
+    setShowResults(false);
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById("check")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   function resetCheck() {
     trackEvent({ name: "check_reset" });
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // Ignore — clearing in-memory state below is what matters.
-    }
+    clearPersistedState();
     setAnswers({});
     setTopicIndex(0);
     setShowResults(false);
@@ -925,6 +876,45 @@ export function BeliefChecker() {
 
   return (
     <section id="check" className="scroll-mt-24 py-12 sm:py-16">
+      {showResults ? (
+        /* Checked: the questionnaire collapses to a compact summary so the
+           result below is the focus. Edit selection reopens it; answers stay. */
+        <div className="flex flex-col gap-4 border-b border-rule pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
+              <span className="section-mark" />1 &middot; the check
+            </p>
+            <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
+              Your selection
+            </h2>
+            <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
+              You answered {answeredCount} of {beliefStatements.length}{" "}
+              statement{answeredCount === 1 ? "" : "s"}
+              {qualifiedCount > 0
+                ? `, ${qualifiedCount} marked conditional`
+                : ""}
+              . Your result is below.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={editSelection}
+              className="border border-ink px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
+            >
+              Edit selection
+            </button>
+            <button
+              type="button"
+              onClick={resetCheck}
+              className="border border-rule px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted transition hover:border-ink hover:text-ink"
+            >
+              Start over
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
       {/* Section title */}
       <div className="flex flex-col gap-6 border-b border-rule pb-8 lg:flex-row lg:items-end lg:justify-between">
         <div>
@@ -935,14 +925,8 @@ export function BeliefChecker() {
             Choose what you believe.
           </h2>
           <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
-            Answer only the statements you want to examine. Skip any of them —
-            unselected answers count as Not sure when you check. Your responses
-            never leave the browser.
-          </p>
-          <p className="mt-3 font-sans text-[0.7rem] uppercase tracking-[0.16em] text-muted">
-            <span className="section-mark" />
-            Saved on this device — a refresh won&apos;t lose your answers.
-            &ldquo;Start over&rdquo; clears them.
+            Answer only the statements you want to examine — skip the rest. Your
+            answers stay in this browser, so a refresh won&apos;t lose them.
           </p>
           <details className="group mt-4 max-w-2xl border-t border-rule-soft pt-3">
             <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
@@ -957,15 +941,6 @@ export function BeliefChecker() {
               God existed...&rdquo;), do not affirm it as an actual belief.
             </p>
           </details>
-          <p className="mt-4 font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
-            Have a compare link from someone?{" "}
-            <Link
-              href="/compare-beliefs"
-              className="text-indigo-ink underline decoration-indigo-ink/40 underline-offset-[5px] transition hover:decoration-indigo-ink"
-            >
-              Open it here →
-            </Link>
-          </p>
         </div>
         <div className="w-full max-w-sm border-l-2 border-mark pl-5">
           <div className="flex items-baseline justify-between font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
@@ -1040,8 +1015,8 @@ export function BeliefChecker() {
               when ready
             </p>
             <p className="mt-2 font-serif text-[0.95rem] leading-6 text-ink-soft">
-              Partial answers are fine. Skipped statements count as Not sure
-              and only affirmed statements can trigger a finding.
+              Partial answers are fine — skipped statements count as Not sure,
+              and only affirmed ones can trigger a finding.
             </p>
             <button
               type="button"
@@ -1125,6 +1100,8 @@ export function BeliefChecker() {
           </div>
         </div>
       </div>
+        </>
+      )}
 
       {showResults ? (
         <section
@@ -1180,7 +1157,7 @@ export function BeliefChecker() {
             </div>
           </div>
 
-          {affirmed.length > 0 ? (
+          {conflictCount > 0 ? (
             <p className="mt-8 border-l-2 border-mark bg-paper-soft px-5 py-4 font-serif text-[1rem] leading-7 text-ink-soft">
               <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
                 <span className="section-mark" />
@@ -1198,74 +1175,8 @@ export function BeliefChecker() {
             </p>
           ) : null}
 
-          {/* Socratic surfacing — the shape of commitment and of what is
-              still open. Framed as honest and edifying, never as a failing. */}
-          {affirmed.length > 0 ? (
-            <div className="mt-8 border-l-2 border-rule pl-5">
-              <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-                <span className="section-mark" />
-                the shape of your answers
-              </p>
-              <dl className="mt-3 flex flex-wrap gap-x-8 gap-y-3 font-serif">
-                <div>
-                  <dt className="font-sans text-[0.66rem] uppercase tracking-[0.16em] text-mark">
-                    affirmed
-                  </dt>
-                  <dd className="mt-0.5 text-2xl tabular text-ink">
-                    {affirmed.length}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-sans text-[0.66rem] uppercase tracking-[0.16em] text-muted">
-                    rejected
-                  </dt>
-                  <dd className="mt-0.5 text-2xl tabular text-ink">
-                    {rejectedCount}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-sans text-[0.66rem] uppercase tracking-[0.16em] text-muted">
-                    still open
-                  </dt>
-                  <dd className="mt-0.5 text-2xl tabular text-ink">
-                    {openCount}
-                  </dd>
-                </div>
-                {qualifiedCount > 0 ? (
-                  <div>
-                    <dt className="font-sans text-[0.66rem] uppercase tracking-[0.16em] text-muted">
-                      qualified
-                    </dt>
-                    <dd className="mt-0.5 text-2xl tabular text-ink">
-                      {qualifiedCount}
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
-              <p className="mt-4 max-w-2xl font-serif text-[0.97rem] leading-7 text-ink-soft">
-                The check reasons from what you affirm; a deliberate rejection
-                can sharpen a finding, but{" "}
-                {openCount > 0 ? (
-                  <>
-                    the {openCount} statement{openCount === 1 ? "" : "s"} you
-                    left open are where your web is still unsettled. Suspending
-                    judgement is honest, not a failing — Socrates began there.
-                    But it is a place to move through, not to live: the aim is a
-                    view you can hold on purpose.
-                  </>
-                ) : (
-                  <>
-                    you have taken a position on every statement. The work now
-                    is not to settle more, but to hold what you affirm on
-                    purpose — and to keep testing the bridges between your
-                    commitments.
-                  </>
-                )}
-              </p>
-            </div>
-          ) : null}
-
-          {/* Personalised diagram showing affirmed nodes + triggered edges */}
+          {/* Personalised, explorable diagram: affirmed nodes + fired edges,
+              with hover/tap to trace each belief's relationships. */}
           {affirmed.length > 0 ? (
             <figure className="mt-8 border border-rule bg-paper-soft p-5 sm:p-7">
               <figcaption className="mb-3 flex items-baseline justify-between font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
@@ -1277,11 +1188,9 @@ export function BeliefChecker() {
                   {affirmed.length} affirmed / {findings.length} edges triggered
                 </span>
               </figcaption>
-              <BeliefWebDiagram
+              <InteractiveBeliefWeb
                 affirmed={affirmedSet}
-                triggeredEdges={triggeredPairs.length ? triggeredPairs : undefined}
-                className="block h-auto w-full"
-                title={`Diagram of the engine's belief web with your ${affirmed.length} affirmed beliefs highlighted in oxblood and ${findings.length} edges triggered.`}
+                triggered={triggeredPairs}
               />
             </figure>
           ) : null}
@@ -1395,13 +1304,6 @@ export function BeliefChecker() {
                   className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
                 >
                   Copy text summary
-                </button>
-                <button
-                  type="button"
-                  onClick={resetCheck}
-                  className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-                >
-                  Start over
                 </button>
               </div>
 

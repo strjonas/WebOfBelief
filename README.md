@@ -3,12 +3,13 @@
 **See whether your beliefs actually fit together.**
 [webofbelief.app](https://webofbelief.app) · [Method &amp; sources](https://webofbelief.app/method)
 
-You answer plain statements about God, morality, meaning, free will, mind, and
+You answer plain statements about morality, meaning, free will, mind, God, and
 right action. A small, inspectable rule engine then shows you where your stated
 beliefs **contradict**, what they **may commit you to under stated premises**,
 and which "obviously incompatible" pairs are in fact **coherent**. Every result
 links to the relevant [Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/)
-entry.
+entry. It's a mirror you can argue with — not a score, a label, or a verdict on
+you.
 
 Named after Quine and Ullian's *The Web of Belief* (1970): no belief stands
 alone; they hang together, and a strain in one place is felt across the web.

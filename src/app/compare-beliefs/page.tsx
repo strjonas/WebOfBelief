@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default function CompareBeliefsPage() {
   return (
     <ContentPage
-      eyebrow="compare webs"
+      eyebrow="friends compare"
       title="Where your webs differ."
       lede={
         <p>

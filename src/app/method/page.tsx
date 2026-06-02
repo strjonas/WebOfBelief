@@ -69,7 +69,7 @@ export default function MethodPage() {
           method &amp; sources
         </p>
         <h1 className="mt-5 font-serif text-[2.5rem] font-medium leading-[1.1] tracking-tight text-ink sm:text-[3.1rem]">
-          Accuracy begins with restraint.
+          What the check does, and what it doesn&apos;t.
         </h1>
         <p className="mt-5 max-w-3xl font-serif text-[1.12rem] leading-[1.65] text-ink-soft">
           Web of Belief reports relationships among exact statements you mark as

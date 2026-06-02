@@ -31,7 +31,7 @@ export default function Home() {
                 </span>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-[1.6] text-ink-soft">
-                Answer plain statements about God, morality, freedom, and mind.
+                Answer plain statements about morality, freedom, mind, and God.
                 The check shows where your beliefs flatly clash, where one
                 quietly commits you to another (a conditional implication), and
                 where they hold together. Every result cites the Stanford
@@ -40,10 +40,19 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col gap-5">
-              <BeginCheckLink className="group inline-flex w-fit items-center gap-3 border border-ink bg-ink px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark">
-                Begin the check
-                <span className="transition group-hover:translate-x-1">→</span>
-              </BeginCheckLink>
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+                <BeginCheckLink className="group inline-flex w-fit items-center gap-3 border border-ink bg-ink px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark">
+                  Begin the check
+                  <span className="transition group-hover:translate-x-1">→</span>
+                </BeginCheckLink>
+                <Link
+                  href="/compare-beliefs"
+                  className="group inline-flex w-fit items-center gap-3 border border-rule px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-ink transition hover:border-ink"
+                >
+                  Have a friend&apos;s link?
+                  <span className="transition group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
               <div className="flex flex-wrap items-baseline gap-x-6 gap-y-3">
                 <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
                   22 statements &middot; ~5 min &middot; no login
@@ -135,9 +144,9 @@ export default function Home() {
           <div className="max-w-3xl">
             <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
               A small, inspectable rule engine. Every
-              &ldquo;contradiction&rdquo; it reports cites a specific pair of
-              statements you affirmed and a specific source — there&apos;s no AI
-              sizing you up here, just a mirror you can argue with.
+              &ldquo;contradiction&rdquo; it reports names the specific pair of
+              statements you affirmed and the source behind the call — a mirror
+              you can argue with, not a score or a label.
             </p>
 
             <details className="group mt-5 border-t border-rule-soft pt-4">

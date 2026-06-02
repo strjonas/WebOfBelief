@@ -14,7 +14,8 @@ import {
   type AnswerMap,
   type Finding,
 } from "@/lib/evaluate";
-import { decodeAnswers } from "@/lib/share-code";
+import { decodeAnswers, encodeAnswers } from "@/lib/share-code";
+import { loadPersistedState, type PersistedState } from "@/lib/answer-storage";
 import { findingAccents, findingLabels, findingMarks } from "@/lib/findings";
 import { BeliefWebDiagram } from "./belief-web-diagram";
 import { trackEvent } from "@/lib/analytics";
@@ -100,15 +101,69 @@ function StanceList({
   );
 }
 
+/** A code/link text input with a submit button — shared by both paste flows. */
+function PasteRow({
+  value,
+  onChange,
+  onSubmit,
+  error,
+  placeholder,
+  ariaLabel,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+  error: string | null;
+  placeholder: string;
+  ariaLabel: string;
+}) {
+  return (
+    <div className="mt-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") onSubmit();
+          }}
+          placeholder={placeholder}
+          aria-label={ariaLabel}
+          className="w-full max-w-md border border-rule bg-paper px-4 py-2.5 font-mono text-[0.85rem] text-ink outline-none focus:border-ink"
+        />
+        <button
+          type="button"
+          onClick={onSubmit}
+          className="border border-ink bg-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
+        >
+          Compare
+        </button>
+      </div>
+      {error ? (
+        <p className="mt-3 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-mark">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export function BeliefCompare() {
   const hash = useSyncExternalStore(
     subscribeHash,
     getHashSnapshot,
     getServerHashSnapshot,
   );
+  // The viewer's own web. It comes either from answers already saved in this
+  // browser (the common case — no need to paste a link you already have) or
+  // from a code/link the viewer pastes (e.g. they're on a different device).
+  const [saved, setSaved] = useState<PersistedState | null>(null);
   const [mine, setMine] = useState<AnswerMap | null>(null);
+  const [mineSource, setMineSource] = useState<"saved" | "pasted" | null>(null);
+  const [showPaste, setShowPaste] = useState(false);
   const [myInput, setMyInput] = useState("");
   const [myError, setMyError] = useState<string | null>(null);
+  const [linkNotice, setLinkNotice] = useState<string | null>(null);
 
   // Decode the sharer's web from the URL fragment — client-only, never sent.
   const { their, theirError } = useMemo<{
@@ -123,15 +178,34 @@ export function BeliefCompare() {
       : { their: null, theirError: result.reason };
   }, [hash]);
 
+  // Reuse the viewer's saved web if they've taken the check on this browser.
+  // Done in an effect (not a lazy initializer) so SSR and the first client
+  // render stay identical — the same restore pattern the checker uses.
+  useEffect(() => {
+    const s = loadPersistedState();
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setSaved(s);
+    if (s && Object.keys(s.answers).length > 0) {
+      setMine(s.answers);
+      setMineSource("saved");
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+
   // Analytics is a real side-effect (not state), so it belongs in an effect.
   useEffect(() => {
     if (their) trackEvent({ name: "compare_viewed" });
   }, [their]);
 
-  function loadMine() {
+  const savedAnsweredCount = saved ? Object.keys(saved.answers).length : 0;
+  const hasSavedWeb = savedAnsweredCount > 0;
+
+  function loadPasted() {
     const result = decodeAnswers(extractCode(myInput));
     if (result.ok) {
       setMine(result.answers);
+      setMineSource("pasted");
+      setShowPaste(false);
       setMyError(null);
       trackEvent({ name: "compare_completed" });
     } else if (result.reason === "version") {
@@ -140,6 +214,43 @@ export function BeliefCompare() {
       );
     } else {
       setMyError("That doesn't look like a valid code or compare link.");
+    }
+  }
+
+  function useSavedWeb() {
+    if (!saved) return;
+    setMine(saved.answers);
+    setMineSource("saved");
+    setShowPaste(false);
+  }
+
+  // No friend's web in the URL yet: treat a pasted code/link as the friend's
+  // web by writing it to the hash, which `their` reads. The viewer's own web is
+  // already loaded from saved answers, so this lands straight on the diff.
+  function loadFriendCode() {
+    const code = extractCode(myInput);
+    const result = decodeAnswers(code);
+    if (result.ok) {
+      setMyError(null);
+      setMyInput("");
+      window.location.hash = code;
+    } else if (result.reason === "version") {
+      setMyError(
+        "That code is from a different version of the check, so the two can't be compared.",
+      );
+    } else {
+      setMyError("That doesn't look like a valid compare link or code.");
+    }
+  }
+
+  async function copyMyLink() {
+    if (!saved) return;
+    const link = `${window.location.origin}/compare-beliefs#${encodeAnswers(saved.answers)}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      setLinkNotice("Link copied — send it to a friend to compare.");
+    } catch {
+      setLinkNotice("Clipboard access was unavailable in this browser.");
     }
   }
 
@@ -187,6 +298,71 @@ export function BeliefCompare() {
   // --- Empty / error states for the sharer's web -------------------------
 
   if (theirError === "none") {
+    // No friend's web in the URL. What we show depends on whether the visitor
+    // already has a web of their own saved in this browser.
+    if (hasSavedWeb) {
+      return (
+        <div>
+          <div className="border-l-2 border-mark pl-5">
+            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
+              <span className="section-mark" />
+              your web is ready
+            </p>
+            <p className="mt-2 font-serif text-[1.05rem] leading-7 text-ink-soft">
+              You&apos;ve answered{" "}
+              <span className="text-ink">{savedAnsweredCount}</span> of{" "}
+              {beliefStatements.length} statements. A comparison needs a second
+              web — open the link a friend sent you, paste their compare code
+              below, or send them yours.
+            </p>
+          </div>
+
+          <div className="mt-8 border-t border-rule pt-8">
+            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
+              <span className="section-mark" />
+              paste your friend&apos;s link
+            </p>
+            <PasteRow
+              value={myInput}
+              onChange={(v) => {
+                setMyInput(v);
+                setMyError(null);
+              }}
+              onSubmit={loadFriendCode}
+              error={myError}
+              placeholder="Paste your friend's compare link or code"
+              ariaLabel="Your friend's compare link or code"
+            />
+          </div>
+
+          <div className="mt-8 border-t border-rule pt-8">
+            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+              <span className="section-mark" />
+              or share yours
+            </p>
+            <p className="mt-2 max-w-2xl font-serif text-[1rem] leading-7 text-ink-soft">
+              Send a friend a link to your web. Your answers ride inside the
+              link itself and never reach a server.
+            </p>
+            <button
+              type="button"
+              onClick={copyMyLink}
+              className="mt-4 border border-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
+            >
+              Copy your compare link
+            </button>
+            {linkNotice ? (
+              <p
+                aria-live="polite"
+                className="mt-3 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-mark"
+              >
+                {linkNotice}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="border-l-2 border-rule pl-5">
         <p className="font-serif text-[1.05rem] leading-7 text-ink-soft">
@@ -237,51 +413,25 @@ export function BeliefCompare() {
 
   if (!their) return null; // decoding on first paint
 
-  // --- Have the sharer's web; collect the viewer's --------------------------
+  // --- Reusable paste field (different device / not my web) ----------------
 
-  const myWebInput = (
-    <div className="mt-8 border-t border-rule pt-8">
-      <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
-        <span className="section-mark" />
-        add your web
-      </p>
-      <p className="mt-2 max-w-2xl font-serif text-[1rem] leading-7 text-ink-soft">
-        Take the check yourself, then copy your compare link and paste it below.
-        Nothing you paste leaves your browser.
-      </p>
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <input
-          type="text"
-          value={myInput}
-          onChange={(e) => setMyInput(e.target.value)}
-          placeholder="Paste your compare link or code"
-          aria-label="Your compare link or code"
-          className="w-full max-w-md border border-rule bg-paper px-4 py-2.5 font-mono text-[0.85rem] text-ink outline-none focus:border-ink"
-        />
-        <button
-          type="button"
-          onClick={loadMine}
-          className="border border-ink bg-ink px-5 py-2.5 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
-        >
-          Compare
-        </button>
-      </div>
-      {myError ? (
-        <p className="mt-3 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-mark">
-          {myError}
-        </p>
-      ) : null}
-      <Link
-        href="/#check"
-        className="mt-4 inline-block font-sans text-[0.78rem] uppercase tracking-[0.16em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-      >
-        Haven&apos;t taken it yet? Begin the check →
-      </Link>
-    </div>
+  const pasteField = (
+    <PasteRow
+      value={myInput}
+      onChange={(v) => {
+        setMyInput(v);
+        setMyError(null);
+      }}
+      onSubmit={loadPasted}
+      error={myError}
+      placeholder="Paste your compare link or code"
+      ariaLabel="Your compare link or code"
+    />
   );
 
+  // --- Have the sharer's web, but not the viewer's yet ----------------------
+
   if (!diff) {
-    // Show the sharer's web alone while we wait for the viewer's.
     const affirmedTheir = new Set(affirmedBeliefs(their));
     return (
       <div>
@@ -296,18 +446,86 @@ export function BeliefCompare() {
             title={`Your friend's belief web with ${affirmedTheir.size} affirmed beliefs highlighted.`}
           />
         </figure>
-        {myWebInput}
+
+        <div className="mt-8 border-t border-rule pt-8">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
+            <span className="section-mark" />
+            add your web
+          </p>
+          <p className="mt-2 max-w-2xl font-serif text-[1.05rem] leading-7 text-ink-soft">
+            To compare, take the check first. Your answers stay in this browser,
+            and this page will use them automatically — no link to copy or
+            paste.
+          </p>
+          <Link
+            href="/#check"
+            className="mt-5 inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink"
+          >
+            Begin the check <span aria-hidden>→</span>
+          </Link>
+
+          <details className="group mt-6 border-t border-rule-soft pt-4">
+            <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-muted marker:hidden">
+              <span className="group-open:hidden">
+                ↳ on a different device? paste your link or code
+              </span>
+              <span className="hidden group-open:inline">↑ hide</span>
+            </summary>
+            <p className="mt-3 max-w-2xl font-serif text-[0.97rem] leading-7 text-muted">
+              Nothing you paste leaves your browser.
+            </p>
+            {pasteField}
+          </details>
+        </div>
       </div>
     );
   }
 
   // --- The diff -------------------------------------------------------------
 
-  const hasStructuralDifference =
-    diff.onlyFriendFindings.length + diff.onlyYouFindings.length > 0;
-
   return (
     <div>
+      {/* Which web is being compared, and how to change it. */}
+      <div className="mb-8 flex flex-col gap-3 border-l-2 border-mark bg-paper-soft px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted">
+          {mineSource === "saved" ? (
+            <>
+              Compared against your saved answers —{" "}
+              <span className="text-ink">{savedAnsweredCount}</span> of{" "}
+              {beliefStatements.length} answered.
+            </>
+          ) : (
+            <>Compared against the web you pasted.</>
+          )}
+        </p>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-sans text-[0.72rem] uppercase tracking-[0.16em]">
+          {mineSource === "saved" ? (
+            <Link
+              href="/#check"
+              className="text-indigo-ink underline decoration-indigo-ink/40 underline-offset-[5px] transition hover:decoration-indigo-ink"
+            >
+              Review or change your answers →
+            </Link>
+          ) : hasSavedWeb ? (
+            <button
+              type="button"
+              onClick={useSavedWeb}
+              className="text-indigo-ink underline decoration-indigo-ink/40 underline-offset-[5px] transition hover:decoration-indigo-ink"
+            >
+              Use your saved answers
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setShowPaste((v) => !v)}
+            className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+          >
+            {showPaste ? "Hide" : "Use a different web"}
+          </button>
+        </div>
+      </div>
+      {showPaste ? <div className="mb-8">{pasteField}</div> : null}
+
       <figure className="border border-rule bg-paper-soft p-5 sm:p-7">
         <figcaption className="mb-3 font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
           <span className="font-mono text-mark">fig.</span> · the two webs
@@ -363,7 +581,7 @@ export function BeliefCompare() {
         <h2 className="font-serif text-2xl font-medium tracking-tight text-ink">
           Where your reasoning pulls apart
         </h2>
-        {hasStructuralDifference ? (
+        {diff.onlyFriendFindings.length + diff.onlyYouFindings.length > 0 ? (
           <>
             <p className="mt-3 max-w-2xl font-serif text-[1rem] leading-7 text-ink-soft">
               These relationships fire on one web but not the other — a{" "}
@@ -395,7 +613,10 @@ export function BeliefCompare() {
           href="/#check"
           className="inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink"
         >
-          Take the check yourself <span aria-hidden>→</span>
+          {mineSource === "saved"
+            ? "Review the check yourself"
+            : "Take the check yourself"}{" "}
+          <span aria-hidden>→</span>
         </Link>
       </div>
     </div>

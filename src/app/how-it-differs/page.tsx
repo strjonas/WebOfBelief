@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Web of Belief vs. other belief & worldview tests",
   description:
     "An honest comparison of Web of Belief with personality-style worldview quizzes, the PhilPapers survey, and asking an AI chatbot about your beliefs.",
-  alternates: { canonical: "/compare" },
+  alternates: { canonical: "/how-it-differs" },
 };
 
 const comparisons = [
@@ -43,11 +43,11 @@ const comparisons = [
   },
 ];
 
-export default function ComparePage() {
+export default function HowItDiffersPage() {
   return (
     <ContentPage
-      eyebrow="compare"
-      title="How Web of Belief compares."
+      eyebrow="how it differs"
+      title="How Web of Belief differs."
       lede={
         <p>
           There are many ways to poke at what you believe. Most aren&apos;t
@@ -101,7 +101,7 @@ export default function ComparePage() {
 
       <div className="mt-14 border-t border-rule pt-8">
         <h2 className="font-serif text-2xl font-medium tracking-tight text-ink">
-          The fastest way to compare is to try it.
+          The fastest way to see the difference is to try it.
         </h2>
         <p className="mt-3 max-w-2xl font-serif text-[1.05rem] leading-7 text-ink-soft">
           It takes about five minutes, asks for no login, and keeps your answers

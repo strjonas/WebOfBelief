@@ -69,8 +69,8 @@ export const corePages: ContentEntry[] = [
     lastModified: REVISED,
   },
   {
-    path: "/compare",
-    title: "Web of Belief vs. other belief & worldview tests",
+    path: "/how-it-differs",
+    title: "How Web of Belief differs from other belief & worldview tests",
     description:
       "An honest comparison of Web of Belief with personality-style worldview quizzes, the PhilPapers survey, and asking an AI chatbot about your beliefs.",
     changeFrequency: "monthly",
@@ -79,7 +79,7 @@ export const corePages: ContentEntry[] = [
   },
   {
     path: "/compare-beliefs",
-    title: "Compare belief webs with a friend",
+    title: "Friends compare — see where two belief webs differ",
     description:
       "Open a friend's belief web and see exactly where yours pulls apart from theirs — and the premise on each fault line. Privacy-clean: answers ride in the link, never a server.",
     changeFrequency: "monthly",

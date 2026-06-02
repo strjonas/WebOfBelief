@@ -47,6 +47,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // The "vs. other tools" page used to live at /compare, which collided
+      // with the friends-compare feature. It's now /how-it-differs.
+      {
+        source: "/compare",
+        destination: "/how-it-differs",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

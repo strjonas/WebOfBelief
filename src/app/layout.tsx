@@ -129,8 +129,14 @@ export default function RootLayout({
                   Web of Belief
                 </p>
                 <p className="mt-2 max-w-xs font-serif text-[0.95rem] leading-6 text-muted">
-                  Reflection prompts, not a verdict on a person.
+                  See whether your beliefs actually fit together.
                 </p>
+                <Link
+                  href="/about"
+                  className="mt-4 inline-block font-sans text-[0.82rem] text-ink-soft transition hover:text-mark"
+                >
+                  About
+                </Link>
               </div>
 
               <nav aria-label="Explore">
@@ -148,25 +154,20 @@ export default function RootLayout({
                       className="transition hover:text-mark"
                       href="/compare-beliefs"
                     >
-                      Compare with a friend
+                      Friends compare
                     </Link>
                   </li>
                   <li>
                     <Link
                       className="transition hover:text-mark"
-                      href="/compare"
+                      href="/how-it-differs"
                     >
-                      Compare to other tools
+                      How it differs
                     </Link>
                   </li>
                   <li>
                     <Link className="transition hover:text-mark" href="/guides">
                       Guides
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="transition hover:text-mark" href="/about">
-                      About
                     </Link>
                   </li>
                 </ul>
