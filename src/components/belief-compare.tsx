@@ -372,7 +372,7 @@ export function BeliefCompare() {
           send someone a link that opens here.
         </p>
         <Link
-          href="/#check"
+          href="/check"
           className="mt-5 inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink"
         >
           Begin the check <span aria-hidden>→</span>
@@ -391,7 +391,7 @@ export function BeliefCompare() {
           Your friend used a different version of the check. The statements may
           have changed, so an honest comparison isn&apos;t possible. Ask them
           for a fresh link, or{" "}
-          <Link href="/#check" className="text-mark underline underline-offset-[3px]">
+          <Link href="/check" className="text-mark underline underline-offset-[3px]">
             take the current check
           </Link>
           .
@@ -458,7 +458,7 @@ export function BeliefCompare() {
             paste.
           </p>
           <Link
-            href="/#check"
+            href="/check"
             className="mt-5 inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink"
           >
             Begin the check <span aria-hidden>→</span>
@@ -501,7 +501,7 @@ export function BeliefCompare() {
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-sans text-[0.72rem] uppercase tracking-[0.16em]">
           {mineSource === "saved" ? (
             <Link
-              href="/#check"
+              href="/check"
               className="text-indigo-ink underline decoration-indigo-ink/40 underline-offset-[5px] transition hover:decoration-indigo-ink"
             >
               Review or change your answers →
@@ -610,7 +610,7 @@ export function BeliefCompare() {
 
       <div className="mt-12 border-t border-rule pt-8">
         <Link
-          href="/#check"
+          href="/check"
           className="inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink"
         >
           {mineSource === "saved"

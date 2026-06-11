@@ -109,7 +109,7 @@ export default function Guide() {
           This four-way split is exactly the standard{" "}
           <Link href="/method">Web of Belief uses</Link>: ⊥ direct conflict, ⊢
           conditional implication, ‡ live argument, and ≈ coherent combination.{" "}
-          <Link href="/#check">See which ones your beliefs trigger →</Link>
+          <Link href="/check">See which ones your beliefs trigger →</Link>
         </p>
       </Prose>
     </ContentPage>

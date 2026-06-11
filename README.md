@@ -5,8 +5,9 @@
 
 <img width="1200" height="630" alt="image" src="https://github.com/user-attachments/assets/5e5121a3-0cd9-4e8d-82b5-7508cefb16f6" />
 
-You answer twenty-three plain statements about morality, freedom, mind, AI
-consciousness, God, and right action. A small, inspectable rule engine then
+You answer twenty-nine plain statements about morality, freedom, mind, AI
+consciousness, knowledge, identity, God, and right action. A small, inspectable
+rule engine then
 shows where your stated beliefs **flatly clash**, where one quietly **commits
 you to another** under a stated premise, and which "obviously incompatible"
 pairs are in fact **coherent**. Every result names the exact pair of statements
@@ -45,9 +46,11 @@ only ever reasons from statements you explicitly mark "I believe this."
 | ‡ &nbsp;**Live argument** | A serious tension that turns on a disputed bridge premise, which the result names and leaves open. *Example:* divine hiddenness; the evidentialist challenge to theism. |
 | ≈ &nbsp;**Coherent combination** | A pairing often dismissed as incoherent that has a recognized philosophical home. *Example:* atheism + objective meaning. |
 
-The twenty-three statements span five topics — **morality and meaning**,
+The twenty-nine statements span five topics — **morality and meaning**,
 **freedom and responsibility**, **mind and consciousness**, **God and
-evidence**, and **right action**. Topic selection is grounded in the
+evidence**, and **right action** — with added coverage for knowledge,
+personal identity, spiritual-but-not-theist views, and constructivism. Topic
+selection is grounded in the
 [PhilPapers 2020 Survey](https://survey2020.philpeople.org/) of philosophers and
 [Pew's Religious Landscape Study](https://www.pewresearch.org/rls/).
 

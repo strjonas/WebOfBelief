@@ -2,6 +2,8 @@ import Link from "next/link";
 import { BeliefWebDiagram } from "@/components/belief-web-diagram";
 import { BeginCheckLink } from "@/components/begin-check-link";
 import { HomeViewTracker } from "@/components/home-view-tracker";
+import { checkStepCount } from "@/lib/check-flow";
+import { beliefStatements } from "@/lib/beliefs";
 
 export default function Home() {
   return (
@@ -22,19 +24,20 @@ export default function Home() {
                 </figcaption>
               </figure>
               <h1 className="mt-8 font-serif text-[2.65rem] font-medium leading-[1.05] tracking-tight text-ink sm:text-[3.4rem]">
-                Twenty-three beliefs.
+                Your beliefs form a web.
                 <br />
-                <span className="text-ink-soft">
-                  One web. Find out where it tears.
-                </span>
+                <span className="text-ink-soft">Find out where it tears.</span>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-[1.6] text-ink-soft">
-                Answer plain statements about morality, freedom, mind, AI
-                consciousness, and God. The check shows where your beliefs
-                flatly clash, where one quietly commits you to another (a
-                conditional implication), and where they hold together. Every
-                result cites at least one Stanford Encyclopedia of Philosophy
-                entry behind the call.
+                {checkStepCount} questions about God, morality, free will,
+                mind, and meaning. The check shows where your answers flatly
+                clash, where one quietly commits you to another, and where they
+                hold together — with a published source behind every call.
+              </p>
+              <p className="mt-4 max-w-xl font-serif text-[0.98rem] italic leading-7 text-muted">
+                Not an either&#8202;/&#8202;or quiz: most questions let you
+                hold several positions at once, or none. Mixed, in-between
+                views are exactly what it&apos;s built for.
               </p>
             </div>
 
@@ -45,7 +48,7 @@ export default function Home() {
               </BeginCheckLink>
               <div className="flex flex-wrap items-baseline gap-x-6 gap-y-3">
                 <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-                  23 statements &middot; ~5 min &middot; no login
+                  {`${checkStepCount} questions · ~5 min · no login · answers stay on your device`}
                 </span>
 
                 <Link
@@ -60,16 +63,14 @@ export default function Home() {
 
           <aside className="flex flex-col">
             <figure className="border border-rule bg-paper-soft p-5 sm:p-7">
-              <figcaption className="mb-3 flex items-baseline justify-between font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
-                <span>
-                  <span className="font-mono text-mark">fig. 1</span> &middot;
-                  the rule-graph — the map of checks it runs
-                </span>
-                <span>23 nodes / 22 edges</span>
+              <figcaption className="mb-3 font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
+                <span className="font-mono text-mark">fig. 1</span> &middot;
+                the {beliefStatements.length} positions the check knows, and
+                every connection it tests
               </figcaption>
               <BeliefWebDiagram
                 className="block h-auto w-full"
-                title="Diagram showing 23 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark conditional implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
+                title="Diagram showing 29 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark conditional implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
               />
               <div className="mt-5 border-t border-rule-soft pt-3 font-sans text-[0.7rem] leading-5 text-muted">
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
@@ -118,10 +119,51 @@ export default function Home() {
               <span className="font-mono normal-case tracking-normal text-mark">
                 ¶
               </span>{" "}
-              the diagram is the engine. tapping &ldquo;check&rdquo; lights up
-              the edges your answers actually trigger.
+              your answers light up the lines they actually trigger.
             </p>
           </aside>
+        </div>
+      </section>
+
+      {/* How it works — three plain steps, so no one has to guess the flow. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-x-12 gap-y-6 px-6 py-10 sm:grid-cols-[10rem_1fr] lg:px-8">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.22em] text-mark">
+            <span className="section-mark" />
+            how it works
+          </p>
+          <ol className="grid max-w-3xl gap-6 sm:grid-cols-3">
+            <li>
+              <p className="font-mono text-[0.78rem] tracking-[0.18em] text-mark">
+                i.
+              </p>
+              <p className="mt-2 font-serif text-[1.02rem] leading-7 text-ink-soft">
+                <span className="font-medium text-ink">Answer</span> one
+                question at a time. Pick the positions you actually hold — or
+                skip.
+              </p>
+            </li>
+            <li>
+              <p className="font-mono text-[0.78rem] tracking-[0.18em] text-mark">
+                ii.
+              </p>
+              <p className="mt-2 font-serif text-[1.02rem] leading-7 text-ink-soft">
+                <span className="font-medium text-ink">The engine</span>{" "}
+                cross-checks everything you affirmed against a reviewed set of
+                relationships.
+              </p>
+            </li>
+            <li>
+              <p className="font-mono text-[0.78rem] tracking-[0.18em] text-mark">
+                iii.
+              </p>
+              <p className="mt-2 font-serif text-[1.02rem] leading-7 text-ink-soft">
+                <span className="font-medium text-ink">Read the result</span>{" "}
+                — each finding names the exact beliefs at issue and cites its
+                source.
+              </p>
+            </li>
+          </ol>
         </div>
       </section>
 
@@ -176,13 +218,13 @@ export default function Home() {
           </p>
           <div className="max-w-3xl">
             <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-ink">
-              Twenty-three statements drawn from the questions philosophers and
-              the public most disagree about.
+              Drawn from the questions philosophers and the public most
+              disagree about.
             </h2>
             <p className="mt-4 font-serif text-[1.05rem] leading-7 text-ink-soft">
               Topic selection uses the PhilPapers 2020 survey of philosophers
               and Pew Research&apos;s 2023–24 Religious Landscape Study. Each
-              statement&apos;s explanation links to relevant Stanford
+              question&apos;s explanation links to relevant Stanford
               Encyclopedia of Philosophy entries and, where needed, focused
               contemporary research; nothing here treats one school as obvious.
             </p>
@@ -205,8 +247,7 @@ export default function Home() {
               Ready to map your own web?
             </h2>
             <p className="mt-2 font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-              23 statements &middot; ~5 min &middot; no login &middot; answers
-              stay in your browser
+              {`${checkStepCount} questions · ~5 min · no login · answers stay in your browser`}
             </p>
           </div>
           <BeginCheckLink className="group inline-flex w-fit shrink-0 items-center gap-3 border border-ink bg-ink px-7 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark">

@@ -1,4 +1,5 @@
 import { statementById, type Answer, type BeliefId } from "./beliefs";
+import { checkStepCount } from "./check-flow";
 import type { AnswerMap } from "./evaluate";
 
 // Persist in-progress answers on the visitor's own device so an accidental
@@ -21,6 +22,9 @@ export interface PersistedState {
   // only started answering. Lets callers tell a finished web from an exploratory
   // one.
   showResults: boolean;
+  // Which question of the step-by-step check the visitor was on, so a reload
+  // drops them back where they left off rather than at question one.
+  step: number;
 }
 
 /** Read and validate the saved check state from localStorage, or null. */
@@ -39,9 +43,14 @@ export function loadPersistedState(): PersistedState | null {
         }
       }
     }
+    const step =
+      typeof parsed.step === "number" && Number.isInteger(parsed.step)
+        ? Math.min(Math.max(parsed.step, 0), checkStepCount - 1)
+        : 0;
     return {
       answers,
       showResults: parsed.showResults === true,
+      step,
     };
   } catch {
     return null;

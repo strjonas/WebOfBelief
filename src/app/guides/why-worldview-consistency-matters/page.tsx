@@ -110,7 +110,7 @@ export default function Guide() {
         <p className="!mt-10 border-l-2 border-mark pl-5 font-serif text-[1rem] italic leading-7 text-muted">
           That is the spirit of Web of Belief: a mirror, not a judge. Every
           finding is framed as a question you decide.{" "}
-          <Link href="/#check">Take the check →</Link>
+          <Link href="/check">Take the check →</Link>
         </p>
       </Prose>
     </ContentPage>

@@ -22,7 +22,11 @@ export type SourceId =
   | "animals"
   | "consequentialism"
   | "deontology"
-  | "religionEpistemology";
+  | "religionEpistemology"
+  | "religiousExperience"
+  | "moralConstructivism"
+  | "skepticism"
+  | "personalIdentity";
 
 export type BeliefCategoryId =
   | "religion"
@@ -38,14 +42,20 @@ export type BeliefId =
   | "nonresistantNonbelief"
   | "infallibleForeknowledge"
   | "beliefNeedsEvidence"
+  | "spiritualReality"
   | "moralFacts"
   | "attitudeOnlyMorality"
+  | "constructedMorality"
   | "divineCommandOnly"
   | "independentDuty"
   | "naturalMeaning"
   | "meaningNeedsTranscendent"
+  | "ordinaryKnowledge"
+  | "radicalSkepticalScenario"
   | "consequencesOnly"
   | "sideConstraints"
+  | "psychologicalContinuity"
+  | "bodilySoulContinuity"
   | "determinism"
   | "samePastAlternative"
   | "responsibilityWithoutAlternatives"
@@ -80,15 +90,6 @@ export interface BeliefStatement {
   clarify: string;
   caseFor: string;
   caseAgainst: string;
-  /**
-   * True when this statement is the reverse of the one immediately before it —
-   * the other side of the same question. The check flags it with a small
-   * "opposite pole" marker so the pair reads as a deliberate contrast rather
-   * than a repeat. The device is explained once, on its first appearance; the
-   * marker deliberately says nothing about whether the two clash — any tension
-   * is for the result to reveal, not the question.
-   */
-  oppositePole?: boolean;
   sourceIds: SourceId[];
 }
 
@@ -262,6 +263,34 @@ export const sources: Record<SourceId, Source> = {
     url: "https://plato.stanford.edu/entries/religion-epistemology/",
     use: "Covers evidentialism (Locke, Clifford) and reformed-epistemology replies about belief in God.",
   },
+  religiousExperience: {
+    id: "religiousExperience",
+    title: "Religious Experience",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/religious-experience/",
+    use: "Surveys experience-based arguments for spiritual or religious reality and naturalistic explanations of those experiences.",
+  },
+  moralConstructivism: {
+    id: "moralConstructivism",
+    title: "Constructivism in Metaethics",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/constructivism-metaethics/",
+    use: "Explains constructivist views on which moral truths are fixed by rational or practical procedures rather than by bare approval or stance-independent facts.",
+  },
+  skepticism: {
+    id: "skepticism",
+    title: "Skepticism",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/skepticism/",
+    use: "Frames radical skeptical hypotheses, closure principles, and ordinary-knowledge replies.",
+  },
+  personalIdentity: {
+    id: "personalIdentity",
+    title: "Personal Identity",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/identity-personal/",
+    use: "Surveys psychological-continuity, bodily-continuity, animalist, and soul-based accounts of persistence over time.",
+  },
 };
 
 export const categories: BeliefCategory[] = [
@@ -284,8 +313,9 @@ export const categories: BeliefCategory[] = [
   },
   {
     id: "value",
-    name: "Morality and meaning",
-    description: "Objective value, moral grounding, and meaningful lives.",
+    name: "Morality, meaning, and knowledge",
+    description:
+      "Objective value, moral grounding, meaningful lives, and skeptical pressure.",
   },
   {
     id: "mind",
@@ -322,7 +352,6 @@ export const beliefStatements: BeliefStatement[] = [
       "Arguments may appeal to the absence of adequate evidence, evil, hiddenness, or low prior plausibility for particular gods.",
     caseAgainst:
       "Agnosticism withholds the claim, while theism invokes cosmological, moral, experiential, or revealed grounds.",
-    oppositePole: true,
     sourceIds: ["atheism", "cosmological", "evil", "hiddenness"],
   },
   {
@@ -386,6 +415,21 @@ export const beliefStatements: BeliefStatement[] = [
     sourceIds: ["religionEpistemology"],
   },
   {
+    id: "spiritualReality",
+    category: "religion",
+    prompt:
+      "Some non-personal spiritual reality, sacred order, or transcendent dimension exists, even if no personal God exists.",
+    plain:
+      "There is something spiritually real or sacred beyond ordinary physical life, even if it is not a personal God.",
+    clarify:
+      "This is meant for spiritual-but-not-classical-theist views. It does not affirm Jesus, a personal creator, or any deity with a will; if your view is purely metaphorical, mark qualify or unsure.",
+    caseFor:
+      "Support may come from religious experience, contemplative practice, perceived sacredness, or arguments that reality has a non-personal transcendent aspect.",
+    caseAgainst:
+      "Naturalists explain such experiences without a spiritual reality, and the term may be too indeterminate unless a view says what exists and how we could know it.",
+    sourceIds: ["religiousExperience", "pew"],
+  },
+  {
     id: "moralFacts",
     category: "value",
     prompt:
@@ -413,8 +457,22 @@ export const beliefStatements: BeliefStatement[] = [
       "Subjectivist and relativist approaches can explain moral practice through attitudes, cultures, or commitments.",
     caseAgainst:
       "Realists object that approval cannot make atrocities right and that moral criticism often claims objective force.",
-    oppositePole: true,
     sourceIds: ["moralAntiRealism"],
+  },
+  {
+    id: "constructedMorality",
+    category: "value",
+    prompt:
+      "Some moral truths are constructed by rational agents under fair or reasonable conditions, rather than discovered as mind-independent facts or made true by current approval.",
+    plain:
+      "Some moral truths come from what rational people would have reason to endorse under fair conditions, not from bare opinion or from facts wholly independent of us.",
+    clarify:
+      "This is a constructivist-style claim. It is not simple relativism: actual approval is not enough. It also need not be robust moral realism: the procedure, standpoint, or practical reasoning does important grounding work.",
+    caseFor:
+      "Constructivists argue that moral authority can arise from practical reason, reciprocity, or idealized agreement without appealing to stance-independent moral facts.",
+    caseAgainst:
+      "Realists argue that valid procedures answer to independent moral facts, while subjectivists and error theorists deny that construction secures genuine moral truth.",
+    sourceIds: ["moralConstructivism", "moralAntiRealism"],
   },
   {
     id: "divineCommandOnly",
@@ -442,7 +500,6 @@ export const beliefStatements: BeliefStatement[] = [
       "Moral realists and some theists hold that goodness or reasons can be prior to, or independent of, commands.",
     caseAgainst:
       "Strong divine-command theories deny obligation that is independent of divine willing or commanding.",
-    oppositePole: true,
     sourceIds: ["voluntarism", "moralAntiRealism"],
   },
   {
@@ -473,8 +530,67 @@ export const beliefStatements: BeliefStatement[] = [
       "Supernaturalist accounts ground ultimate significance in God, immortality, or both.",
     caseAgainst:
       "Objective naturalist and hybrid accounts identify meaningful activity within finite human life.",
-    oppositePole: true,
     sourceIds: ["meaning"],
+  },
+  {
+    id: "ordinaryKnowledge",
+    category: "value",
+    prompt:
+      "People can know many ordinary facts about the external world, such as that they have hands, live among other people, or ate breakfast today.",
+    plain:
+      "We can really know many everyday facts about the world around us.",
+    clarify:
+      "This concerns ordinary empirical knowledge, not certainty about every detail or immunity from all possible error.",
+    caseFor:
+      "Common-sense and fallibilist epistemologies hold that knowledge does not require eliminating every remote skeptical possibility.",
+    caseAgainst:
+      "Skeptical arguments press that if we cannot rule out radical deception, we may not know ordinary external-world claims.",
+    sourceIds: ["skepticism"],
+  },
+  {
+    id: "radicalSkepticalScenario",
+    category: "value",
+    prompt:
+      "For all I know, my experiences could be produced by a radically deceptive dream, simulation, or brain-in-a-vat scenario.",
+    plain:
+      "I cannot rule out that my whole experience is a radical deception, like a dream, simulation, or brain in a vat.",
+    clarify:
+      "Affirm this only if you mean an epistemic possibility you cannot rule out, not just a science-fiction scenario you can imagine.",
+    caseFor:
+      "Radical skeptical hypotheses seem compatible with the same experiences, making ordinary knowledge hard to secure if knowledge requires ruling them out.",
+    caseAgainst:
+      "Moorean, contextualist, externalist, and pragmatic replies deny that such possibilities defeat ordinary knowledge.",
+    sourceIds: ["skepticism"],
+  },
+  {
+    id: "psychologicalContinuity",
+    category: "mind",
+    prompt:
+      "A person remains the same person over time mainly because of psychological continuity: memory, character, intentions, and connected mental life.",
+    plain:
+      "What makes someone the same person over time is mainly continuity of mind: memories, character, intentions, and mental life.",
+    clarify:
+      "This is a psychological-continuity view of personal identity. It does not say bodies are irrelevant in practice; it says bodily sameness is not the main identity-maker.",
+    caseFor:
+      "Memory, character, and agency seem central to survival in transplant, amnesia, and duplication thought experiments.",
+    caseAgainst:
+      "Animalists, bodily-continuity theorists, and soul theorists argue that psychology can change too much, duplicate, or depend on something deeper.",
+    sourceIds: ["personalIdentity"],
+  },
+  {
+    id: "bodilySoulContinuity",
+    category: "mind",
+    prompt:
+      "A person remains the same person over time mainly because the same living body or soul persists, even if memory and character change radically.",
+    plain:
+      "What makes someone the same person over time is mainly the same body or soul continuing, even if their mind changes a lot.",
+    clarify:
+      "This groups bodily and soul-continuity views because both deny that psychological continuity is the main identity-maker. If you accept one but strongly reject the other, mark qualify.",
+    caseFor:
+      "Bodily and soul-based accounts avoid duplication worries and explain identity through an enduring subject rather than a chain of mental connections.",
+    caseAgainst:
+      "Psychological-continuity theorists argue that a persisting body or soul without the right mental connections may not preserve the person who mattered.",
+    sourceIds: ["personalIdentity"],
   },
   {
     id: "determinism",
@@ -504,7 +620,6 @@ export const beliefStatements: BeliefStatement[] = [
       "Libertarian accounts regard genuine alternative possibilities or agent causation as essential to freedom.",
     caseAgainst:
       "Compatibilists reject this requirement; skeptics argue indeterminism alone does not produce control.",
-    oppositePole: true,
     sourceIds: ["freeWill", "compatibilism"],
   },
   {
@@ -550,7 +665,6 @@ export const beliefStatements: BeliefStatement[] = [
       "Conceivability arguments (Chalmers) use such a world to challenge physicalist entailment of consciousness.",
     caseAgainst:
       "Conceivability is not possibility: a priori imaginability can outrun what is metaphysically possible (Type-B physicalists), and illusionists (Frankish, Dennett) deny we even conceive a coherent zombie. Affirm this only if you mean genuine metaphysical possibility, not merely that the scenario seems imaginable.",
-    oppositePole: true,
     sourceIds: ["physicalism", "dualism"],
   },
   {
@@ -602,7 +716,6 @@ export const beliefStatements: BeliefStatement[] = [
       "Deontologists hold that persons have rights or dignity that cannot be overridden by aggregate benefit.",
     caseAgainst:
       "Consequentialists argue it is irrational to forbid an act that genuinely makes the world go best.",
-    oppositePole: true,
     sourceIds: ["deontology", "consequentialism"],
   },
   {

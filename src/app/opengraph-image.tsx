@@ -133,9 +133,11 @@ export default function OpenGraphImage() {
                   lineHeight: 1.06,
                 }}
               >
-                <div style={{ display: "flex" }}>Twenty-three beliefs.</div>
+                <div style={{ display: "flex" }}>
+                  Your beliefs form a web.
+                </div>
                 <div style={{ color: "#545860", display: "flex" }}>
-                  One web. Where does it tear?
+                  Find out where it tears.
                 </div>
               </div>
               <div
@@ -213,7 +215,7 @@ export default function OpenGraphImage() {
             }}
           >
             <div style={{ display: "flex" }}>
-              23 statements &middot; ~5 minutes
+              18 questions &middot; ~5 minutes
             </div>
             <div style={{ color: "#7a1f1d", display: "flex" }}>
               webofbelief.app

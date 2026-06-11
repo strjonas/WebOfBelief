@@ -26,20 +26,26 @@ const nodes: NodePos[] = [
   { id: "nonresistantNonbelief", x: 160, y: 88, short: "hiddenness" },
   { id: "infallibleForeknowledge", x: 110, y: 158, short: "foreknown" },
   { id: "beliefNeedsEvidence", x: 44, y: 188, short: "evidence" },
+  { id: "spiritualReality", x: 182, y: 138, short: "spiritual" },
   // Morality & meaning (right cluster)
   { id: "moralFacts", x: 256, y: 60, short: "mind-indep." },
   { id: "attitudeOnlyMorality", x: 354, y: 38, short: "attitudes only" },
+  { id: "constructedMorality", x: 314, y: 82, short: "constructed" },
   { id: "divineCommandOnly", x: 244, y: 126, short: "command-only" },
   { id: "independentDuty", x: 348, y: 116, short: "indep. duty" },
   { id: "naturalMeaning", x: 274, y: 200, short: "finite meaning" },
   { id: "meaningNeedsTranscendent", x: 372, y: 198, short: "needs transc." },
+  { id: "ordinaryKnowledge", x: 270, y: 158, short: "ordinary know." },
+  { id: "radicalSkepticalScenario", x: 392, y: 158, short: "skeptic" },
   // Freedom (mid-low)
   { id: "determinism", x: 172, y: 232, short: "determined" },
   { id: "samePastAlternative", x: 96, y: 268, short: "alt. open" },
   { id: "responsibilityWithoutAlternatives", x: 168, y: 310, short: "responsibility" },
   // Mind (lower-right)
-  { id: "physicalClosure", x: 280, y: 282, short: "physical" },
-  { id: "zombieWorld", x: 360, y: 298, short: "zombie" },
+  { id: "psychologicalContinuity", x: 268, y: 246, short: "psych cont." },
+  { id: "bodilySoulContinuity", x: 344, y: 246, short: "body/soul" },
+  { id: "physicalClosure", x: 280, y: 306, short: "physical" },
+  { id: "zombieWorld", x: 360, y: 308, short: "zombie" },
   { id: "futureAiConscious", x: 418, y: 330, short: "future AI" },
   // Right action & animals (low-left)
   { id: "consequencesOnly", x: 30, y: 252, short: "consequences" },
@@ -63,12 +69,14 @@ const edges: Edge[] = [
   { a: "perfectGod", b: "noDeity", kind: "conflict" },
   { a: "perfectGod", b: "gratuitousSuffering", kind: "conflict" },
   { a: "moralFacts", b: "attitudeOnlyMorality", kind: "conflict" },
+  { a: "constructedMorality", b: "attitudeOnlyMorality", kind: "conflict" },
   { a: "divineCommandOnly", b: "independentDuty", kind: "conflict" },
   { a: "naturalMeaning", b: "meaningNeedsTranscendent", kind: "conflict" },
   { a: "determinism", b: "samePastAlternative", kind: "conflict" },
   { a: "physicalClosure", b: "zombieWorld", kind: "conflict" },
   { a: "consequencesOnly", b: "sideConstraints", kind: "conflict" },
   { a: "infallibleForeknowledge", b: "noDeity", kind: "conflict" },
+  { a: "psychologicalContinuity", b: "bodilySoulContinuity", kind: "conflict" },
   // implication forks
   { a: "noDeity", b: "meaningNeedsTranscendent", kind: "implication" },
   { a: "noDeity", b: "divineCommandOnly", kind: "implication" },
@@ -77,6 +85,7 @@ const edges: Edge[] = [
   { a: "infallibleForeknowledge", b: "samePastAlternative", kind: "argument" },
   { a: "determinism", b: "responsibilityWithoutAlternatives", kind: "argument" },
   { a: "beliefNeedsEvidence", b: "perfectGod", kind: "argument" },
+  { a: "ordinaryKnowledge", b: "radicalSkepticalScenario", kind: "argument" },
   { a: "zombieWorld", b: "futureAiConscious", kind: "argument" },
   { a: "minorConvenienceHarmWrong", b: "factoryFarmPermissible", kind: "argument" },
   { a: "animalsMatter", b: "factoryFarmPermissible", kind: "argument" },
@@ -84,12 +93,13 @@ const edges: Edge[] = [
   { a: "perfectGod", b: "moralFacts", kind: "compatible" },
   { a: "noDeity", b: "moralFacts", kind: "compatible" },
   { a: "noDeity", b: "naturalMeaning", kind: "compatible" },
+  { a: "noDeity", b: "spiritualReality", kind: "compatible" },
   { a: "physicalClosure", b: "futureAiConscious", kind: "compatible" },
 ];
 
 const clusterLabels: ClusterLabel[] = [
   { text: "god & evidence", x: 16, y: 18, anchor: "start" },
-  { text: "morality & meaning", x: 464, y: 18, anchor: "end" },
+  { text: "value & knowledge", x: 464, y: 18, anchor: "end" },
   { text: "freedom", x: 16, y: 350, anchor: "start" },
   { text: "mind", x: 320, y: 350, anchor: "start" },
   { text: "right action", x: 464, y: 350, anchor: "end" },
@@ -141,7 +151,7 @@ export function BeliefWebDiagram({
   showClusters = true,
   decorative = false,
   className,
-  title = "A diagram of the belief web this tool checks. Twenty-three statements are connected by edges representing direct conflicts, conditional implications, live arguments, and coherent combinations.",
+  title = "A diagram of the belief web this tool checks. Twenty-nine statements are connected by edges representing direct conflicts, conditional implications, live arguments, and coherent combinations.",
 }: BeliefWebDiagramProps) {
   const triggered = triggeredEdges
     ? new Set<string>(triggeredEdges.map(([a, b]) => edgeKey(a, b)))

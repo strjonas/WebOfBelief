@@ -159,9 +159,9 @@ export const homeEntry: ContentEntry = {
  * engine explanation that lives on the home page. */
 export const checkEntry: ContentEntry = {
   path: "/check",
-  title: "Take the check — answer 23 statements about what you believe",
+  title: "Take the check — 18 questions about what you believe",
   description:
-    "Answer 23 plain statements on morality, freedom, mind, AI consciousness, and God, then see where your beliefs clash, imply one another, or hold together.",
+    "Answer 18 questions on morality, freedom, mind, AI consciousness, knowledge, identity, and God — holding one position, several, or none on each — then see where your beliefs clash, imply one another, or hold together.",
   changeFrequency: "weekly",
   priority: 0.9,
   lastModified: REVISED,

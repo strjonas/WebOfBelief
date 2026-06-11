@@ -76,6 +76,19 @@ const rules: Finding[] = [
     sourceIds: ["moralAntiRealism"],
   },
   {
+    id: "constructivism-and-attitude-only",
+    kind: "conflict",
+    title: "Constructed morality and approval-only morality",
+    requires: ["constructedMorality", "attitudeOnlyMorality"],
+    gist:
+      "Constructivism says bare approval is not enough: the right procedure, standpoint, or rational conditions matter. Approval-only morality says approval is all there is. Those cannot both be the whole story.",
+    explanation:
+      "The constructivist statement says moral truth is not made true merely by actual attitudes or approvals; it depends on rational, fair, or reasonable conditions. The attitude-only statement says every moral truth depends only on attitudes or approvals. Those claims directly pull apart as worded.",
+    nextQuestion:
+      "Do actual attitudes make morality true, or do they need to pass some independent rational or fair procedure first?",
+    sourceIds: ["moralConstructivism", "moralAntiRealism"],
+  },
+  {
     id: "command-and-independent-duty",
     kind: "conflict",
     title: "Sole divine source and command-independent duty",
@@ -126,6 +139,34 @@ const rules: Finding[] = [
     nextQuestion:
       "Is the zombie world genuinely possible, or only imaginable despite being impossible?",
     sourceIds: ["physicalism", "dualism"],
+  },
+  {
+    id: "ordinary-knowledge-and-radical-skepticism",
+    kind: "argument",
+    title: "Ordinary knowledge and radical skeptical scenarios",
+    requires: ["ordinaryKnowledge", "radicalSkepticalScenario"],
+    gist:
+      "You say we know ordinary external-world facts, while also saying radical deception remains open for all you know. That is the classic skeptical pressure: can knowledge survive without ruling out the scenario?",
+    explanation:
+      "This is not a direct contradiction. Fallibilist, contextualist, externalist, and Moorean views allow ordinary knowledge even when radical skeptical possibilities are not eliminated in the strongest sense. The pressure comes from a closure-style thought: if you know ordinary facts, and those facts exclude being radically deceived, then perhaps you must be able to know you are not radically deceived.",
+    bridge:
+      "If you know an ordinary external-world fact, you must be able to rule out radical skeptical scenarios incompatible with that fact.",
+    nextQuestion:
+      "Does knowledge require ruling out radical deception, or is ordinary knowledge compatible with remote skeptical possibilities?",
+    sourceIds: ["skepticism"],
+  },
+  {
+    id: "psychological-and-bodily-soul-identity",
+    kind: "conflict",
+    title: "Psychological continuity and body-or-soul continuity",
+    requires: ["psychologicalContinuity", "bodilySoulContinuity"],
+    gist:
+      "One statement says psychological continuity is the main identity-maker; the other says the same living body or soul is the main identity-maker even through radical psychological change. They assign the main work to different things.",
+    explanation:
+      "As worded, the two claims cannot both be the main account of personal identity. One makes memory, character, intentions, and connected mental life primary; the other makes a persisting body or soul primary even if psychology changes radically.",
+    nextQuestion:
+      "Which relation does the identity-making work in hard cases: the continuing mind, the continuing organism, or a soul or subject beneath both?",
+    sourceIds: ["personalIdentity"],
   },
   {
     id: "future-ai-and-zombie-evidence",
@@ -262,6 +303,19 @@ const rules: Finding[] = [
     nextQuestion:
       "Do moral facts depend on God in your view, or could they hold independently of any divine command?",
     sourceIds: ["moralArguments", "voluntarism", "moralAntiRealism"],
+  },
+  {
+    id: "spiritual-but-not-theist",
+    kind: "compatible",
+    title: "Spiritual reality without a personal deity",
+    requires: ["noDeity", "spiritualReality"],
+    gist:
+      "Denying gods while affirming a non-personal sacred or transcendent dimension is a coherent spiritual-but-not-theist position, not a contradiction.",
+    explanation:
+      "The no-deity statement denies gods or deities. The spiritual-reality statement, as written, allows a non-personal sacred order or transcendent dimension without a divine person. That combination is coherent if the spiritual reality is not itself a deity.",
+    nextQuestion:
+      "What makes the spiritual reality real rather than metaphorical, and why is it not a deity?",
+    sourceIds: ["religiousExperience", "atheism"],
   },
   {
     id: "atheist-moral-realism",

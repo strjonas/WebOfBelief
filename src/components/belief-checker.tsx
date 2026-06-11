@@ -2,15 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  beliefStatements,
   categories,
   sources,
   statementById,
   type Answer,
-  type BeliefCategoryId,
   type BeliefId,
   type BeliefStatement,
 } from "@/lib/beliefs";
+import {
+  checkStepCount,
+  checkSteps,
+  stepStatementIds,
+  type CheckStep,
+  type ClaimStep,
+  type PositionsStep,
+} from "@/lib/check-flow";
 import {
   affirmedBeliefs,
   countFindings,
@@ -41,16 +47,36 @@ import {
   savePersistedState,
 } from "@/lib/answer-storage";
 
-const choices: Array<{ id: Answer; label: string; hint: string }> = [
-  { id: "affirm", label: "I believe this", hint: "Affirm as worded." },
-  { id: "reject", label: "I reject this", hint: "Reject as worded." },
-  { id: "unsure", label: "Not sure", hint: "No settled view." },
+const claimChoices: Array<{ id: Answer; label: string; hint: string }> = [
+  {
+    id: "affirm",
+    label: "Yes — I believe this",
+    hint: "You take it to be actually true, as worded.",
+  },
+  {
+    id: "reject",
+    label: "No — I reject this",
+    hint: "You take it to be false, as worded.",
+  },
+  {
+    id: "unsure",
+    label: "I'm not sure",
+    hint: "No settled view either way — never counted against you.",
+  },
   {
     id: "qualify",
-    label: "Conditional / qualify",
-    hint: "Use for hypothetical, if-this-were-true, or otherwise qualified readings.",
+    label: "It's complicated",
+    hint: "The wording doesn't quite fit your view, or you'd only affirm it hypothetically. The check sets it aside.",
   },
 ];
+
+// Short answer names for the review list.
+const claimAnswerSummary: Record<Answer, string> = {
+  affirm: "Yes",
+  reject: "No",
+  unsure: "Not sure",
+  qualify: "It's complicated",
+};
 
 // One plain line per kind, so the label is legible before the full
 // explanation. Wording mirrors the contradiction-vs-tension guide.
@@ -69,24 +95,14 @@ const findingGlosses: Record<FindingKind, string> = {
 
 const BRAND = "Web of Belief";
 
-const deityDependentStatementIds = new Set<BeliefId>([
-  "perfectGod",
-  "infallibleForeknowledge",
-  "divineCommandOnly",
-]);
+// Shown on deity-dependent questions once "no gods exist" has been affirmed,
+// so a hypothetical "if God existed…" reading doesn't get recorded as an
+// actual belief.
+const deityNoteForForeknowledge =
+  "You've affirmed that no god or deity exists. Choose “Yes — I believe this” only if you also take this deity-dependent sentence to be actually true; choose “It's complicated” for a hypothetical reading, or reject it as worded.";
 
-const deityDependentContextNote =
-  "You have already affirmed that no god or deity exists. Choose “I believe this” only if you also take this deity-dependent sentence to be actually true; choose “Conditional / qualify” for a hypothetical reading, or reject it as worded.";
-
-// Shown once, on the first statement marked as an opposite pole, so the device
-// reads as deliberate rather than a repeated question. It says nothing about
-// whether the poles clash — that is for the result to reveal.
-const oppositePoleExplainer =
-  "A few statements turn an earlier one around to face the other way. Answer each on its own — you needn’t simply flip your previous answer, and sometimes neither side is yours.";
-
-const firstOppositePoleId: BeliefId | undefined = categories
-  .flatMap((category) => statementsForCategory(category.id))
-  .find((statement) => statement.oppositePole)?.id;
+const deityNoteForDivineCommand =
+  "You've affirmed that no god or deity exists. Select “duties exist only because God commands them” only if you take it to be actually true — for a purely hypothetical reading, leave it unselected.";
 
 interface BadgeData {
   conflicts: number;
@@ -315,12 +331,6 @@ function drawBadge(canvas: HTMLCanvasElement, data: BadgeData) {
   ctx.textAlign = "left";
 }
 
-function statementsForCategory(categoryId: BeliefCategoryId) {
-  return beliefStatements.filter(
-    (statement) => statement.category === categoryId,
-  );
-}
-
 function SourceLinks({ ids }: { ids: BeliefStatement["sourceIds"] }) {
   return (
     <span className="flex flex-wrap gap-x-4 gap-y-1 font-sans text-[0.78rem]">
@@ -342,72 +352,217 @@ function SourceLinks({ ids }: { ids: BeliefStatement["sourceIds"] }) {
   );
 }
 
-function StatementCard({
+/**
+ * The collapsible fine print under each statement: exact wording, what it
+ * means, the case each way, sources, and a feedback affordance.
+ */
+function StatementBackground({ statement }: { statement: BeliefStatement }) {
+  return (
+    <details className="group/bg">
+      <summary className="cursor-pointer list-none py-3 font-sans text-[0.74rem] uppercase tracking-[0.18em] text-mark marker:hidden">
+        <span className="group-open/bg:hidden">
+          ↳ exact wording, arguments, sources
+        </span>
+        <span className="hidden group-open/bg:inline">↑ hide background</span>
+      </summary>
+      <div className="grid gap-5 pb-4 font-serif text-[0.98rem] leading-7 text-ink-soft md:grid-cols-2">
+        <div className="md:col-span-2 border-l border-rule-soft pl-4">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+            <span className="section-mark" />
+            exact wording used by the check
+          </p>
+          <p className="mt-2 font-serif italic text-ink">{statement.prompt}</p>
+        </div>
+        <div className="md:col-span-2 border-l border-rule-soft pl-4">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+            <span className="section-mark" />
+            what it means
+          </p>
+          <p className="mt-2">{statement.clarify}</p>
+        </div>
+        <div className="border-l border-rule-soft pl-4">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-forest">
+            <span className="section-mark" />
+            reason to hold it
+          </p>
+          <p className="mt-2">{statement.caseFor}</p>
+        </div>
+        <div className="border-l border-rule-soft pl-4">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
+            <span className="section-mark" />
+            reason not to
+          </p>
+          <p className="mt-2">{statement.caseAgainst}</p>
+        </div>
+        <div className="md:col-span-2 border-l border-rule-soft pl-4">
+          <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
+            <span className="section-mark" />
+            sources
+          </p>
+          <div className="mt-2">
+            <SourceLinks ids={statement.sourceIds} />
+          </div>
+        </div>
+        <div className="md:col-span-2">
+          <StatementFeedback beliefId={statement.id} />
+        </div>
+      </div>
+    </details>
+  );
+}
+
+/** One selectable position on a topic question. */
+function PositionCard({
   statement,
-  index,
-  answer,
-  onAnswer,
-  contextNote,
-  explainPole,
+  label,
+  selected,
+  onToggle,
 }: {
   statement: BeliefStatement;
-  index: number;
-  answer?: Answer;
-  onAnswer: (answer: Answer) => void;
-  contextNote?: string;
-  explainPole?: boolean;
+  label: string;
+  selected: boolean;
+  onToggle: () => void;
 }) {
   return (
-    <fieldset className="relative border-l-2 border-rule-soft pl-5 pb-7 pt-1 sm:pl-7">
-      <legend className="sr-only">{statement.prompt}</legend>
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <p className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted">
-          prop. {String(index + 1).padStart(2, "0")}
-        </p>
-        {statement.oppositePole ? (
-          <span className="font-sans text-[0.66rem] uppercase tracking-[0.18em] text-indigo-ink">
-            <span aria-hidden="true">⇄ </span>opposite pole
+    <div
+      className={`border transition focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-mark ${
+        selected
+          ? "border-mark bg-paper shadow-[inset_4px_0_0_0_var(--color-mark)]"
+          : "border-rule-soft bg-paper-soft hover:border-ink"
+      }`}
+    >
+      <label className="flex cursor-pointer items-start gap-4 px-5 py-4 sm:px-6">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onToggle}
+          aria-label={`${label}: ${statement.prompt}`}
+          className="sr-only"
+        />
+        <span
+          aria-hidden="true"
+          className={`mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center border font-mono text-[0.78rem] ${
+            selected
+              ? "border-mark bg-mark text-paper"
+              : "border-rule text-muted/70"
+          }`}
+        >
+          {selected ? "✓" : "+"}
+        </span>
+        <span>
+          <span
+            className={`font-sans text-[0.95rem] font-medium leading-6 ${
+              selected ? "text-ink" : "text-ink-soft"
+            }`}
+          >
+            {label}
           </span>
-        ) : null}
+          <span className="mt-1 block font-serif text-[0.95rem] leading-6 text-muted">
+            {statement.plain}
+          </span>
+        </span>
+      </label>
+      <div className="border-t border-rule-soft/70 px-5 sm:px-6">
+        <StatementBackground statement={statement} />
       </div>
-      {statement.oppositePole && explainPole ? (
-        <div className="mt-2.5 border-l-2 border-indigo-ink bg-paper-soft px-4 py-3">
-          <p className="font-sans text-[0.64rem] uppercase tracking-[0.18em] text-indigo-ink">
-            <span aria-hidden="true">⇄ </span>what the opposite-pole mark means
-          </p>
-          <p className="mt-1.5 font-serif text-[0.9rem] italic leading-6 text-ink-soft">
-            {oppositePoleExplainer}
-          </p>
-        </div>
-      ) : null}
-      <p className="mt-2 font-serif text-[1.18rem] leading-7 text-ink sm:text-[1.22rem]">
-        {statement.plain}
-      </p>
+    </div>
+  );
+}
 
-      {contextNote ? (
-        <p className="mt-4 border-l-2 border-amber-ink bg-paper-soft px-4 py-3 font-serif text-[0.95rem] leading-6 text-ink-soft">
+/** A topic question: select any number of positions, or none. */
+function PositionsScreen({
+  step,
+  answers,
+  onToggle,
+  note,
+}: {
+  step: PositionsStep;
+  answers: AnswerMap;
+  onToggle: (beliefId: BeliefId) => void;
+  note?: string;
+}) {
+  return (
+    <fieldset>
+      <legend className="sr-only">{step.question}</legend>
+      <h2 className="font-serif text-[1.7rem] font-medium leading-tight tracking-tight text-ink sm:text-[2.1rem]">
+        {step.question}
+      </h2>
+      <p className="mt-3 max-w-2xl font-serif text-[0.98rem] italic leading-7 text-muted">
+        Select every position you genuinely hold — one, several, or none.
+        Mixed views are welcome; if two selections pull against each other,
+        the result will show it.
+      </p>
+      {step.help ? (
+        <p className="mt-2 max-w-2xl font-serif text-[0.98rem] leading-7 text-ink-soft">
+          {step.help}
+        </p>
+      ) : null}
+      {note ? (
+        <p className="mt-4 max-w-2xl border-l-2 border-amber-ink bg-paper-soft px-4 py-3 font-serif text-[0.95rem] leading-6 text-ink-soft">
           <span className="font-sans text-[0.68rem] uppercase tracking-[0.18em] text-amber-ink">
             answer as an actual belief
           </span>
           <br />
-          {contextNote}
+          {note}
         </p>
       ) : null}
+      <div className="mt-6 space-y-3">
+        {step.positions.map((position) => (
+          <PositionCard
+            key={position.id}
+            statement={statementById[position.id]}
+            label={position.label}
+            selected={answers[position.id] === "affirm"}
+            onToggle={() => onToggle(position.id)}
+          />
+        ))}
+      </div>
+    </fieldset>
+  );
+}
 
-      <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        {choices.map((choice) => {
+/** A single yes / no / unsure / it's-complicated statement. */
+function ClaimScreen({
+  step,
+  answer,
+  onAnswer,
+  note,
+}: {
+  step: ClaimStep;
+  answer?: Answer;
+  onAnswer: (answer: Answer) => void;
+  note?: string;
+}) {
+  const statement = statementById[step.statementId];
+  return (
+    <fieldset>
+      <legend className="sr-only">{statement.prompt}</legend>
+      <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-muted">
+        do you believe this?
+      </p>
+      <h2 className="mt-3 max-w-2xl font-serif text-[1.55rem] font-medium leading-snug tracking-tight text-ink sm:text-[1.9rem]">
+        {statement.plain}
+      </h2>
+      {note ? (
+        <p className="mt-4 max-w-2xl border-l-2 border-amber-ink bg-paper-soft px-4 py-3 font-serif text-[0.95rem] leading-6 text-ink-soft">
+          <span className="font-sans text-[0.68rem] uppercase tracking-[0.18em] text-amber-ink">
+            answer as an actual belief
+          </span>
+          <br />
+          {note}
+        </p>
+      ) : null}
+      <div className="mt-6 grid max-w-2xl gap-2.5">
+        {claimChoices.map((choice) => {
           const selected = answer === choice.id;
-          const baseLabel =
-            "group flex cursor-pointer items-baseline gap-3 border border-rule-soft bg-paper-soft px-4 py-3 text-[0.95rem] transition";
           const selectedClasses =
             choice.id === "affirm"
-              ? "border-mark bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-mark)]"
+              ? "border-mark bg-paper shadow-[inset_4px_0_0_0_var(--color-mark)]"
               : choice.id === "reject"
-                ? "border-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-ink)]"
+                ? "border-ink bg-paper shadow-[inset_4px_0_0_0_var(--color-ink)]"
                 : choice.id === "unsure"
-                  ? "border-amber-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-amber-ink)]"
-                  : "border-indigo-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-indigo-ink)]";
-          const idleClasses = "text-muted hover:border-ink hover:text-ink";
+                  ? "border-amber-ink bg-paper shadow-[inset_4px_0_0_0_var(--color-amber-ink)]"
+                  : "border-indigo-ink bg-paper shadow-[inset_4px_0_0_0_var(--color-indigo-ink)]";
           const idleGlyph =
             choice.id === "affirm"
               ? "+"
@@ -427,8 +582,11 @@ function StatementCard({
           return (
             <label
               key={choice.id}
-              title={choice.hint}
-              className={`${baseLabel} focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-mark ${selected ? selectedClasses : idleClasses}`}
+              className={`group flex cursor-pointer items-baseline gap-3.5 border px-5 py-3.5 transition focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-mark ${
+                selected
+                  ? `${selectedClasses} text-ink`
+                  : "border-rule-soft bg-paper-soft text-ink-soft hover:border-ink"
+              }`}
             >
               <input
                 type="radio"
@@ -441,68 +599,27 @@ function StatementCard({
               />
               <span
                 aria-hidden="true"
-                className={`font-mono text-[0.78rem] tracking-[0.12em] ${
+                className={`font-mono text-[0.82rem] ${
                   selected ? selectedGlyphColor : "text-muted/60"
                 }`}
               >
                 {selected ? "✓" : idleGlyph}
               </span>
-              <span className="font-serif">{choice.label}</span>
+              <span>
+                <span className="font-serif text-[1.02rem]">
+                  {choice.label}
+                </span>
+                <span className="mt-0.5 block font-serif text-[0.85rem] italic leading-5 text-muted">
+                  {choice.hint}
+                </span>
+              </span>
             </label>
           );
         })}
       </div>
-
-      <details className="group/bg mt-5 border-t border-rule-soft pt-4">
-        <summary className="cursor-pointer list-none font-sans text-[0.78rem] uppercase tracking-[0.18em] text-mark marker:hidden">
-          <span className="group-open/bg:hidden">
-            ↳ exact wording, arguments, sources
-          </span>
-          <span className="hidden group-open/bg:inline">↑ hide background</span>
-        </summary>
-        <div className="mt-5 grid gap-5 font-serif text-[0.98rem] leading-7 text-ink-soft md:grid-cols-2">
-          <div className="md:col-span-2 border-l border-rule-soft pl-4">
-            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-              <span className="section-mark" />
-              exact wording used by the check
-            </p>
-            <p className="mt-2 font-serif italic text-ink">
-              {statement.prompt}
-            </p>
-          </div>
-          <div className="md:col-span-2 border-l border-rule-soft pl-4">
-            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-              <span className="section-mark" />
-              what it means
-            </p>
-            <p className="mt-2">{statement.clarify}</p>
-          </div>
-          <div className="border-l border-rule-soft pl-4">
-            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-forest">
-              <span className="section-mark" />
-              reason to hold it
-            </p>
-            <p className="mt-2">{statement.caseFor}</p>
-          </div>
-          <div className="border-l border-rule-soft pl-4">
-            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
-              <span className="section-mark" />
-              reason not to
-            </p>
-            <p className="mt-2">{statement.caseAgainst}</p>
-          </div>
-          <div className="md:col-span-2 border-l border-rule-soft pl-4">
-            <p className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-muted">
-              <span className="section-mark" />
-              sources
-            </p>
-            <div className="mt-2">
-              <SourceLinks ids={statement.sourceIds} />
-            </div>
-          </div>
-        </div>
-        <StatementFeedback beliefId={statement.id} />
-      </details>
+      <div className="mt-5 max-w-2xl border-t border-rule-soft">
+        <StatementBackground statement={statement} />
+      </div>
     </fieldset>
   );
 }
@@ -593,12 +710,34 @@ function FindingCard({ finding }: { finding: Finding }) {
   );
 }
 
+type Phase = "questions" | "review" | "results";
+
+/** True once the visitor has recorded anything on this question. */
+function stepHasAnswer(step: CheckStep, answers: AnswerMap): boolean {
+  return stepStatementIds(step).some((id) => answers[id] !== undefined);
+}
+
+/** Review-list summary of what was recorded on a question. */
+function stepSummary(step: CheckStep, answers: AnswerMap): string {
+  if (step.kind === "claim") {
+    const answer = answers[step.statementId];
+    return answer ? claimAnswerSummary[answer] : "Skipped — counts as not sure";
+  }
+  const selected = step.positions.filter(
+    (position) => answers[position.id] === "affirm",
+  );
+  if (selected.length === 0) return "Nothing selected — counts as not sure";
+  return selected.map((position) => position.label).join(" · ");
+}
+
 export function BeliefChecker() {
   const [answers, setAnswers] = useState<AnswerMap>({});
-  const [showResults, setShowResults] = useState(false);
+  const [phase, setPhase] = useState<Phase>("questions");
+  const [step, setStep] = useState(0);
   const [copyNotice, setCopyNotice] = useState("");
   const [compareNotice, setCompareNotice] = useState("");
   const [hydrated, setHydrated] = useState(false);
+  const topRef = useRef<HTMLElement | null>(null);
 
   // Restore saved progress once, after mount. Doing this in an effect (rather
   // than a lazy useState initializer that reads localStorage) keeps the server
@@ -609,7 +748,8 @@ export function BeliefChecker() {
     if (saved) {
       /* eslint-disable react-hooks/set-state-in-effect */
       setAnswers(saved.answers);
-      setShowResults(saved.showResults);
+      setPhase(saved.showResults ? "results" : "questions");
+      setStep(saved.step);
       /* eslint-enable react-hooks/set-state-in-effect */
     }
     setHydrated(true);
@@ -619,11 +759,19 @@ export function BeliefChecker() {
   // initial empty state never overwrites saved answers.
   useEffect(() => {
     if (!hydrated) return;
-    savePersistedState({ answers, showResults });
-  }, [hydrated, answers, showResults]);
+    savePersistedState({
+      answers,
+      showResults: phase === "results",
+      step,
+    });
+  }, [hydrated, answers, phase, step]);
 
-  const answeredCount = Object.keys(answers).length;
-  const unansweredCount = beliefStatements.length - answeredCount;
+  const scrollToTop = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
+
   const qualifiedCount = Object.values(answers).filter(
     (a) => a === "qualify",
   ).length;
@@ -634,6 +782,9 @@ export function BeliefChecker() {
   const implicationCount = countFindings(findings, "implication");
   const compatibleCount = countFindings(findings, "compatible");
   const noDirectConflict = conflictCount === 0 && affirmed.length > 0;
+  const answeredSteps = checkSteps.filter((s) =>
+    stepHasAnswer(s, answers),
+  ).length;
 
   const affirmedSet = useMemo(() => new Set(affirmed), [affirmed]);
   const triggeredEdges = useMemo<
@@ -681,7 +832,7 @@ export function BeliefChecker() {
   const [badgeUrl, setBadgeUrl] = useState("");
 
   useEffect(() => {
-    if (!showResults) return;
+    if (phase !== "results") return;
     const canvas = canvasRef.current ?? document.createElement("canvas");
     canvasRef.current = canvas;
     try {
@@ -690,7 +841,7 @@ export function BeliefChecker() {
     } catch {
       setBadgeUrl("");
     }
-  }, [showResults, badgeData]);
+  }, [phase, badgeData]);
 
   const downloadBadge = useCallback(() => {
     const canvas = canvasRef.current;
@@ -820,604 +971,569 @@ export function BeliefChecker() {
     }
   }, [answers, siteOrigin]);
 
-  function answeredForCategory(categoryId: BeliefCategoryId) {
-    return statementsForCategory(categoryId).filter(
-      (statement) => answers[statement.id],
-    ).length;
-  }
-
-  function answerStatement(statementId: BeliefStatement["id"], answer: Answer) {
+  function recordAnswer(updater: (previous: AnswerMap) => AnswerMap) {
     setAnswers((previous) => {
+      const next = updater(previous);
       // Fire "check_started" only on the very first recorded answer, so the
       // event maps to "this visitor actually began the check" vs. bouncing.
-      if (Object.keys(previous).length === 0) {
+      if (
+        Object.keys(previous).length === 0 &&
+        Object.keys(next).length > 0
+      ) {
         trackEvent({ name: "check_started" });
       }
-      return { ...previous, [statementId]: answer };
+      return next;
     });
     setCopyNotice("");
   }
 
-  function reviewResults() {
-    trackEvent({ name: "results_viewed" });
-    setShowResults(true);
-    window.requestAnimationFrame(() => {
-      document
-        .getElementById("results")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  function answerClaim(statementId: BeliefId, answer: Answer) {
+    recordAnswer((previous) => ({ ...previous, [statementId]: answer }));
+  }
+
+  function togglePosition(beliefId: BeliefId) {
+    recordAnswer((previous) => {
+      if (previous[beliefId] === "affirm") {
+        const next = { ...previous };
+        delete next[beliefId];
+        return next;
+      }
+      return { ...previous, [beliefId]: "affirm" };
     });
   }
 
-  // Reopen the questionnaire from the results view, keeping all answers.
-  function editSelection() {
-    setShowResults(false);
-    window.requestAnimationFrame(() => {
-      document
-        .getElementById("check")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+  function goToStep(index: number) {
+    setStep(Math.min(Math.max(index, 0), checkStepCount - 1));
+    setPhase("questions");
+    scrollToTop();
+  }
+
+  function goNext() {
+    if (step >= checkStepCount - 1) {
+      setPhase("review");
+    } else {
+      setStep(step + 1);
+    }
+    scrollToTop();
+  }
+
+  function goBack() {
+    if (step > 0) setStep(step - 1);
+    scrollToTop();
+  }
+
+  function openReview() {
+    setPhase("review");
+    scrollToTop();
+  }
+
+  function reviewResults() {
+    trackEvent({ name: "results_viewed" });
+    setPhase("results");
+    scrollToTop();
   }
 
   function resetCheck() {
     trackEvent({ name: "check_reset" });
     clearPersistedState();
     setAnswers({});
-    setShowResults(false);
+    setPhase("questions");
+    setStep(0);
     setCopyNotice("");
     setCompareNotice("");
-    window.requestAnimationFrame(() => {
-      document
-        .getElementById("check")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    scrollToTop();
   }
 
-  async function copyPrivateSummary() {
-    const qualifiedNote =
-      qualifiedCount > 0
-        ? `${qualifiedCount} were marked conditional and set aside. `
-        : "";
-    const summary =
-      `${BRAND} reflection: I answered ${answeredCount} statements; ` +
-      `${unansweredCount} unanswered statements were treated as not sure. ` +
-      qualifiedNote +
-      `It identified ${conflictCount} direct conflict(s), ${implicationCount} conditional implication(s), ` +
-      `${argumentCount} live argument(s), and ${compatibleCount} coherent combination(s). ` +
-      `It is a discussion prompt, not a verdict. ${siteOrigin}`;
-    try {
-      await navigator.clipboard.writeText(summary);
-      trackEvent({ name: "summary_copied" });
-      setCopyNotice(
-        "Summary copied. It includes counts only, not your choices.",
-      );
-    } catch {
-      setCopyNotice("Clipboard access was unavailable in this browser.");
-    }
-  }
+  const currentStep = checkSteps[step];
+  const isLastStep = step === checkStepCount - 1;
+  const currentAnswered = stepHasAnswer(currentStep, answers);
 
-  // First statement index per topic — for the prop. NN numbering.
-  const categoryStartIndex = useMemo(() => {
-    const map = new Map<BeliefCategoryId, number>();
-    let i = 0;
-    for (const cat of categories) {
-      map.set(cat.id, i);
-      i += statementsForCategory(cat.id).length;
-    }
-    return map;
-  }, []);
+  const stepNote =
+    answers.noDeity === "affirm"
+      ? currentStep.kind === "claim" &&
+        currentStep.statementId === "infallibleForeknowledge"
+        ? deityNoteForForeknowledge
+        : currentStep.id === "morality-and-god"
+          ? deityNoteForDivineCommand
+          : undefined
+      : undefined;
 
   return (
-    <section id="check" className="scroll-mt-24 py-12 sm:py-16">
-      {showResults ? (
-        /* Checked: the questionnaire collapses to a compact summary so the
-           result below is the focus. Edit selection reopens it; answers stay. */
-        <div className="flex flex-col gap-4 border-b border-rule pb-8 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
-              <span className="section-mark" />1 &middot; the check
-            </p>
-            <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
-              Your selection
-            </h2>
-            <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
-              You answered {answeredCount} of {beliefStatements.length}{" "}
-              statement{answeredCount === 1 ? "" : "s"}
-              {qualifiedCount > 0
-                ? `, ${qualifiedCount} marked conditional`
-                : ""}
-              . Your result is below.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={editSelection}
-              className="border border-ink px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
-            >
-              Edit selection
-            </button>
-            <button
-              type="button"
-              onClick={resetCheck}
-              className="border border-rule px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted transition hover:border-ink hover:text-ink"
-            >
-              Start over
-            </button>
-          </div>
-        </div>
-      ) : (
+    <section
+      id="check"
+      ref={topRef}
+      className="scroll-mt-24 py-10 sm:py-14"
+    >
+      {phase === "questions" ? (
         <>
-          {/* Section title */}
-          <div className="border-b border-rule pb-8">
-            <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
-              <span className="section-mark" />1 &middot; the check
-            </p>
-            <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
-              Choose what you believe.
-            </h2>
-            <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
-              Go through the statements below and mark the ones you want to
-              examine. Answer as many or as few as you like — there&apos;s no
-              login, and your answers stay in this browser. When you reach the
-              bottom, see your results.
-            </p>
-            <details className="group mt-5 max-w-2xl">
-              <summary className="cursor-pointer list-none font-sans text-[0.72rem] uppercase tracking-[0.18em] text-mark marker:hidden">
-                <span className="group-open:hidden">
-                  ↳ how answers are counted
-                </span>
-                <span className="hidden group-open:inline">↑ hide</span>
-              </summary>
-              <p className="mt-3 font-serif text-[0.98rem] italic leading-7 text-muted">
-                A <em>belief</em>
-                {" here is a claim you take to be true — not a hope, a guess, or something you’d entertain only in theory ("}
-                <a
-                  href="https://plato.stanford.edu/entries/belief/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="not-italic underline decoration-rule underline-offset-[3px] transition hover:text-ink hover:decoration-ink"
-                >
-                  the philosophers’ sense, on the SEP
-                </a>
-                {"). So only “I believe this” becomes a premise. Being unsure, rejecting, or marking something conditional is never read as believing its opposite — a hypothetical like “if God existed…” isn’t an affirmation. A finding appears only where two beliefs you affirmed genuinely pull against each other; the aim is to surface that pressure, not to score your worldview."}
+          {/* Progress header: where am I, how much is left, and the one exit
+              (review & finish) — always visible, never a dead end. */}
+          <div className="border-b border-rule pb-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+              <p className="font-sans text-[0.72rem] uppercase tracking-[0.18em] text-muted">
+                question{" "}
+                <span className="tabular text-ink">{step + 1}</span> of{" "}
+                <span className="tabular">{checkStepCount}</span>
+                <span className="text-rule"> · </span>
+                <span className="text-mark">{currentStep.title}</span>
               </p>
-            </details>
-          </div>
-
-          {/* Sticky progress + topic jump links — the only navigation for the
-              single scrolling list, so it can't pull anyone out of the survey.
-              "See results" rides here too, so no one has to scroll to the very
-              end to finish. Per-topic counts stay hidden until a topic actually
-              has answers, so the bar reads clean on first sight and fills in as
-              you go. */}
-          <div className="sticky top-0 z-10 -mx-6 border-b border-rule bg-paper/95 px-6 py-3 backdrop-blur lg:-mx-8 lg:px-8">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-baseline gap-2.5 font-sans text-[0.7rem] uppercase tracking-[0.16em] text-muted">
-                <span>progress</span>
-                <span className="tabular text-ink">
-                  {answeredCount}
-                  <span className="text-muted">
-                    {" "}
-                    / {beliefStatements.length}
-                  </span>
-                </span>
-              </div>
-              {answeredCount > 0 ? (
-                <button
-                  type="button"
-                  onClick={reviewResults}
-                  className="group inline-flex shrink-0 items-center gap-2 border border-ink bg-ink px-4 py-1.5 font-sans text-[0.68rem] uppercase tracking-[0.16em] text-paper transition hover:border-mark hover:bg-mark"
-                >
-                  See results
-                  <span
-                    aria-hidden="true"
-                    className="transition group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </button>
-              ) : null}
+              <button
+                type="button"
+                onClick={openReview}
+                className="font-sans text-[0.72rem] uppercase tracking-[0.16em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+              >
+                Review &amp; finish →
+              </button>
             </div>
             <div
               role="progressbar"
-              aria-label="Statements answered"
-              aria-valuemin={0}
-              aria-valuemax={beliefStatements.length}
-              aria-valuenow={answeredCount}
-              className="mt-2 h-[3px] w-full overflow-hidden bg-rule-soft"
+              aria-label="Question progress"
+              aria-valuemin={1}
+              aria-valuemax={checkStepCount}
+              aria-valuenow={step + 1}
+              className="mt-3 h-[3px] w-full overflow-hidden bg-rule-soft"
             >
               <div
                 className="h-full bg-mark transition-all"
                 style={{
-                  width: `${(answeredCount / beliefStatements.length) * 100}%`,
+                  width: `${((step + 1) / checkStepCount) * 100}%`,
                 }}
               />
             </div>
-            <nav
-              aria-label="Jump to topic"
-              className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5"
-            >
-              {categories.map((item) => {
-                const categoryCount = statementsForCategory(item.id).length;
-                const answered = answeredForCategory(item.id);
-                const done = answered === categoryCount;
-                const started = answered > 0;
-                return (
-                  <a
-                    key={item.id}
-                    href={`#topic-${item.id}`}
-                    className={`font-sans text-[0.68rem] uppercase tracking-[0.14em] underline decoration-rule/50 underline-offset-[5px] transition hover:text-ink hover:decoration-ink ${
-                      started ? "text-ink-soft" : "text-muted"
-                    }`}
-                  >
-                    {item.name}
-                    {started ? (
-                      <span
-                        className={`ml-1.5 font-mono tabular ${
-                          done ? "text-mark" : "text-muted"
-                        }`}
-                      >
-                        {answered}/{categoryCount}
-                      </span>
-                    ) : null}
-                  </a>
-                );
-              })}
-            </nav>
           </div>
 
-          {/* The full set of statements, in one scroll, grouped by topic. */}
-          <div className="mt-10 space-y-14">
-            {categories.map((cat, ci) => {
-              const startIdx = categoryStartIndex.get(cat.id) ?? 0;
-              const topicStatements = statementsForCategory(cat.id);
-              const answered = answeredForCategory(cat.id);
-              return (
-                <section
-                  key={cat.id}
-                  id={`topic-${cat.id}`}
-                  aria-label={cat.name}
-                  className="scroll-mt-28"
-                >
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-rule pb-6">
-                    <div>
-                      <p className="font-mono text-[0.7rem] uppercase tracking-[0.22em] text-muted">
-                        topic {ci + 1} of {categories.length}
-                      </p>
-                      <h3 className="mt-2 font-serif text-[1.85rem] font-medium leading-tight tracking-tight text-ink sm:text-3xl">
-                        {cat.name}
-                      </h3>
-                      <p className="mt-3 max-w-2xl font-serif text-[1rem] italic leading-7 text-ink-soft">
-                        {cat.description}
-                      </p>
-                    </div>
-                    <span className="font-mono tabular text-[0.72rem] uppercase tracking-[0.16em] text-muted">
-                      {answered}/{topicStatements.length} answered
-                    </span>
-                  </div>
+          <div className="mt-8 min-h-[22rem]">
+            {currentStep.kind === "positions" ? (
+              <PositionsScreen
+                step={currentStep}
+                answers={answers}
+                onToggle={togglePosition}
+                note={stepNote}
+              />
+            ) : (
+              <ClaimScreen
+                step={currentStep}
+                answer={answers[currentStep.statementId]}
+                onAnswer={(answer) =>
+                  answerClaim(currentStep.statementId, answer)
+                }
+                note={stepNote}
+              />
+            )}
+          </div>
 
-                  <div className="mt-7 space-y-1">
-                    {topicStatements.map((statement, localIdx) => {
-                      const contextNote =
-                        answers.noDeity === "affirm" &&
-                        deityDependentStatementIds.has(statement.id)
-                          ? deityDependentContextNote
-                          : undefined;
+          {/* Back / next. Skipping is always allowed and labelled as such. */}
+          <div className="mt-10 flex items-center justify-between gap-4 border-t border-rule pt-6">
+            <button
+              type="button"
+              onClick={goBack}
+              disabled={step === 0}
+              className="border border-rule px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted transition enabled:hover:border-ink enabled:hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              ← Back
+            </button>
+            <button
+              type="button"
+              onClick={goNext}
+              className={`group inline-flex items-center gap-3 px-7 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] transition ${
+                currentAnswered || isLastStep
+                  ? "border border-ink bg-ink text-paper hover:border-mark hover:bg-mark"
+                  : "border border-ink text-ink hover:bg-ink hover:text-paper"
+              }`}
+            >
+              {isLastStep
+                ? "Review answers"
+                : currentAnswered
+                  ? "Next"
+                  : "Skip for now"}
+              <span
+                aria-hidden="true"
+                className="transition group-hover:translate-x-1"
+              >
+                →
+              </span>
+            </button>
+          </div>
+        </>
+      ) : null}
+
+      {phase === "review" ? (
+        <>
+          <div className="border-b border-rule pb-8">
+            <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
+              <span className="section-mark" />
+              review
+            </p>
+            <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
+              Your answers
+            </h2>
+            <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
+              {`You answered ${answeredSteps} of ${checkStepCount} questions.`}{" "}
+              Anything skipped or left unselected counts as &ldquo;not
+              sure&rdquo; — never as belief in the opposite. Select a question
+              to change it, or see your results.
+            </p>
+          </div>
+
+          <div className="mt-8 space-y-8">
+            {categories.map((category) => {
+              const categorySteps = checkSteps.filter(
+                (s) => s.category === category.id,
+              );
+              if (categorySteps.length === 0) return null;
+              return (
+                <div key={category.id}>
+                  <h3 className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-muted">
+                    {category.name}
+                  </h3>
+                  <ul className="mt-3 divide-y divide-rule-soft border-y border-rule-soft">
+                    {categorySteps.map((s) => {
+                      const index = checkSteps.indexOf(s);
+                      const has = stepHasAnswer(s, answers);
                       return (
-                        <StatementCard
-                          key={statement.id}
-                          statement={statement}
-                          index={startIdx + localIdx}
-                          answer={answers[statement.id]}
-                          onAnswer={(answer) =>
-                            answerStatement(statement.id, answer)
-                          }
-                          contextNote={contextNote}
-                          explainPole={statement.id === firstOppositePoleId}
-                        />
+                        <li key={s.id}>
+                          <button
+                            type="button"
+                            onClick={() => goToStep(index)}
+                            className="group flex w-full flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-1 py-3.5 text-left transition hover:bg-paper-soft"
+                          >
+                            <span className="font-serif text-[1.02rem] text-ink">
+                              {s.title}
+                            </span>
+                            <span
+                              className={`font-sans text-[0.78rem] ${
+                                has ? "text-ink-soft" : "italic text-muted"
+                              }`}
+                            >
+                              {stepSummary(s, answers)}
+                              <span className="ml-3 font-sans text-[0.68rem] uppercase tracking-[0.14em] text-mark opacity-0 transition group-hover:opacity-100">
+                                edit →
+                              </span>
+                            </span>
+                          </button>
+                        </li>
                       );
                     })}
-                  </div>
-                </section>
+                  </ul>
+                </div>
               );
             })}
           </div>
 
-          {/* One prominent finish action at the very end — the overview, share,
-              and compare only appear after this. */}
-          <div className="mt-14 border-t border-rule pt-8">
-            <p className="max-w-2xl font-serif text-[1rem] leading-7 text-ink-soft">
-              That&apos;s all of them. Skipped statements count as &ldquo;Not
-              sure,&rdquo; and only the ones you affirm can trigger a finding —
-              so partial answers are fine.
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-4">
-              <button
-                type="button"
-                onClick={reviewResults}
-                aria-label="See my results"
-                className="group inline-flex items-center gap-3 border border-ink bg-ink px-8 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark"
+          <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-rule pt-8">
+            <button
+              type="button"
+              onClick={reviewResults}
+              aria-label="See my results"
+              className="group inline-flex items-center gap-3 border border-ink bg-ink px-8 py-4 font-sans text-[0.82rem] uppercase tracking-[0.18em] text-paper transition hover:border-mark hover:bg-mark"
+            >
+              See my results
+              <span
+                aria-hidden="true"
+                className="transition group-hover:translate-x-1"
               >
-                See my results
-                <span
-                  aria-hidden="true"
-                  className="transition group-hover:translate-x-1"
-                >
-                  →
-                </span>
-              </button>
-              {answeredCount > 0 ? (
-                <button
-                  type="button"
-                  onClick={resetCheck}
-                  className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-                >
-                  Start over
-                </button>
-              ) : null}
-            </div>
+                →
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => goToStep(step)}
+              className="font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+            >
+              ← Back to the questions
+            </button>
           </div>
         </>
-      )}
+      ) : null}
 
-      {showResults ? (
-        <section
-          id="results"
-          aria-live="polite"
-          aria-label="Reflection results"
-          className="mt-12 scroll-mt-6"
-        >
-          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
+      {phase === "results" ? (
+        <>
+          <div className="flex flex-col gap-4 border-b border-rule pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
-                <span className="section-mark" />2 &middot; the result
-              </p>
-              <h3 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
-                {conflictCount > 0
-                  ? `${conflictCount} direct conflict${
-                      conflictCount === 1 ? "" : "s"
-                    } to examine`
-                  : "No direct conflict detected"}
-              </h3>
-              <p className="mt-4 max-w-2xl font-serif text-[1rem] leading-7 text-ink-soft">
-                Checked {affirmed.length} belief
-                {affirmed.length === 1 ? "" : "s"} you affirmed as true. This
-                check treats {unansweredCount} unselected statement
-                {unansweredCount === 1 ? "" : "s"} as Not sure
-                {qualifiedCount > 0
-                  ? `, and sets aside ${qualifiedCount} you marked conditional`
-                  : ""}
-                . Results report relationships in the rule set; they do not
-                prove your complete worldview coherent or incoherent.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-left sm:max-w-xs">
-              {(
-                [
-                  ["conflict", conflictCount],
-                  ["implication", implicationCount],
-                  ["argument", argumentCount],
-                  ["compatible", compatibleCount],
-                ] as const
-              ).map(([kind, count]) => (
-                <div key={kind} className="border-l-2 border-rule-soft pl-3">
-                  <p
-                    className={`font-mono text-[0.7rem] uppercase tracking-[0.18em] ${findingAccents[kind].ink}`}
-                  >
-                    {findingLabels[kind].toLowerCase()}
-                  </p>
-                  <p className="mt-1 font-serif text-2xl tabular text-ink">
-                    {count}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {conflictCount > 0 ? (
-            <p className="mt-8 border-l-2 border-mark bg-paper-soft px-5 py-4 font-serif text-[1rem] leading-7 text-ink-soft">
-              <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
                 <span className="section-mark" />
-                how to read this
-              </span>
-              <br />
-              Nothing here is a verdict on you. Each result just points to a
-              place where two of your beliefs pull against each other — and what
-              to do there is your call: drop one, add a condition, or make the
-              case for the premise that joins them. Being consistent won&apos;t
-              make a belief true; plenty of tidy worldviews are wrong. It only
-              means your beliefs aren&apos;t quietly working against each other.
-              The aim is to see what you actually believe, and choose it on
-              purpose.
-            </p>
-          ) : null}
-
-          {/* Personalised, explorable diagram: affirmed nodes + fired edges,
-              with hover/tap to trace each belief's relationships. */}
-          {affirmed.length > 0 ? (
-            <figure className="mt-8 border border-rule bg-paper-soft p-5 sm:p-7">
-              <figcaption className="mb-3 flex items-baseline justify-between font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
-                <span>
-                  <span className="font-mono text-mark">fig. 2</span> &middot;
-                  your beliefs on the web
-                </span>
-                <span className="tabular">
-                  {affirmed.length} affirmed / {findings.length} edges triggered
-                </span>
-              </figcaption>
-              <InteractiveBeliefWeb
-                affirmed={affirmedSet}
-                triggered={triggeredPairs}
-                findings={findings}
-              />
-            </figure>
-          ) : null}
-
-          {findings.length === 0 && !noDirectConflict ? (
-            <p className="mt-8 border-l-2 border-rule-soft px-5 py-4 font-serif text-[1rem] italic leading-7 text-ink-soft">
-              None of the explicit relationships in this version was triggered.
-              Answer additional topics to broaden the check.
-            </p>
-          ) : findings.length === 0 ? null : (
-            <div className="mt-8 space-y-4">
-              {findings.map((finding) => (
-                <FindingCard key={finding.id} finding={finding} />
-              ))}
+                your result
+              </p>
+              <p className="mt-3 max-w-2xl font-serif text-[1.02rem] leading-7 text-ink-soft">
+                {affirmed.length > 0
+                  ? `Based on ${affirmed.length} belief${
+                      affirmed.length === 1 ? "" : "s"
+                    } you affirmed across ${answeredSteps} answered question${
+                      answeredSteps === 1 ? "" : "s"
+                    }.`
+                  : "You didn't affirm any beliefs yet, so there was nothing to check — only affirmed beliefs become premises."}
+              </p>
             </div>
-          )}
-
-          {/* Share block */}
-          <div className="mt-12 grid gap-8 border-t border-rule pt-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
-            <div>
-              <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
-                <span className="section-mark" />3 &middot; share
-              </p>
-              <h4 className="mt-3 font-serif text-2xl font-medium leading-tight tracking-tight text-ink">
-                A shareable card — counts &amp; structure only.
-              </h4>
-              <p className="mt-3 max-w-xl font-serif text-[1rem] leading-7 text-ink-soft">
-                The image shows your finding counts and the shape of your
-                affirmations on the rule-graph. Individual stances are never
-                shown. It is rendered in your browser and never uploaded.
-              </p>
-
-              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={shareBadge}
-                  className="border border-ink bg-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
-                >
-                  System share sheet
-                </button>
-                <a
-                  href={tweetUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
-                >
-                  Share on X
-                </a>
-                <a
-                  href={blueskyUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
-                >
-                  Share on Bluesky
-                </a>
-                <a
-                  href={redditUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
-                >
-                  Post to Reddit
-                </a>
-              </div>
-
-              <div className="mt-3 flex flex-wrap items-baseline gap-x-5 gap-y-2 font-sans text-[0.75rem] uppercase tracking-[0.16em]">
-                <button
-                  type="button"
-                  onClick={copyBadge}
-                  className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-                >
-                  Copy image
-                </button>
-                <button
-                  type="button"
-                  onClick={downloadBadge}
-                  className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-                >
-                  Download image
-                </button>
-                <button
-                  type="button"
-                  onClick={copyShareText}
-                  className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-                >
-                  Copy caption
-                </button>
-                <button
-                  type="button"
-                  onClick={copyPrivateSummary}
-                  className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
-                >
-                  Copy text summary
-                </button>
-              </div>
-
-              <p className="mt-4 font-serif text-[0.92rem] italic leading-6 text-muted">
-                X and Reddit open with the caption ready — attach the downloaded
-                image yourself.
-              </p>
-
-              {copyNotice ? (
-                <p
-                  aria-live="polite"
-                  className="mt-3 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-mark"
-                >
-                  {copyNotice}
-                </p>
-              ) : null}
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={openReview}
+                className="border border-ink px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
+              >
+                Edit answers
+              </button>
+              <button
+                type="button"
+                onClick={resetCheck}
+                className="border border-rule px-5 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-muted transition hover:border-ink hover:text-ink"
+              >
+                Start over
+              </button>
             </div>
-
-            {badgeUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={badgeUrl}
-                alt="Shareable summary of your belief-consistency counts and your structure on the rule-graph"
-                width={1200}
-                height={630}
-                className="h-auto w-full border border-rule shadow-[6px_8px_0_0_var(--color-paper-deep)]"
-              />
-            ) : null}
           </div>
 
-          {/* Compare — its own prominent step at the end of the result. */}
-          {affirmed.length > 0 ? (
-            <div className="mt-12 border-t border-rule pt-10">
-              <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-indigo-ink">
-                <span className="section-mark" />4 &middot; compare
+          <section
+            id="results"
+            aria-live="polite"
+            aria-label="Reflection results"
+            className="mt-10 scroll-mt-6"
+          >
+            <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
+              <div>
+                <h3 className="font-serif text-3xl font-medium leading-tight tracking-tight text-ink sm:text-4xl">
+                  {conflictCount > 0
+                    ? `${conflictCount} direct conflict${
+                        conflictCount === 1 ? "" : "s"
+                      } to examine`
+                    : "No direct conflict detected"}
+                </h3>
+                <p className="mt-4 max-w-2xl font-serif text-[1rem] leading-7 text-ink-soft">
+                  Only the beliefs you affirmed were checked. Everything else —
+                  rejections, &ldquo;not sure,&rdquo; skipped questions
+                  {qualifiedCount > 0
+                    ? `, and the ${qualifiedCount} answer${
+                        qualifiedCount === 1 ? "" : "s"
+                      } you marked “it's complicated”`
+                    : ""}{" "}
+                  — was never read as a hidden opposite belief. Results report
+                  relationships in the rule set; they do not prove your
+                  complete worldview coherent or incoherent.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-left sm:max-w-xs">
+                {(
+                  [
+                    ["conflict", conflictCount],
+                    ["implication", implicationCount],
+                    ["argument", argumentCount],
+                    ["compatible", compatibleCount],
+                  ] as const
+                ).map(([kind, count]) => (
+                  <div key={kind} className="border-l-2 border-rule-soft pl-3">
+                    <p
+                      className={`font-mono text-[0.7rem] uppercase tracking-[0.18em] ${findingAccents[kind].ink}`}
+                    >
+                      {findingLabels[kind].toLowerCase()}
+                    </p>
+                    <p className="mt-1 font-serif text-2xl tabular text-ink">
+                      {count}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {conflictCount > 0 ? (
+              <p className="mt-8 border-l-2 border-mark bg-paper-soft px-5 py-4 font-serif text-[1rem] leading-7 text-ink-soft">
+                <span className="font-sans text-[0.7rem] uppercase tracking-[0.18em] text-mark">
+                  <span className="section-mark" />
+                  how to read this
+                </span>
+                <br />
+                Nothing here is a verdict on you. Each result just points to a
+                place where two of your beliefs pull against each other — and
+                what to do there is your call: drop one, add a condition, or
+                make the case for the premise that joins them. Being consistent
+                won&apos;t make a belief true; plenty of tidy worldviews are
+                wrong. It only means your beliefs aren&apos;t quietly working
+                against each other. The aim is to see what you actually
+                believe, and choose it on purpose.
               </p>
-              <div className="mt-4 border-l-[3px] border-indigo-ink bg-paper-soft px-5 py-6 sm:px-7">
-                <h4 className="font-serif text-2xl font-medium leading-tight tracking-tight text-ink">
-                  Compare your web with a friend&apos;s.
+            ) : null}
+
+            {/* Personalised, explorable diagram: affirmed nodes + fired edges,
+                with hover/tap to trace each belief's relationships. */}
+            {affirmed.length > 0 ? (
+              <figure className="mt-8 border border-rule bg-paper-soft p-5 sm:p-7">
+                <figcaption className="mb-3 flex items-baseline justify-between font-sans text-[0.65rem] uppercase tracking-[0.22em] text-muted">
+                  <span>
+                    <span className="font-mono text-mark">fig. 2</span> &middot;
+                    your beliefs on the web
+                  </span>
+                  <span className="tabular">
+                    {affirmed.length} affirmed / {findings.length} edges
+                    triggered
+                  </span>
+                </figcaption>
+                <InteractiveBeliefWeb
+                  affirmed={affirmedSet}
+                  triggered={triggeredPairs}
+                  findings={findings}
+                />
+              </figure>
+            ) : null}
+
+            {findings.length === 0 && !noDirectConflict ? (
+              <p className="mt-8 border-l-2 border-rule-soft px-5 py-4 font-serif text-[1rem] italic leading-7 text-ink-soft">
+                None of the explicit relationships in this version was
+                triggered. Answer additional questions to broaden the check.
+              </p>
+            ) : findings.length === 0 ? null : (
+              <div className="mt-8 space-y-4">
+                {findings.map((finding) => (
+                  <FindingCard key={finding.id} finding={finding} />
+                ))}
+              </div>
+            )}
+
+            {/* Share block */}
+            <div className="mt-12 grid gap-8 border-t border-rule pt-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
+              <div>
+                <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-mark">
+                  <span className="section-mark" />
+                  share
+                </p>
+                <h4 className="mt-3 font-serif text-2xl font-medium leading-tight tracking-tight text-ink">
+                  A shareable card — counts &amp; structure only.
                 </h4>
                 <p className="mt-3 max-w-xl font-serif text-[1rem] leading-7 text-ink-soft">
-                  Send someone a link and they&apos;ll see exactly where your
-                  two webs pull apart — and the premise on each fault line. Your
-                  answers travel inside the link itself; they never reach our
-                  server.
+                  The image shows your finding counts and the shape of your
+                  affirmations on the rule-graph. Individual stances are never
+                  shown. It is rendered in your browser and never uploaded.
                 </p>
-                <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <button
                     type="button"
-                    onClick={copyCompareLink}
-                    className="border border-indigo-ink bg-indigo-ink px-6 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:border-ink hover:bg-ink"
+                    onClick={shareBadge}
+                    className="border border-ink bg-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:bg-mark hover:border-mark"
                   >
-                    Copy compare link
+                    System share sheet
                   </button>
-                  <Link
-                    href="/compare-beliefs"
-                    className="font-sans text-[0.75rem] uppercase tracking-[0.16em] text-indigo-ink underline decoration-indigo-ink/40 underline-offset-[5px] transition hover:decoration-indigo-ink"
+                  <a
+                    href={tweetUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
                   >
-                    Or open a link someone sent you →
-                  </Link>
+                    Share on X
+                  </a>
+                  <a
+                    href={blueskyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
+                  >
+                    Share on Bluesky
+                  </a>
+                  <a
+                    href={redditUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="border border-ink px-5 py-2.5 text-center font-sans text-[0.78rem] uppercase tracking-[0.18em] text-ink transition hover:bg-ink hover:text-paper"
+                  >
+                    Post to Reddit
+                  </a>
                 </div>
-                {compareNotice ? (
+
+                <div className="mt-3 flex flex-wrap items-baseline gap-x-5 gap-y-2 font-sans text-[0.75rem] uppercase tracking-[0.16em]">
+                  <button
+                    type="button"
+                    onClick={copyBadge}
+                    className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+                  >
+                    Copy image
+                  </button>
+                  <button
+                    type="button"
+                    onClick={downloadBadge}
+                    className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+                  >
+                    Download image
+                  </button>
+                  <button
+                    type="button"
+                    onClick={copyShareText}
+                    className="text-muted underline decoration-rule underline-offset-[5px] transition hover:text-ink hover:decoration-ink"
+                  >
+                    Copy caption
+                  </button>
+                </div>
+
+                <p className="mt-4 font-serif text-[0.92rem] italic leading-6 text-muted">
+                  X and Reddit open with the caption ready — attach the
+                  downloaded image yourself.
+                </p>
+
+                {copyNotice ? (
                   <p
                     aria-live="polite"
-                    className="mt-4 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-indigo-ink"
+                    className="mt-3 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-mark"
                   >
-                    {compareNotice}
+                    {copyNotice}
                   </p>
                 ) : null}
               </div>
-            </div>
-          ) : null}
 
-          <GeneralFeedback />
-        </section>
+              {badgeUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={badgeUrl}
+                  alt="Shareable summary of your belief-consistency counts and your structure on the rule-graph"
+                  width={1200}
+                  height={630}
+                  className="h-auto w-full border border-rule shadow-[6px_8px_0_0_var(--color-paper-deep)]"
+                />
+              ) : null}
+            </div>
+
+            {/* Compare — its own prominent step at the end of the result. */}
+            {affirmed.length > 0 ? (
+              <div className="mt-12 border-t border-rule pt-10">
+                <p className="font-sans text-[0.72rem] uppercase tracking-[0.22em] text-indigo-ink">
+                  <span className="section-mark" />
+                  compare
+                </p>
+                <div className="mt-4 border-l-[3px] border-indigo-ink bg-paper-soft px-5 py-6 sm:px-7">
+                  <h4 className="font-serif text-2xl font-medium leading-tight tracking-tight text-ink">
+                    Compare your web with a friend&apos;s.
+                  </h4>
+                  <p className="mt-3 max-w-xl font-serif text-[1rem] leading-7 text-ink-soft">
+                    Send someone a link and they&apos;ll see exactly where your
+                    two webs pull apart — and the premise on each fault line.
+                    Your answers travel inside the link itself; they never reach
+                    our server.
+                  </p>
+                  <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+                    <button
+                      type="button"
+                      onClick={copyCompareLink}
+                      className="border border-indigo-ink bg-indigo-ink px-6 py-3 font-sans text-[0.78rem] uppercase tracking-[0.18em] text-paper transition hover:border-ink hover:bg-ink"
+                    >
+                      Copy compare link
+                    </button>
+                    <Link
+                      href="/compare-beliefs"
+                      className="font-sans text-[0.75rem] uppercase tracking-[0.16em] text-indigo-ink underline decoration-indigo-ink/40 underline-offset-[5px] transition hover:decoration-indigo-ink"
+                    >
+                      Or open a link someone sent you →
+                    </Link>
+                  </div>
+                  {compareNotice ? (
+                    <p
+                      aria-live="polite"
+                      className="mt-4 font-sans text-[0.78rem] uppercase tracking-[0.16em] text-indigo-ink"
+                    >
+                      {compareNotice}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+
+            <GeneralFeedback />
+          </section>
+        </>
       ) : null}
     </section>
   );

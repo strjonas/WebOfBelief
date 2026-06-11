@@ -6,23 +6,26 @@ import {
   encodeAnswers,
   SHARE_CODE_ORDER_V1,
   SHARE_CODE_ORDER_V2,
+  SHARE_CODE_ORDER_V3,
   SHARE_CODE_VERSION,
 } from "./share-code";
 
 describe("share-code frozen order", () => {
   it("stays in lockstep with the belief set (add/remove a statement and this fails loudly)", () => {
     const fromBeliefs = [...beliefStatements.map((s) => s.id)].sort();
-    const fromOrder = [...SHARE_CODE_ORDER_V2].sort();
+    const fromOrder = [...SHARE_CODE_ORDER_V3].sort();
     expect(fromOrder).toEqual(fromBeliefs);
   });
 
   it("has no duplicates", () => {
-    expect(new Set(SHARE_CODE_ORDER_V2).size).toBe(SHARE_CODE_ORDER_V2.length);
+    expect(new Set(SHARE_CODE_ORDER_V3).size).toBe(SHARE_CODE_ORDER_V3.length);
   });
 
-  it("keeps the legacy v1 order frozen for old comparison links", () => {
+  it("keeps legacy orders frozen for old comparison links", () => {
     expect(SHARE_CODE_ORDER_V1).not.toContain("futureAiConscious");
     expect(SHARE_CODE_ORDER_V2).toContain("futureAiConscious");
+    expect(SHARE_CODE_ORDER_V2).not.toContain("spiritualReality");
+    expect(SHARE_CODE_ORDER_V3).toContain("spiritualReality");
   });
 });
 
@@ -33,6 +36,7 @@ describe("encode / decode round-trip", () => {
       noDeity: "reject",
       determinism: "affirm",
       futureAiConscious: "affirm",
+      constructedMorality: "affirm",
       responsibilityWithoutAlternatives: "reject",
       infallibleForeknowledge: "qualify",
     };
@@ -57,12 +61,12 @@ describe("encode / decode round-trip", () => {
     expect(decodeAnswers(encodeAnswers(all))).toEqual({ ok: true, answers: all });
   });
 
-  it("produces a short code (8 chars of payload for 23 statements)", () => {
+  it("produces a short code (11 chars of payload for 29 statements)", () => {
     const all: AnswerMap = {};
     for (const s of beliefStatements) all[s.id] = "qualify";
     const code = encodeAnswers(all);
     expect(code.startsWith(`v${SHARE_CODE_VERSION}.`)).toBe(true);
-    expect(code.split(".")[1].length).toBeLessThanOrEqual(8);
+    expect(code.split(".")[1].length).toBeLessThanOrEqual(11);
   });
 
   it("decodes legacy v1 links with newer statements left open", () => {

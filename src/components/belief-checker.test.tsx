@@ -3,10 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { BeliefChecker } from "./belief-checker";
 
+// Exact wording of the statements driven through the wizard below.
 const perfectGod =
   "A personal God exists who is omniscient, omnipotent, perfectly good, and perfectly loving.";
-const moralFacts =
-  "At least some moral facts are true regardless of what any person or society approves.";
 const gratuitousSuffering =
   "Some suffering exists that no omniscient, omnipotent, perfectly good being could have morally sufficient reason to permit.";
 const noDeity = "No god or deity exists.";
@@ -26,34 +25,43 @@ beforeAll(() => {
 
 afterEach(() => {
   cleanup();
-  // The checker now persists progress to localStorage; clear it so each test
+  // The checker persists progress to localStorage; clear it so each test
   // starts from a fresh, empty state.
   window.localStorage.clear();
 });
 
+/** Advance the wizard one question, whether or not it was answered. */
+async function next(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(
+    screen.getByRole("button", { name: /Next|Skip for now|Review answers/ }),
+  );
+}
+
 describe("BeliefChecker", () => {
-  it("records visible radio selections and displays a direct conflict", async () => {
+  it("records a position and a claim, then reports the direct conflict", async () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);
 
-    // Every statement renders at once now, so the conflicting pair can be
-    // answered without opening a topic first.
-    const godChoice = screen.getByRole("radio", {
-      name: `I believe this: ${perfectGod}`,
-    }) as HTMLInputElement;
-    const sufferingChoice = screen.getByRole("radio", {
-      name: `I believe this: ${gratuitousSuffering}`,
-    }) as HTMLInputElement;
+    // Question 1 (free will) and 2 (responsibility) are skipped.
+    await next(user);
+    await next(user);
 
+    // Question 3: the God topic — select the classical-theism position.
+    const godChoice = screen.getByRole("checkbox", {
+      name: `A perfect, personal God exists: ${perfectGod}`,
+    }) as HTMLInputElement;
     await user.click(godChoice);
-    await user.click(sufferingChoice);
-
     expect(godChoice.checked).toBe(true);
-    expect(sufferingChoice.checked).toBe(true);
-    expect(
-      screen.getByRole("progressbar").getAttribute("aria-valuenow"),
-    ).toBe("2");
+    await next(user);
 
+    // Question 4: the gratuitous-suffering claim.
+    await user.click(
+      screen.getByRole("radio", {
+        name: `Yes — I believe this: ${gratuitousSuffering}`,
+      }),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Review & finish →" }));
     await user.click(screen.getByRole("button", { name: "See my results" }));
 
     expect(
@@ -64,72 +72,83 @@ describe("BeliefChecker", () => {
     ).toBeDefined();
   });
 
-  it("keeps answers when moving to results and back to edit", async () => {
+  it("keeps answers when moving to results and back to a question", async () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);
 
+    await next(user);
+    await next(user);
     await user.click(
-      screen.getByRole("radio", {
-        name: `I believe this: ${moralFacts}`,
+      screen.getByRole("checkbox", {
+        name: `A perfect, personal God exists: ${perfectGod}`,
       }),
     );
 
+    await user.click(screen.getByRole("button", { name: "Review & finish →" }));
     await user.click(screen.getByRole("button", { name: "See my results" }));
+    await user.click(screen.getByRole("button", { name: "Edit answers" }));
+
+    // The review list shows the selection and links back to the question.
     expect(
-      screen.getByRole("heading", { name: "Your selection" }),
+      screen.getByText("A perfect, personal God exists"),
     ).toBeDefined();
+    await user.click(
+      screen.getByRole("button", { name: /God and the divine/ }),
+    );
 
-    await user.click(screen.getByRole("button", { name: "Edit selection" }));
-
-    const restoredChoice = screen.getByRole("radio", {
-      name: `I believe this: ${moralFacts}`,
+    const restoredChoice = screen.getByRole("checkbox", {
+      name: `A perfect, personal God exists: ${perfectGod}`,
     }) as HTMLInputElement;
     expect(restoredChoice.checked).toBe(true);
   });
 
-  it("can evaluate immediately with skipped statements treated as not sure", async () => {
+  it("can finish immediately with everything skipped", async () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);
 
-    const reviewButton = screen.getByRole("button", {
-      name: "See my results",
-    }) as HTMLButtonElement;
+    await user.click(screen.getByRole("button", { name: "Review & finish →" }));
+    expect(
+      screen.getByText(/You answered 0 of 18 questions/),
+    ).toBeDefined();
 
-    expect(reviewButton.disabled).toBe(false);
-    await user.click(reviewButton);
+    await user.click(screen.getByRole("button", { name: "See my results" }));
 
     expect(
       screen.getByRole("heading", { name: "No direct conflict detected" }),
     ).toBeDefined();
     expect(
       screen.getByText(
-        "Checked 0 beliefs you affirmed as true. This check treats 23 unselected statements as Not sure. Results report relationships in the rule set; they do not prove your complete worldview coherent or incoherent.",
+        "You didn't affirm any beliefs yet, so there was nothing to check — only affirmed beliefs become premises.",
       ),
     ).toBeDefined();
   });
 
-  it("explains deity-dependent statements after atheism and ignores qualified hypotheticals", async () => {
+  it("warns on deity-dependent questions after atheism and sets qualified answers aside", async () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);
 
+    await next(user);
+    await next(user);
     await user.click(
-      screen.getByRole("radio", {
-        name: `I believe this: ${noDeity}`,
+      screen.getByRole("checkbox", {
+        name: `No gods of any kind exist: ${noDeity}`,
       }),
     );
+    await next(user); // suffering
+    await next(user); // hiddenness
+    await next(user); // now on foreknowledge
 
     expect(
-      screen.getAllByText(
-        /You have already affirmed that no god or deity exists/,
-      ),
-    ).not.toHaveLength(0);
+      screen.getByText(/You've affirmed that no god or deity exists/),
+    ).toBeDefined();
 
     await user.click(
       screen.getByRole("radio", {
-        name: `Conditional / qualify: ${infallibleForeknowledge}`,
+        name: `It's complicated: ${infallibleForeknowledge}`,
       }),
     );
 
+    await user.click(screen.getByRole("button", { name: "Review & finish →" }));
     await user.click(screen.getByRole("button", { name: "See my results" }));
 
     expect(

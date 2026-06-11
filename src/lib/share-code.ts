@@ -18,7 +18,7 @@ import type { AnswerMap } from "./evaluate";
  * conditional reading. Decoding `open` omits the statement from the map.
  */
 
-export const SHARE_CODE_VERSION = 2;
+export const SHARE_CODE_VERSION = 3;
 
 /**
  * Versioned frozen statement orders. Codes are positional, so an existing
@@ -56,11 +56,22 @@ export const SHARE_CODE_ORDER_V2: readonly BeliefId[] = [
   "futureAiConscious",
 ];
 
-const CURRENT_SHARE_CODE_ORDER = SHARE_CODE_ORDER_V2;
+export const SHARE_CODE_ORDER_V3: readonly BeliefId[] = [
+  ...SHARE_CODE_ORDER_V2,
+  "spiritualReality",
+  "constructedMorality",
+  "ordinaryKnowledge",
+  "radicalSkepticalScenario",
+  "psychologicalContinuity",
+  "bodilySoulContinuity",
+];
+
+const CURRENT_SHARE_CODE_ORDER = SHARE_CODE_ORDER_V3;
 
 const SHARE_CODE_ORDERS: Partial<Record<number, readonly BeliefId[]>> = {
   1: SHARE_CODE_ORDER_V1,
   2: SHARE_CODE_ORDER_V2,
+  3: SHARE_CODE_ORDER_V3,
 };
 
 // 2-bit code per statement. 0 is the default ("open") so absent statements and

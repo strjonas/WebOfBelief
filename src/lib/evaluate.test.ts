@@ -84,6 +84,63 @@ describe("evaluateBeliefs", () => {
     ]);
   });
 
+  it("treats spiritual but non-theist answers as compatible when the spiritual reality is not a deity", () => {
+    const results = evaluateBeliefs({
+      noDeity: "affirm",
+      spiritualReality: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "spiritual-but-not-theist",
+        kind: "compatible",
+      }),
+    ]);
+  });
+
+  it("flags constructivism against approval-only morality without treating it as simple realism", () => {
+    const results = evaluateBeliefs({
+      constructedMorality: "affirm",
+      attitudeOnlyMorality: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "constructivism-and-attitude-only",
+        kind: "conflict",
+      }),
+    ]);
+  });
+
+  it("treats ordinary knowledge plus radical skepticism as an argument, not a flat conflict", () => {
+    const results = evaluateBeliefs({
+      ordinaryKnowledge: "affirm",
+      radicalSkepticalScenario: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "ordinary-knowledge-and-radical-skepticism",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+  });
+
+  it("flags competing main accounts of personal identity as a direct conflict", () => {
+    const results = evaluateBeliefs({
+      psychologicalContinuity: "affirm",
+      bodilySoulContinuity: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "psychological-and-bodily-soul-identity",
+        kind: "conflict",
+      }),
+    ]);
+  });
+
   it("treats zombies plus future AI consciousness as an evidence problem, not a flat conflict", () => {
     const results = evaluateBeliefs({
       zombieWorld: "affirm",

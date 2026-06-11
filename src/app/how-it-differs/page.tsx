@@ -115,7 +115,7 @@ export default function HowItDiffersPage() {
           first if you&apos;d rather.
         </p>
         <Link
-          href="/#check"
+          href="/check"
           className="mt-5 inline-flex items-baseline gap-3 font-serif text-lg text-ink underline decoration-mark decoration-2 underline-offset-[6px] transition hover:decoration-ink"
         >
           <span className="font-mono text-[0.78rem] tracking-[0.18em] text-mark">
