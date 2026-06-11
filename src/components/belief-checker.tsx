@@ -551,8 +551,8 @@ function PositionsScreen({
             It&apos;s complicated (none of the above)
           </span>
           <span className="mt-0.5 block font-serif text-[0.85rem] italic leading-5 text-muted">
-            The wording doesn&apos;t quite fit your view, or you'd only affirm
-            it hypothetically
+            The wording doesn&apos;t quite fit your view, or you&apos;d only
+            affirm it hypothetically
           </span>
         </span>
       </label>
