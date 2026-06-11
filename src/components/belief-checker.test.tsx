@@ -134,7 +134,7 @@ describe("BeliefChecker", () => {
     await user.click(godChoice);
 
     const qualifyChoice = screen.getByRole("checkbox", {
-      name: /It's complicated (none of the above)/,
+      name: /It's complicated \(none of the above\)/,
     }) as HTMLInputElement;
     await user.click(qualifyChoice);
     expect(qualifyChoice.checked).toBe(true);
@@ -170,7 +170,7 @@ describe("BeliefChecker", () => {
     expect(
       (
         screen.getByRole("checkbox", {
-          name: /It's complicated (none of the above)/,
+          name: /It's complicated \(none of the above\)/,
         }) as HTMLInputElement
       ).checked,
     ).toBe(false);

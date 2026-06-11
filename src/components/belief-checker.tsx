@@ -1267,7 +1267,7 @@ export function BeliefChecker() {
                           <button
                             type="button"
                             onClick={() => goToStep(index)}
-                            className="group flex w-full flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-1 py-3.5 text-left transition hover:bg-paper-soft"
+                            className="group flex w-full flex-col gap-1 px-1 py-3.5 text-left transition hover:bg-paper-soft"
                           >
                             <span className="font-serif text-[1.02rem] text-ink">
                               {s.title}
