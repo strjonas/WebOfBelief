@@ -7,18 +7,19 @@ import {
   SHARE_CODE_ORDER_V1,
   SHARE_CODE_ORDER_V2,
   SHARE_CODE_ORDER_V3,
+  SHARE_CODE_ORDER_V4,
   SHARE_CODE_VERSION,
 } from "./share-code";
 
 describe("share-code frozen order", () => {
   it("stays in lockstep with the belief set (add/remove a statement and this fails loudly)", () => {
     const fromBeliefs = [...beliefStatements.map((s) => s.id)].sort();
-    const fromOrder = [...SHARE_CODE_ORDER_V3].sort();
+    const fromOrder = [...SHARE_CODE_ORDER_V4].sort();
     expect(fromOrder).toEqual(fromBeliefs);
   });
 
   it("has no duplicates", () => {
-    expect(new Set(SHARE_CODE_ORDER_V3).size).toBe(SHARE_CODE_ORDER_V3.length);
+    expect(new Set(SHARE_CODE_ORDER_V4).size).toBe(SHARE_CODE_ORDER_V4.length);
   });
 
   it("keeps legacy orders frozen for old comparison links", () => {
@@ -26,6 +27,8 @@ describe("share-code frozen order", () => {
     expect(SHARE_CODE_ORDER_V2).toContain("futureAiConscious");
     expect(SHARE_CODE_ORDER_V2).not.toContain("spiritualReality");
     expect(SHARE_CODE_ORDER_V3).toContain("spiritualReality");
+    expect(SHARE_CODE_ORDER_V3).not.toContain("limitedGod");
+    expect(SHARE_CODE_ORDER_V4).toContain("limitedGod");
   });
 });
 
@@ -61,12 +64,12 @@ describe("encode / decode round-trip", () => {
     expect(decodeAnswers(encodeAnswers(all))).toEqual({ ok: true, answers: all });
   });
 
-  it("produces a short code (11 chars of payload for 29 statements)", () => {
+  it("produces a short code (12 chars of payload for 35 statements)", () => {
     const all: AnswerMap = {};
     for (const s of beliefStatements) all[s.id] = "qualify";
     const code = encodeAnswers(all);
     expect(code.startsWith(`v${SHARE_CODE_VERSION}.`)).toBe(true);
-    expect(code.split(".")[1].length).toBeLessThanOrEqual(11);
+    expect(code.split(".")[1].length).toBeLessThanOrEqual(12);
   });
 
   it("decodes legacy v1 links with newer statements left open", () => {

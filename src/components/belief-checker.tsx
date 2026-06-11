@@ -474,11 +474,15 @@ function PositionsScreen({
   step,
   answers,
   onToggle,
+  qualified,
+  onToggleQualified,
   note,
 }: {
   step: PositionsStep;
   answers: AnswerMap;
   onToggle: (beliefId: BeliefId) => void;
+  qualified: boolean;
+  onToggleQualified: () => void;
   note?: string;
 }) {
   return (
@@ -517,6 +521,41 @@ function PositionsScreen({
           />
         ))}
       </div>
+      {/* The same escape hatch the yes/no questions offer: a topic-level
+          "it's complicated" for visitors whose view none of the wordings
+          captures. Mutually exclusive with selecting positions. */}
+      <label
+        className={`mt-3 flex cursor-pointer items-baseline gap-3.5 border px-5 py-3.5 transition focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-mark ${
+          qualified
+            ? "border-indigo-ink bg-paper text-ink shadow-[inset_4px_0_0_0_var(--color-indigo-ink)]"
+            : "border-rule-soft bg-paper-soft text-ink-soft hover:border-ink"
+        }`}
+      >
+        <input
+          type="checkbox"
+          checked={qualified}
+          onChange={onToggleQualified}
+          aria-label={`It's complicated — none of these fits: ${step.question}`}
+          className="sr-only"
+        />
+        <span
+          aria-hidden="true"
+          className={`font-mono text-[0.82rem] ${
+            qualified ? "text-indigo-ink" : "text-muted/60"
+          }`}
+        >
+          {qualified ? "✓" : "±"}
+        </span>
+        <span>
+          <span className="font-serif text-[1.02rem]">
+            It&apos;s complicated — none of these fits
+          </span>
+          <span className="mt-0.5 block font-serif text-[0.85rem] italic leading-5 text-muted">
+            Your view on this topic isn&apos;t captured by these wordings. The
+            check sets the topic aside — never read as agreement or denial.
+          </span>
+        </span>
+      </label>
     </fieldset>
   );
 }
@@ -717,6 +756,18 @@ function stepHasAnswer(step: CheckStep, answers: AnswerMap): boolean {
   return stepStatementIds(step).some((id) => answers[id] !== undefined);
 }
 
+/**
+ * True when a topic question was answered "it's complicated" rather than by
+ * selecting positions. The toggle records `qualify` on every position in the
+ * step; any affirmed position means the topic was answered normally.
+ */
+function stepQualified(step: PositionsStep, answers: AnswerMap): boolean {
+  return (
+    step.positions.some((position) => answers[position.id] === "qualify") &&
+    !step.positions.some((position) => answers[position.id] === "affirm")
+  );
+}
+
 /** Review-list summary of what was recorded on a question. */
 function stepSummary(step: CheckStep, answers: AnswerMap): string {
   if (step.kind === "claim") {
@@ -726,8 +777,11 @@ function stepSummary(step: CheckStep, answers: AnswerMap): string {
   const selected = step.positions.filter(
     (position) => answers[position.id] === "affirm",
   );
-  if (selected.length === 0) return "Nothing selected — counts as not sure";
-  return selected.map((position) => position.label).join(" · ");
+  if (selected.length > 0) {
+    return selected.map((position) => position.label).join(" · ");
+  }
+  if (stepQualified(step, answers)) return claimAnswerSummary.qualify;
+  return "Nothing selected — counts as not sure";
 }
 
 export function BeliefChecker() {
@@ -772,8 +826,12 @@ export function BeliefChecker() {
     });
   }, []);
 
-  const qualifiedCount = Object.values(answers).filter(
-    (a) => a === "qualify",
+  // Counted per question, not per statement: a topic answered "it's
+  // complicated" records qualify on each of its positions but is one answer.
+  const qualifiedCount = checkSteps.filter((s) =>
+    s.kind === "claim"
+      ? answers[s.statementId] === "qualify"
+      : stepQualified(s, answers),
   ).length;
   const findings = useMemo(() => evaluateBeliefs(answers), [answers]);
   const affirmed = useMemo(() => affirmedBeliefs(answers), [answers]);
@@ -991,14 +1049,34 @@ export function BeliefChecker() {
     recordAnswer((previous) => ({ ...previous, [statementId]: answer }));
   }
 
-  function togglePosition(beliefId: BeliefId) {
+  function togglePosition(positionsStep: PositionsStep, beliefId: BeliefId) {
     recordAnswer((previous) => {
-      if (previous[beliefId] === "affirm") {
-        const next = { ...previous };
-        delete next[beliefId];
-        return next;
+      const next = { ...previous };
+      // Selecting a position withdraws the topic-level "it's complicated".
+      for (const position of positionsStep.positions) {
+        if (next[position.id] === "qualify") delete next[position.id];
       }
-      return { ...previous, [beliefId]: "affirm" };
+      if (previous[beliefId] === "affirm") {
+        delete next[beliefId];
+      } else {
+        next[beliefId] = "affirm";
+      }
+      return next;
+    });
+  }
+
+  function toggleStepQualified(positionsStep: PositionsStep) {
+    recordAnswer((previous) => {
+      const wasQualified = stepQualified(positionsStep, previous);
+      const next = { ...previous };
+      for (const position of positionsStep.positions) {
+        if (wasQualified) {
+          delete next[position.id];
+        } else {
+          next[position.id] = "qualify";
+        }
+      }
+      return next;
     });
   }
 
@@ -1107,7 +1185,9 @@ export function BeliefChecker() {
               <PositionsScreen
                 step={currentStep}
                 answers={answers}
-                onToggle={togglePosition}
+                onToggle={(beliefId) => togglePosition(currentStep, beliefId)}
+                qualified={stepQualified(currentStep, answers)}
+                onToggleQualified={() => toggleStepQualified(currentStep)}
                 note={stepNote}
               />
             ) : (

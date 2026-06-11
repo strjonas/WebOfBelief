@@ -63,6 +63,75 @@ const rules: Finding[] = [
     sourceIds: ["evil"],
   },
   {
+    id: "limited-and-perfect-god",
+    kind: "conflict",
+    title: "A perfect God and a limited God",
+    requires: ["perfectGod", "limitedGod"],
+    gist:
+      "One statement says God is omnipotent and omniscient; the other says God's power or knowledge is genuinely limited. Describing the same God, both can't be true.",
+    explanation:
+      "Both statements describe the one God: the classical statement attributes unlimited power and knowledge, while the limited statement denies exactly that package. A single being cannot both have and lack those attributes.",
+    nextQuestion:
+      "Which is your actual working picture — a perfect being, or a God with real limits doing the best a God can?",
+    sourceIds: ["processTheism", "cosmological"],
+  },
+  {
+    id: "limited-god-and-no-deity",
+    kind: "conflict",
+    title: "A limited God exists and no deity exists",
+    requires: ["limitedGod", "noDeity"],
+    gist:
+      "A limited personal God is still a god — so “a limited God exists” and “no gods of any kind exist” can't both stand.",
+    explanation:
+      "The limited-God statement affirms a personal divine being; the no-deity statement denies every god of any kind, limited ones included.",
+    nextQuestion:
+      "Is your denial aimed at every divine being, or only at the all-powerful classical conception?",
+    sourceIds: ["atheism", "processTheism"],
+  },
+  {
+    id: "limited-god-and-suffering",
+    kind: "compatible",
+    title: "A limited God and unjustifiable suffering",
+    requires: ["limitedGod", "gratuitousSuffering"],
+    gist:
+      "A God who cannot prevent every evil is not impugned by pointless-looking suffering — limiting the divine attributes is precisely how some theists answer the problem of evil.",
+    explanation:
+      "The argument from gratuitous suffering targets the combination of perfect goodness, omnipotence, and omniscience. A God with genuinely limited power or knowledge may be unable to prevent some suffering, so this pairing is a recognized, coherent package — process and open theists defend versions of it.",
+    nextQuestion:
+      "Does the limited conception still support what you want from theism — providence, prayer, hope — or does it concede too much?",
+    sourceIds: ["processTheism", "evil"],
+  },
+  {
+    id: "agnosticism-and-theism",
+    kind: "argument",
+    title: "Suspended judgment and belief in God",
+    requires: ["agnosticismAboutGod", "perfectGod"],
+    gist:
+      "You believe God exists, while also holding that the evidence warrants suspending judgment. That is believing beyond what you yourself say the evidence supports.",
+    explanation:
+      "This is not a flat contradiction — one claim is about what exists, the other about what the evidence warrants. The tension is epistemic: by your own assessment, suspension is the most reasonable response, yet you hold the belief. Reformed epistemologists answer that belief in God can be properly basic — grounded in experience rather than argument; pragmatists allow commitments that evidence alone does not settle.",
+    bridge:
+      "One should not hold a settled belief that one regards as unsupported by the balance of evidence.",
+    nextQuestion:
+      "Does your belief rest on something the public arguments leave out — experience, trust, tradition — and do you count that as evidence?",
+    sourceIds: ["atheism", "religionEpistemology"],
+  },
+  {
+    id: "agnosticism-and-atheism",
+    kind: "argument",
+    title: "Suspended judgment and the denial of God",
+    requires: ["agnosticismAboutGod", "noDeity"],
+    gist:
+      "“No gods exist” is a settled verdict; “the evidence doesn't settle it” says no verdict is warranted. Holding both asserts more than your own standard allows.",
+    explanation:
+      "The no-deity statement is the positive claim that no god exists, not a mere lack of belief. If the evidence genuinely does not settle the question, that positive denial outruns the evidence by your own lights. Atheists who feel this pressure usually either soften the denial to “no good reason to believe,” or argue the evidence does settle it — for instance, that hiddenness and suffering are strong evidence of absence.",
+    bridge:
+      "One should not hold a settled belief that one regards as unsupported by the balance of evidence.",
+    nextQuestion:
+      "Do you mean to assert that no god exists, or only that belief in God is unwarranted? The first claim needs evidence of its own.",
+    sourceIds: ["atheism"],
+  },
+  {
     id: "realism-and-attitude-only",
     kind: "conflict",
     title: "Mind-independent and attitude-only morality",
@@ -89,6 +158,71 @@ const rules: Finding[] = [
     sourceIds: ["moralConstructivism", "moralAntiRealism"],
   },
   {
+    id: "error-theory-and-moral-facts",
+    kind: "conflict",
+    title: "Objective wrongs and no moral truths",
+    requires: ["noMoralTruths", "moralFacts"],
+    gist:
+      "One says some things are really wrong no matter what anyone thinks; the other says nothing is ever really right or wrong. Straight negations of each other.",
+    explanation:
+      "The error-theoretic statement denies every moral truth, of any kind. The moral-facts statement affirms at least one approval-independent moral truth. They cannot both hold.",
+    nextQuestion:
+      "When you say cruelty is wrong, do you take that to be literally true, or a stance you express without claiming truth?",
+    sourceIds: ["moralAntiRealism"],
+  },
+  {
+    id: "error-theory-and-constructed-morality",
+    kind: "conflict",
+    title: "Constructed moral truths and no moral truths",
+    requires: ["noMoralTruths", "constructedMorality"],
+    gist:
+      "Constructivism says some moral truths exist once the right rational procedure fixes them; error theory says no moral claim is true by any route — construction included.",
+    explanation:
+      "The constructivist statement affirms moral truths grounded in what rational agents would endorse under fair conditions. The error-theoretic statement says moral claims are systematically untrue. As worded, they cannot both hold.",
+    nextQuestion:
+      "Could a fair procedure make a moral claim genuinely true, or would its output still be just what was agreed, not what is right?",
+    sourceIds: ["moralConstructivism", "moralAntiRealism"],
+  },
+  {
+    id: "error-theory-and-constraints",
+    kind: "conflict",
+    title: "Off-limits acts and no moral truths",
+    requires: ["noMoralTruths", "sideConstraints"],
+    gist:
+      "You say nothing is ever really wrong — and also that some acts are wrong even when they would produce the best outcome. The second is exactly the kind of truth the first rules out.",
+    explanation:
+      "The constraints statement asserts a first-order moral truth: some actions are wrong regardless of consequences. The error-theoretic statement denies that any action is ever wrong. Affirming both is inconsistent as worded.",
+    nextQuestion:
+      "Which gives: the conviction that some acts are off-limits, or the theory that no moral claim is ever true?",
+    sourceIds: ["moralAntiRealism", "deontology"],
+  },
+  {
+    id: "error-theory-and-animal-harm",
+    kind: "conflict",
+    title: "Wrongful animal suffering and no moral truths",
+    requires: ["noMoralTruths", "minorConvenienceHarmWrong"],
+    gist:
+      "Calling severe avoidable animal suffering for taste “morally wrong” asserts a moral truth — the very thing your error-theoretic answer says doesn't exist.",
+    explanation:
+      "One answer says it is morally wrong to cause severe avoidable suffering for minor convenience. The other says no moral claim is ever true. The first is a moral claim; by the second, it cannot be true.",
+    nextQuestion:
+      "Is your objection to animal suffering a truth about the world, or a strong commitment you would act on without calling it true?",
+    sourceIds: ["moralAntiRealism", "animals"],
+  },
+  {
+    id: "error-theory-and-independent-duty",
+    kind: "conflict",
+    title: "A command-independent duty and no moral truths",
+    requires: ["noMoralTruths", "independentDuty"],
+    gist:
+      "You affirm that at least one moral duty would hold even with no God — and also that nothing is ever obligatory. Both can't stand.",
+    explanation:
+      "The independent-duty statement affirms at least one genuine moral obligation. The error-theoretic statement says nothing is ever genuinely obligatory. They directly contradict each other.",
+    nextQuestion:
+      "Did you mean that duties would still feel binding without God, or that they would really bind — which error theory denies?",
+    sourceIds: ["moralAntiRealism", "voluntarism"],
+  },
+  {
     id: "command-and-independent-duty",
     kind: "conflict",
     title: "Sole divine source and command-independent duty",
@@ -112,6 +246,19 @@ const rules: Finding[] = [
       "The first statement affirms possible objective meaning without God or immortality; the second denies that possibility.",
     nextQuestion:
       "Are you claiming all meaning needs transcendence, or only ultimate/cosmic meaning under a narrower definition?",
+    sourceIds: ["meaning"],
+  },
+  {
+    id: "objective-and-subjective-meaning",
+    kind: "conflict",
+    title: "Objective meaning and meaning as conferred only",
+    requires: ["naturalMeaning", "subjectiveMeaningOnly"],
+    gist:
+      "One says a finite life can be objectively meaningful; the other says no life is objectively meaningful — meaning is only conferred. As worded, they negate each other.",
+    explanation:
+      "The naturalist statement affirms that lives can be objectively meaningful through worthwhile activity. The subjectivist statement denies objective meaning across the board, allowing only meaning conferred by the people involved. Both cannot hold.",
+    nextQuestion:
+      "Is a life devoted to something genuinely worthwhile more meaningful than an equally satisfying trivial one? Yes is the objective claim; no is the subjective one.",
     sourceIds: ["meaning"],
   },
   {
@@ -167,6 +314,36 @@ const rules: Finding[] = [
     nextQuestion:
       "Which relation does the identity-making work in hard cases: the continuing mind, the continuing organism, or a soul or subject beneath both?",
     sourceIds: ["personalIdentity"],
+  },
+  {
+    id: "no-self-and-psychological-identity",
+    kind: "argument",
+    title: "No persisting self, yet the mind keeps you the same",
+    requires: ["noPersistentSelf", "psychologicalContinuity"],
+    gist:
+      "You say the mind's continuity keeps a person the same over time — and also that strictly no self persists. Reductionists hold both, but it takes work: all persistence-talk becomes convenient shorthand.",
+    explanation:
+      "This is not necessarily a contradiction; it is the reductionist position Derek Parfit defended. On that view, personal identity just consists in psychological continuity — there is no further self — so “same person” talk is true only in a deflated, bookkeeping sense. The pressure: if no self strictly persists, can promises, blame, and concern for your own future carry the weight we give them?",
+    bridge:
+      "Saying a person “remains the same person” is strictly true — not just convenient shorthand for a stream of connected events.",
+    nextQuestion:
+      "When you care about your future self, are you caring about you — or about a successor who merely inherits your memories and projects? And does the difference matter?",
+    sourceIds: ["personalIdentity", "buddhistMind"],
+  },
+  {
+    id: "no-self-and-body-soul-identity",
+    kind: "argument",
+    title: "No persisting self, yet a body or soul persists",
+    requires: ["noPersistentSelf", "bodilySoulContinuity"],
+    gist:
+      "An enduring soul — or a persisting organism doing the identity work — is exactly the kind of continuing subject the no-self view denies. Holding both needs the body reading, plus deflated person-talk.",
+    explanation:
+      "On the soul reading these flatly contradict: an enduring soul is a persisting self. On the body reading there is room — an organism can persist while “the person” is a construction laid over it — but then the body does not keep a person the same in any deep sense; it merely continues. The combination survives only with that deflationary reading.",
+    bridge:
+      "The persisting body or soul is a genuine continuing subject — not merely a physical process the sense of self rides on.",
+    nextQuestion:
+      "Was it the soul or the body you had in mind — and if the body, does a continuing organism amount to a continuing you?",
+    sourceIds: ["personalIdentity", "buddhistMind"],
   },
   {
     id: "future-ai-and-zombie-evidence",
@@ -388,6 +565,32 @@ const rules: Finding[] = [
     nextQuestion:
       "Do you mean outcomes always settle rightness, or that there are genuine limits (rights, duties) that outcomes cannot override?",
     sourceIds: ["consequentialism", "deontology"],
+  },
+  {
+    id: "virtue-and-consequences-only",
+    kind: "conflict",
+    title: "Only outcomes matter, yet character comes first",
+    requires: ["consequencesOnly", "virtueEthicsPrimary"],
+    gist:
+      "One says outcomes are the only thing that makes an act right; the other gives the primary role to good character. They can't both be the fundamental standard.",
+    explanation:
+      "The consequences-only statement makes outcomes the sole determinant of rightness, leaving no independent work for character. The virtue statement says rightness depends primarily on what an honest, just, compassionate person would do. As worded, the two assign the fundamental standard to different things.",
+    nextQuestion:
+      "When the virtuous person's judgment and the outcome calculation come apart, which one settles what is right for you?",
+    sourceIds: ["virtueEthics", "consequentialism"],
+  },
+  {
+    id: "virtue-and-constraints",
+    kind: "compatible",
+    title: "Character-first ethics and moral limits",
+    requires: ["virtueEthicsPrimary", "sideConstraints"],
+    gist:
+      "Character-first ethics and moral limits travel well together: a just person treats some acts as simply not to be done, whatever the payoff.",
+    explanation:
+      "These answers are natural companions, not a tension: virtue ethicists typically hold that an honest and just person recognizes limits — things such a person would not do even for the best outcome. The open question is which is more basic: do the limits fall out of good character, or does good character consist partly in respecting independent limits?",
+    nextQuestion:
+      "Does the wrongness of those acts come from what they would make of you, or would they be wrong whatever they did to your character?",
+    sourceIds: ["virtueEthics", "deontology"],
   },
   {
     id: "foreknowledge-without-deity",

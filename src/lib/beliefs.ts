@@ -22,6 +22,9 @@ export type SourceId =
   | "animals"
   | "consequentialism"
   | "deontology"
+  | "virtueEthics"
+  | "processTheism"
+  | "buddhistMind"
   | "religionEpistemology"
   | "religiousExperience"
   | "moralConstructivism"
@@ -43,19 +46,25 @@ export type BeliefId =
   | "infallibleForeknowledge"
   | "beliefNeedsEvidence"
   | "spiritualReality"
+  | "limitedGod"
+  | "agnosticismAboutGod"
   | "moralFacts"
+  | "noMoralTruths"
   | "attitudeOnlyMorality"
   | "constructedMorality"
   | "divineCommandOnly"
   | "independentDuty"
   | "naturalMeaning"
   | "meaningNeedsTranscendent"
+  | "subjectiveMeaningOnly"
   | "ordinaryKnowledge"
   | "radicalSkepticalScenario"
   | "consequencesOnly"
   | "sideConstraints"
+  | "virtueEthicsPrimary"
   | "psychologicalContinuity"
   | "bodilySoulContinuity"
+  | "noPersistentSelf"
   | "determinism"
   | "samePastAlternative"
   | "responsibilityWithoutAlternatives"
@@ -256,6 +265,27 @@ export const sources: Record<SourceId, Source> = {
     url: "https://plato.stanford.edu/entries/ethics-deontological/",
     use: "Presents agent-relative constraints on which some acts are wrong even when they maximize the good.",
   },
+  virtueEthics: {
+    id: "virtueEthics",
+    title: "Virtue Ethics",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/ethics-virtue/",
+    use: "Presents character-based accounts of right action in contrast to duty-based and outcome-based approaches, with the main objections.",
+  },
+  processTheism: {
+    id: "processTheism",
+    title: "Process Theism",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/process-theism/",
+    use: "Covers conceptions of God as persuasive rather than all-controlling, with genuinely limited power, and how they answer the problem of evil.",
+  },
+  buddhistMind: {
+    id: "buddhistMind",
+    title: "Mind in Indian Buddhist Philosophy",
+    publisher: "Stanford Encyclopedia of Philosophy",
+    url: "https://plato.stanford.edu/entries/mind-indian-buddhism/",
+    use: "Presents the not-self doctrine: persons as streams of connected physical and mental events without an enduring substantial self.",
+  },
   religionEpistemology: {
     id: "religionEpistemology",
     title: "Epistemology of Religion",
@@ -334,7 +364,7 @@ export const beliefStatements: BeliefStatement[] = [
     plain:
       "There is one God who knows everything, can do anything, and is perfectly good and loving.",
     clarify:
-      "This is classical personal theism, not merely a first cause, spirit, or impersonal ground of reality. If you regard talk of God as literally meaningless rather than true or false (theological non-cognitivism), neither this statement nor its denial captures your view — mark unsure.",
+      "This is classical personal theism, not merely a first cause, spirit, or impersonal ground of reality. If you regard talk of God as literally meaningless rather than true or false (theological non-cognitivism), neither this statement nor its denial captures your view — answer “it's complicated” instead.",
     caseFor:
       "Arguments from contingency, moral reality, religious experience, and other evidence are taken by theists to support such a being.",
     caseAgainst:
@@ -422,12 +452,42 @@ export const beliefStatements: BeliefStatement[] = [
     plain:
       "There is something spiritually real or sacred beyond ordinary physical life, even if it is not a personal God.",
     clarify:
-      "This is meant for spiritual-but-not-classical-theist views. It does not affirm Jesus, a personal creator, or any deity with a will; if your view is purely metaphorical, mark qualify or unsure.",
+      "This is meant for spiritual-but-not-classical-theist views. It does not affirm Jesus, a personal creator, or any deity with a will; if your view is purely metaphorical, leave it unselected.",
     caseFor:
       "Support may come from religious experience, contemplative practice, perceived sacredness, or arguments that reality has a non-personal transcendent aspect.",
     caseAgainst:
       "Naturalists explain such experiences without a spiritual reality, and the term may be too indeterminate unless a view says what exists and how we could know it.",
     sourceIds: ["religiousExperience", "pew"],
+  },
+  {
+    id: "limitedGod",
+    category: "religion",
+    prompt:
+      "A personal God exists, but one whose power or knowledge is genuinely limited — not a being that is both omnipotent and omniscient.",
+    plain:
+      "There is a personal God, but not an all-controlling one — God's power or knowledge has real limits.",
+    clarify:
+      "This is non-classical theism: open theism limits God's foreknowledge of free choices, process theism holds God persuades rather than controls, and finite-God views limit power outright. It concerns the same one God as the classical statement, described differently — not a second, additional deity.",
+    caseFor:
+      "Limiting the classical attributes is a principled response to suffering and hiddenness: a God who cannot unilaterally prevent every evil does not need a justifying reason for permitting it.",
+    caseAgainst:
+      "Classical theists object that a limited being falls short of what 'God' means — a being worthy of unconditional worship — and that perfect-being theology has deep scriptural and philosophical roots.",
+    sourceIds: ["processTheism", "evil"],
+  },
+  {
+    id: "agnosticismAboutGod",
+    category: "religion",
+    prompt:
+      "The available evidence and arguments do not settle whether any god exists, and the most reasonable response is to suspend judgment.",
+    plain:
+      "Whether God exists can't be settled either way on the evidence we have — the honest response is to suspend judgment.",
+    clarify:
+      "This is agnosticism as a positive claim about the evidence, not mere personal indecision: it says suspension is what the evidence actually warrants — for anyone, not just for you.",
+    caseFor:
+      "Agnostics argue that the classic arguments for and against God are inconclusive, and that suspending judgment is the rational attitude toward an evidentially open question.",
+    caseAgainst:
+      "Theists and atheists each hold that the total evidence does favor their side; others argue that experience, trust, or practical stakes can justify belief where public arguments alone cannot.",
+    sourceIds: ["atheism", "religionEpistemology"],
   },
   {
     id: "moralFacts",
@@ -473,6 +533,21 @@ export const beliefStatements: BeliefStatement[] = [
     caseAgainst:
       "Realists argue that valid procedures answer to independent moral facts, while subjectivists and error theorists deny that construction secures genuine moral truth.",
     sourceIds: ["moralConstructivism", "moralAntiRealism"],
+  },
+  {
+    id: "noMoralTruths",
+    category: "value",
+    prompt:
+      "No action is ever genuinely morally right, wrong, obligatory, or forbidden; moral claims are systematically untrue.",
+    plain:
+      "Nothing is really right or wrong — moral claims are never literally true.",
+    clarify:
+      "This is moral error theory, often called moral nihilism: moral talk aims at truth but always misses, because there are no moral facts of any kind — objective, constructed, or attitude-based. It is stronger than 'morality is subjective'; the subjectivist still thinks some moral claims are true.",
+    caseFor:
+      "Error theorists such as J. L. Mackie argue that objective values would be metaphysically queer — unlike anything else we know — and that deep moral disagreement is better explained by there being nothing to be right about.",
+    caseAgainst:
+      "Critics reply that the same skeptical moves would erase mathematical and epistemic truths too, and that 'torturing for fun is wrong' is more credible than any premise in the argument against it.",
+    sourceIds: ["moralAntiRealism"],
   },
   {
     id: "divineCommandOnly",
@@ -533,6 +608,21 @@ export const beliefStatements: BeliefStatement[] = [
     sourceIds: ["meaning"],
   },
   {
+    id: "subjectiveMeaningOnly",
+    category: "value",
+    prompt:
+      "No human life is objectively meaningful; a life has meaning only in the sense that it matters to the person living it or to people affected by it.",
+    plain:
+      "Meaning isn't found, it's conferred: a life means what it means to people — there is no objective measure of a meaningful life.",
+    clarify:
+      "This is subjectivism about meaning, not nihilism: lives can genuinely matter to people. What it denies is any standard by which one life is really more meaningful than another, independent of anyone's caring.",
+    caseFor:
+      "Subjectivists argue that meaning tracks engagement and caring — being gripped by what you love — and that talk of 'objective meaning' has never been given an agreed standard.",
+    caseAgainst:
+      "Objectivists reply that a life spent counting blades of grass, however satisfying, seems less meaningful than one spent on love, knowledge, or others' lives — a comparison that needs a standard beyond caring.",
+    sourceIds: ["meaning"],
+  },
+  {
     id: "ordinaryKnowledge",
     category: "value",
     prompt:
@@ -585,12 +675,27 @@ export const beliefStatements: BeliefStatement[] = [
     plain:
       "What makes someone the same person over time is mainly the same body or soul continuing, even if their mind changes a lot.",
     clarify:
-      "This groups bodily and soul-continuity views because both deny that psychological continuity is the main identity-maker. If you accept one but strongly reject the other, mark qualify.",
+      "This groups bodily and soul-continuity views because both deny that psychological continuity is the main identity-maker. Select it if either version is your view of what keeps a person the same.",
     caseFor:
       "Bodily and soul-based accounts avoid duplication worries and explain identity through an enduring subject rather than a chain of mental connections.",
     caseAgainst:
       "Psychological-continuity theorists argue that a persisting body or soul without the right mental connections may not preserve the person who mattered.",
     sourceIds: ["personalIdentity"],
+  },
+  {
+    id: "noPersistentSelf",
+    category: "mind",
+    prompt:
+      "Strictly speaking, no self persists over time: a person is a stream of connected physical and mental events, and the continuing 'I' is a construction.",
+    plain:
+      "There is no persisting self — the continuous 'me' is a useful construction laid over a stream of connected experiences.",
+    clarify:
+      "This is the not-self view found in Buddhist philosophy and in reductionist accounts like Derek Parfit's. The events in the stream are real and really connected; what is denied is an extra enduring subject that owns them.",
+    caseFor:
+      "Introspection finds experiences but no experiencer behind them, and puzzle cases — fission, gradual replacement — suggest questions of identity have no deep further answer.",
+    caseAgainst:
+      "Critics argue that something must own experiences and persist through change: memory, anticipation, promising, and responsibility all seem to presuppose a continuing subject.",
+    sourceIds: ["personalIdentity", "buddhistMind"],
   },
   {
     id: "determinism",
@@ -717,6 +822,21 @@ export const beliefStatements: BeliefStatement[] = [
     caseAgainst:
       "Consequentialists argue it is irrational to forbid an act that genuinely makes the world go best.",
     sourceIds: ["deontology", "consequentialism"],
+  },
+  {
+    id: "virtueEthicsPrimary",
+    category: "practice",
+    prompt:
+      "Whether an action is morally right depends primarily on whether it is what a virtuous person — honest, just, compassionate — would characteristically do in the circumstances.",
+    plain:
+      "An act is right when it's what a genuinely good person would do — character comes first, not rules or outcome totals.",
+    clarify:
+      "This is virtue ethics as a claim about what makes actions right. It does not deny that outcomes and duties matter; it says they matter through the judgment of good character rather than as the fundamental standard.",
+    caseFor:
+      "Virtue ethicists argue that practical wisdom, not a universal formula, is what actually guides good people, and the view fits how we praise, blame, and teach character.",
+    caseAgainst:
+      "Critics object that the account risks circularity — the virtuous person is the one who acts rightly — and gives too little concrete guidance when virtues conflict in hard cases.",
+    sourceIds: ["virtueEthics", "consequentialism", "deontology"],
   },
   {
     id: "animalsMatter",

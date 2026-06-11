@@ -27,14 +27,18 @@ const nodes: NodePos[] = [
   { id: "infallibleForeknowledge", x: 110, y: 158, short: "foreknown" },
   { id: "beliefNeedsEvidence", x: 44, y: 188, short: "evidence" },
   { id: "spiritualReality", x: 182, y: 138, short: "spiritual" },
+  { id: "limitedGod", x: 52, y: 30, short: "limited God" },
+  { id: "agnosticismAboutGod", x: 100, y: 96, short: "agnostic" },
   // Morality & meaning (right cluster)
   { id: "moralFacts", x: 256, y: 60, short: "mind-indep." },
   { id: "attitudeOnlyMorality", x: 354, y: 38, short: "attitudes only" },
   { id: "constructedMorality", x: 314, y: 82, short: "constructed" },
+  { id: "noMoralTruths", x: 296, y: 20, short: "no moral truths" },
   { id: "divineCommandOnly", x: 244, y: 126, short: "command-only" },
   { id: "independentDuty", x: 348, y: 116, short: "indep. duty" },
   { id: "naturalMeaning", x: 274, y: 200, short: "finite meaning" },
   { id: "meaningNeedsTranscendent", x: 372, y: 198, short: "needs transc." },
+  { id: "subjectiveMeaningOnly", x: 322, y: 178, short: "subj. meaning" },
   { id: "ordinaryKnowledge", x: 270, y: 158, short: "ordinary know." },
   { id: "radicalSkepticalScenario", x: 392, y: 158, short: "skeptic" },
   // Freedom (mid-low)
@@ -44,12 +48,14 @@ const nodes: NodePos[] = [
   // Mind (lower-right)
   { id: "psychologicalContinuity", x: 268, y: 246, short: "psych cont." },
   { id: "bodilySoulContinuity", x: 344, y: 246, short: "body/soul" },
+  { id: "noPersistentSelf", x: 306, y: 224, short: "no self" },
   { id: "physicalClosure", x: 280, y: 306, short: "physical" },
   { id: "zombieWorld", x: 360, y: 308, short: "zombie" },
   { id: "futureAiConscious", x: 418, y: 330, short: "future AI" },
   // Right action & animals (low-left)
   { id: "consequencesOnly", x: 30, y: 252, short: "consequences" },
   { id: "sideConstraints", x: 30, y: 310, short: "constraints" },
+  { id: "virtueEthicsPrimary", x: 84, y: 322, short: "virtue" },
   { id: "animalsMatter", x: 422, y: 78, short: "animals" },
   { id: "minorConvenienceHarmWrong", x: 432, y: 138, short: "no harm" },
   { id: "factoryFarmPermissible", x: 422, y: 250, short: "permitted" },
@@ -77,6 +83,15 @@ const edges: Edge[] = [
   { a: "consequencesOnly", b: "sideConstraints", kind: "conflict" },
   { a: "infallibleForeknowledge", b: "noDeity", kind: "conflict" },
   { a: "psychologicalContinuity", b: "bodilySoulContinuity", kind: "conflict" },
+  { a: "perfectGod", b: "limitedGod", kind: "conflict" },
+  { a: "limitedGod", b: "noDeity", kind: "conflict" },
+  { a: "noMoralTruths", b: "moralFacts", kind: "conflict" },
+  { a: "noMoralTruths", b: "constructedMorality", kind: "conflict" },
+  { a: "noMoralTruths", b: "sideConstraints", kind: "conflict" },
+  { a: "noMoralTruths", b: "minorConvenienceHarmWrong", kind: "conflict" },
+  { a: "noMoralTruths", b: "independentDuty", kind: "conflict" },
+  { a: "naturalMeaning", b: "subjectiveMeaningOnly", kind: "conflict" },
+  { a: "consequencesOnly", b: "virtueEthicsPrimary", kind: "conflict" },
   // implication forks
   { a: "noDeity", b: "meaningNeedsTranscendent", kind: "implication" },
   { a: "noDeity", b: "divineCommandOnly", kind: "implication" },
@@ -89,12 +104,18 @@ const edges: Edge[] = [
   { a: "zombieWorld", b: "futureAiConscious", kind: "argument" },
   { a: "minorConvenienceHarmWrong", b: "factoryFarmPermissible", kind: "argument" },
   { a: "animalsMatter", b: "factoryFarmPermissible", kind: "argument" },
+  { a: "agnosticismAboutGod", b: "perfectGod", kind: "argument" },
+  { a: "agnosticismAboutGod", b: "noDeity", kind: "argument" },
+  { a: "noPersistentSelf", b: "psychologicalContinuity", kind: "argument" },
+  { a: "noPersistentSelf", b: "bodilySoulContinuity", kind: "argument" },
   // coherent combinations
   { a: "perfectGod", b: "moralFacts", kind: "compatible" },
   { a: "noDeity", b: "moralFacts", kind: "compatible" },
   { a: "noDeity", b: "naturalMeaning", kind: "compatible" },
   { a: "noDeity", b: "spiritualReality", kind: "compatible" },
   { a: "physicalClosure", b: "futureAiConscious", kind: "compatible" },
+  { a: "limitedGod", b: "gratuitousSuffering", kind: "compatible" },
+  { a: "virtueEthicsPrimary", b: "sideConstraints", kind: "compatible" },
 ];
 
 const clusterLabels: ClusterLabel[] = [
@@ -151,7 +172,7 @@ export function BeliefWebDiagram({
   showClusters = true,
   decorative = false,
   className,
-  title = "A diagram of the belief web this tool checks. Twenty-nine statements are connected by edges representing direct conflicts, conditional implications, live arguments, and coherent combinations.",
+  title = "A diagram of the belief web this tool checks. Thirty-five statements are connected by edges representing direct conflicts, conditional implications, live arguments, and coherent combinations.",
 }: BeliefWebDiagramProps) {
   const triggered = triggeredEdges
     ? new Set<string>(triggeredEdges.map(([a, b]) => edgeKey(a, b)))

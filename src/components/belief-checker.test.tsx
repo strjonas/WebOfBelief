@@ -123,6 +123,63 @@ describe("BeliefChecker", () => {
     ).toBeDefined();
   });
 
+  it("offers a topic-level “it's complicated” that is exclusive with positions and sets the topic aside", async () => {
+    const user = userEvent.setup();
+    render(<BeliefChecker />);
+
+    await next(user);
+    await next(user);
+
+    // Question 3 (God topic): select a position, then mark the topic
+    // "it's complicated" — the selection must clear.
+    const godChoice = screen.getByRole("checkbox", {
+      name: `A perfect, personal God exists: ${perfectGod}`,
+    }) as HTMLInputElement;
+    await user.click(godChoice);
+
+    const qualifyChoice = screen.getByRole("checkbox", {
+      name: /It's complicated — none of these fits/,
+    }) as HTMLInputElement;
+    await user.click(qualifyChoice);
+    expect(qualifyChoice.checked).toBe(true);
+    expect(
+      (
+        screen.getByRole("checkbox", {
+          name: `A perfect, personal God exists: ${perfectGod}`,
+        }) as HTMLInputElement
+      ).checked,
+    ).toBe(false);
+
+    // The review list shows the topic as "It's complicated", and the result
+    // reasons from nothing — qualified topics are set aside.
+    await user.click(screen.getByRole("button", { name: "Review & finish →" }));
+    expect(screen.getByText("It's complicated")).toBeDefined();
+    expect(screen.getByText(/You answered 1 of 18 questions/)).toBeDefined();
+
+    await user.click(screen.getByRole("button", { name: "See my results" }));
+    expect(
+      screen.getByRole("heading", { name: "No direct conflict detected" }),
+    ).toBeDefined();
+
+    // Re-selecting a position withdraws the topic-level qualify.
+    await user.click(screen.getByRole("button", { name: "Edit answers" }));
+    await user.click(
+      screen.getByRole("button", { name: /God and the divine/ }),
+    );
+    await user.click(
+      screen.getByRole("checkbox", {
+        name: `A perfect, personal God exists: ${perfectGod}`,
+      }),
+    );
+    expect(
+      (
+        screen.getByRole("checkbox", {
+          name: /It's complicated — none of these fits/,
+        }) as HTMLInputElement
+      ).checked,
+    ).toBe(false);
+  });
+
   it("warns on deity-dependent questions after atheism and sets qualified answers aside", async () => {
     const user = userEvent.setup();
     render(<BeliefChecker />);

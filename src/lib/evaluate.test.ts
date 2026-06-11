@@ -333,6 +333,162 @@ describe("evaluateBeliefs", () => {
     }
   });
 
+  it("flags a perfect God alongside a limited God as a direct conflict", () => {
+    const results = evaluateBeliefs({
+      perfectGod: "affirm",
+      limitedGod: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "limited-and-perfect-god",
+        kind: "conflict",
+      }),
+    ]);
+  });
+
+  it("flags a limited God alongside the denial of every deity", () => {
+    const results = evaluateBeliefs({
+      limitedGod: "affirm",
+      noDeity: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "limited-god-and-no-deity",
+        kind: "conflict",
+      }),
+    ]);
+  });
+
+  it("treats a limited God plus gratuitous suffering as coherent — the problem of evil targets the perfect-God package", () => {
+    const results = evaluateBeliefs({
+      limitedGod: "affirm",
+      gratuitousSuffering: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "limited-god-and-suffering",
+        kind: "compatible",
+      }),
+    ]);
+  });
+
+  it("treats agnosticism plus settled belief (either way) as an argument, not a conflict", () => {
+    const withTheism = evaluateBeliefs({
+      agnosticismAboutGod: "affirm",
+      perfectGod: "affirm",
+    });
+    const withAtheism = evaluateBeliefs({
+      agnosticismAboutGod: "affirm",
+      noDeity: "affirm",
+    });
+
+    expect(withTheism).toEqual([
+      expect.objectContaining({
+        id: "agnosticism-and-theism",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+    expect(withAtheism).toEqual([
+      expect.objectContaining({
+        id: "agnosticism-and-atheism",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+  });
+
+  it("flags consequences-only against character-first virtue ethics", () => {
+    const results = evaluateBeliefs({
+      consequencesOnly: "affirm",
+      virtueEthicsPrimary: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "virtue-and-consequences-only",
+        kind: "conflict",
+      }),
+    ]);
+  });
+
+  it("treats virtue ethics plus side constraints as natural companions", () => {
+    const results = evaluateBeliefs({
+      virtueEthicsPrimary: "affirm",
+      sideConstraints: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "virtue-and-constraints",
+        kind: "compatible",
+      }),
+    ]);
+  });
+
+  it("collides error theory with every affirmed first-order and second-order moral truth", () => {
+    const results = evaluateBeliefs({
+      noMoralTruths: "affirm",
+      moralFacts: "affirm",
+      constructedMorality: "affirm",
+      sideConstraints: "affirm",
+      minorConvenienceHarmWrong: "affirm",
+      independentDuty: "affirm",
+    });
+
+    expect(results.map((r) => r.id).sort()).toEqual([
+      "error-theory-and-animal-harm",
+      "error-theory-and-constraints",
+      "error-theory-and-constructed-morality",
+      "error-theory-and-independent-duty",
+      "error-theory-and-moral-facts",
+    ]);
+    expect(results.every((r) => r.kind === "conflict")).toBe(true);
+  });
+
+  it("flags objective natural meaning against meaning-as-conferred-only", () => {
+    const results = evaluateBeliefs({
+      naturalMeaning: "affirm",
+      subjectiveMeaningOnly: "affirm",
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: "objective-and-subjective-meaning",
+        kind: "conflict",
+      }),
+    ]);
+  });
+
+  it("treats the no-self view plus either identity account as an argument, not a flat conflict", () => {
+    const withPsych = evaluateBeliefs({
+      noPersistentSelf: "affirm",
+      psychologicalContinuity: "affirm",
+    });
+    const withBodySoul = evaluateBeliefs({
+      noPersistentSelf: "affirm",
+      bodilySoulContinuity: "affirm",
+    });
+
+    expect(withPsych).toEqual([
+      expect.objectContaining({
+        id: "no-self-and-psychological-identity",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+    expect(withBodySoul).toEqual([
+      expect.objectContaining({
+        id: "no-self-and-body-soul-identity",
+        kind: "argument",
+        bridge: expect.any(String),
+      }),
+    ]);
+  });
+
   it("orders findings with conflicts before softer relationships", () => {
     const results = evaluateBeliefs({
       consequencesOnly: "affirm",

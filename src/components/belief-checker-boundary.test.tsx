@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BeliefCheckerBoundary } from "./belief-checker-boundary";
 
-function BrokenChecker() {
+function BrokenChecker(): never {
   throw new Error("boom");
 }
 

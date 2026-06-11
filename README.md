@@ -5,9 +5,10 @@
 
 <img width="1200" height="630" alt="image" src="https://github.com/user-attachments/assets/5e5121a3-0cd9-4e8d-82b5-7508cefb16f6" />
 
-You answer twenty-nine plain statements about morality, freedom, mind, AI
-consciousness, knowledge, identity, God, and right action. A small, inspectable
-rule engine then
+You answer eighteen plain questions — covering thirty-five distinct positions —
+about morality, freedom, mind, AI consciousness, knowledge, identity, God, and
+right action. On each topic you can hold one position, several, or none. A
+small, inspectable rule engine then
 shows where your stated beliefs **flatly clash**, where one quietly **commits
 you to another** under a stated premise, and which "obviously incompatible"
 pairs are in fact **coherent**. Every result names the exact pair of statements
@@ -24,10 +25,12 @@ alone; they hang together, and a strain in one place is felt across the web.
 ## Try it in two minutes
 
 1. Open [webofbelief.app](https://webofbelief.app) (or run it locally, below).
-2. Answer only the statements you want to examine — skip the rest. Mark each one
-   "I believe this," "I reject this," "Not sure," or "Conditional / qualify."
-   Only affirmations are ever reasoned from.
-3. Hit **Check**. You get an interactive map of your web — affirmed beliefs lit
+2. Answer only the questions you want to examine — skip the rest. Topic
+   questions let you select any combination of positions, or mark the topic
+   "It's complicated — none of these fits"; yes/no claims take "Yes," "No,"
+   "Not sure," or "It's complicated." Only affirmations are ever reasoned
+   from.
+3. Finish via the review screen. You get an interactive map of your web — affirmed beliefs lit
    up, the rules your answers triggered drawn between them — and a written
    finding for each tension, sourced.
 4. **Share** a card with your counts and graph shape (never your answers), or
@@ -46,10 +49,12 @@ only ever reasons from statements you explicitly mark "I believe this."
 | ‡ &nbsp;**Live argument** | A serious tension that turns on a disputed bridge premise, which the result names and leaves open. *Example:* divine hiddenness; the evidentialist challenge to theism. |
 | ≈ &nbsp;**Coherent combination** | A pairing often dismissed as incoherent that has a recognized philosophical home. *Example:* atheism + objective meaning. |
 
-The twenty-nine statements span five topics — **morality and meaning**,
+The thirty-five positions span five topics — **morality and meaning**,
 **freedom and responsibility**, **mind and consciousness**, **God and
-evidence**, and **right action** — with added coverage for knowledge,
-personal identity, spiritual-but-not-theist views, and constructivism. Topic
+evidence**, and **right action** — with added coverage for knowledge, personal
+identity, spiritual-but-not-theist views, agnosticism, non-classical theism,
+virtue ethics, moral error theory, subjectivism about meaning, and the
+Buddhist/Parfitian no-self view. Topic
 selection is grounded in the
 [PhilPapers 2020 Survey](https://survey2020.philpeople.org/) of philosophers and
 [Pew's Religious Landscape Study](https://www.pewresearch.org/rls/).

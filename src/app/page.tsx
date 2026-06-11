@@ -70,7 +70,7 @@ export default function Home() {
               </figcaption>
               <BeliefWebDiagram
                 className="block h-auto w-full"
-                title="Diagram showing 29 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark conditional implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
+                title="Diagram showing 35 belief statements as nodes, connected by edges that represent the engine's actual checks. Oxblood edges mark direct conflicts, ink edges mark conditional implications, dashed edges mark live arguments, and dotted edges mark coherent combinations."
               />
               <div className="mt-5 border-t border-rule-soft pt-3 font-sans text-[0.7rem] leading-5 text-muted">
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">

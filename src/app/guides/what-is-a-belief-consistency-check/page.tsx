@@ -119,7 +119,7 @@ export default function Guide() {
         </p>
 
         <p className="!mt-10 border-l-2 border-mark pl-5 font-serif text-[1rem] italic leading-7 text-muted">
-          Web of Belief is one such check. It asks 18 questions covering 29
+          Web of Belief is one such check. It asks 18 questions covering 35
           distinct positions — you can hold one, several, or none on each topic
           — and reports only the relationships it can actually support, each
           one citing at least one Stanford Encyclopedia of Philosophy entry.{" "}

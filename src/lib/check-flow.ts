@@ -1,7 +1,7 @@
 import type { BeliefCategoryId, BeliefId } from "./beliefs";
 
 /**
- * The presentation layer of the check: the 29 statements in beliefs.ts are
+ * The presentation layer of the check: the 35 statements in beliefs.ts are
  * asked as 18 questions. Statements that compete over the same topic are
  * grouped into one "positions" question where the visitor can hold one,
  * several, or none of them — nuanced and mixed views are the point, and any
@@ -9,8 +9,10 @@ import type { BeliefCategoryId, BeliefId } from "./beliefs";
  * for the form to forbid. Standalone statements stay single "claim" questions.
  *
  * Selecting a position maps to answering its statement "affirm"; deselecting
- * removes the answer. The rule engine, share codes, and compare links all
- * keep operating on the same per-statement AnswerMap as before.
+ * removes the answer. A topic-level "it's complicated — none of these fits"
+ * records "qualify" on every position in the step, mirroring the escape hatch
+ * on yes/no claims. The rule engine, share codes, and compare links all keep
+ * operating on the same per-statement AnswerMap as before.
  */
 
 export interface PositionOption {
@@ -73,10 +75,18 @@ export const checkSteps: CheckStep[] = [
     positions: [
       { id: "perfectGod", label: "A perfect, personal God exists" },
       {
+        id: "limitedGod",
+        label: "A personal God exists — but with real limits",
+      },
+      {
         id: "spiritualReality",
         label: "Something sacred or spiritual exists — but not a personal God",
       },
       { id: "noDeity", label: "No gods of any kind exist" },
+      {
+        id: "agnosticismAboutGod",
+        label: "The evidence can't settle it — I suspend judgment",
+      },
     ],
   },
   {
@@ -119,6 +129,10 @@ export const checkSteps: CheckStep[] = [
         id: "sideConstraints",
         label: "Some acts are wrong no matter how good the outcome",
       },
+      {
+        id: "virtueEthicsPrimary",
+        label: "What a genuinely good person would do — character comes first",
+      },
     ],
   },
   {
@@ -158,6 +172,10 @@ export const checkSteps: CheckStep[] = [
         id: "attitudeOnlyMorality",
         label: "Morality is only what people happen to approve of",
       },
+      {
+        id: "noMoralTruths",
+        label: "Nothing is really right or wrong at all",
+      },
     ],
   },
   {
@@ -182,15 +200,19 @@ export const checkSteps: CheckStep[] = [
     id: "meaning",
     category: "value",
     title: "Meaning",
-    question: "Can a finite life be objectively meaningful?",
+    question: "What could make a life genuinely meaningful?",
     positions: [
       {
         id: "naturalMeaning",
-        label: "Yes — even without God or an afterlife",
+        label: "Worthwhile activity in this world — even without God or an afterlife",
       },
       {
         id: "meaningNeedsTranscendent",
-        label: "No — not without God or an immortal soul",
+        label: "Only God or an immortal soul — nothing finite is enough",
+      },
+      {
+        id: "subjectiveMeaningOnly",
+        label: "Nothing objective — lives mean what they mean to those living them",
       },
     ],
   },
@@ -222,6 +244,10 @@ export const checkSteps: CheckStep[] = [
       {
         id: "bodilySoulContinuity",
         label: "My body or soul — even if my mind changes",
+      },
+      {
+        id: "noPersistentSelf",
+        label: "Nothing, strictly — the continuing self is a construction",
       },
     ],
   },
