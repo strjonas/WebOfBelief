@@ -25,9 +25,9 @@ alone; they hang together, and a strain in one place is felt across the web.
 ## Try it in two minutes
 
 1. Open [webofbelief.app](https://webofbelief.app) (or run it locally, below).
-2. Answer only the questions you want to examine — skip the rest. Topic
+2. Answer only the questions you want to examine & skip the rest. Topic
    questions let you select any combination of positions, or mark the topic
-   "It's complicated — none of these fits"; yes/no claims take "Yes," "No,"
+   "It's complicated (none of the above)"; yes/no claims take "Yes," "No,"
    "Not sure," or "It's complicated." Only affirmations are ever reasoned
    from.
 3. Finish via the review screen. You get an interactive map of your web — affirmed beliefs lit

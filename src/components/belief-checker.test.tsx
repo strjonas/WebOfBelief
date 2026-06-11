@@ -57,7 +57,7 @@ describe("BeliefChecker", () => {
     // Question 4: the gratuitous-suffering claim.
     await user.click(
       screen.getByRole("radio", {
-        name: `Yes — I believe this: ${gratuitousSuffering}`,
+        name: `Yes (I believe this): ${gratuitousSuffering}`,
       }),
     );
 
@@ -89,9 +89,7 @@ describe("BeliefChecker", () => {
     await user.click(screen.getByRole("button", { name: "Edit answers" }));
 
     // The review list shows the selection and links back to the question.
-    expect(
-      screen.getByText("A perfect, personal God exists"),
-    ).toBeDefined();
+    expect(screen.getByText("A perfect, personal God exists")).toBeDefined();
     await user.click(
       screen.getByRole("button", { name: /God and the divine/ }),
     );
@@ -107,9 +105,7 @@ describe("BeliefChecker", () => {
     render(<BeliefChecker />);
 
     await user.click(screen.getByRole("button", { name: "Review & finish →" }));
-    expect(
-      screen.getByText(/You answered 0 of 18 questions/),
-    ).toBeDefined();
+    expect(screen.getByText(/You answered 0 of 18 questions/)).toBeDefined();
 
     await user.click(screen.getByRole("button", { name: "See my results" }));
 
@@ -138,7 +134,7 @@ describe("BeliefChecker", () => {
     await user.click(godChoice);
 
     const qualifyChoice = screen.getByRole("checkbox", {
-      name: /It's complicated — none of these fits/,
+      name: /It's complicated (none of the above)/,
     }) as HTMLInputElement;
     await user.click(qualifyChoice);
     expect(qualifyChoice.checked).toBe(true);
@@ -174,7 +170,7 @@ describe("BeliefChecker", () => {
     expect(
       (
         screen.getByRole("checkbox", {
-          name: /It's complicated — none of these fits/,
+          name: /It's complicated (none of the above)/,
         }) as HTMLInputElement
       ).checked,
     ).toBe(false);
@@ -212,7 +208,9 @@ describe("BeliefChecker", () => {
       screen.getByRole("heading", { name: "No direct conflict detected" }),
     ).toBeDefined();
     expect(
-      screen.queryByText("An infallible divine belief, but no deity to hold it"),
+      screen.queryByText(
+        "An infallible divine belief, but no deity to hold it",
+      ),
     ).toBeNull();
   });
 });

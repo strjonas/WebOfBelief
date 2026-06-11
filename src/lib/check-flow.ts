@@ -9,7 +9,7 @@ import type { BeliefCategoryId, BeliefId } from "./beliefs";
  * for the form to forbid. Standalone statements stay single "claim" questions.
  *
  * Selecting a position maps to answering its statement "affirm"; deselecting
- * removes the answer. A topic-level "it's complicated — none of these fits"
+ * removes the answer. A topic-level "it's complicated (none of the above)"
  * records "qualify" on every position in the step, mirroring the escape hatch
  * on yes/no claims. The rule engine, share codes, and compare links all keep
  * operating on the same per-statement AnswerMap as before.
@@ -204,7 +204,8 @@ export const checkSteps: CheckStep[] = [
     positions: [
       {
         id: "naturalMeaning",
-        label: "Worthwhile activity in this world — even without God or an afterlife",
+        label:
+          "Worthwhile activity in this world — even without God or an afterlife",
       },
       {
         id: "meaningNeedsTranscendent",
@@ -212,7 +213,8 @@ export const checkSteps: CheckStep[] = [
       },
       {
         id: "subjectiveMeaningOnly",
-        label: "Nothing objective — lives mean what they mean to those living them",
+        label:
+          "Nothing objective — lives mean what they mean to those living them",
       },
     ],
   },

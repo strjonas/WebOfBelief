@@ -480,7 +480,7 @@ export const beliefStatements: BeliefStatement[] = [
     prompt:
       "The available evidence and arguments do not settle whether any god exists, and the most reasonable response is to suspend judgment.",
     plain:
-      "Whether God exists can't be settled either way on the evidence we have — the honest response is to suspend judgment.",
+      "Whether God exists can't be settled either way on the evidence we have, so the best response is to suspend judgment.",
     clarify:
       "This is agnosticism as a positive claim about the evidence, not mere personal indecision: it says suspension is what the evidence actually warrants — for anyone, not just for you.",
     caseFor:
@@ -627,8 +627,7 @@ export const beliefStatements: BeliefStatement[] = [
     category: "value",
     prompt:
       "People can know many ordinary facts about the external world, such as that they have hands, live among other people, or ate breakfast today.",
-    plain:
-      "We can really know many everyday facts about the world around us.",
+    plain: "We can really know many everyday facts about the world around us.",
     clarify:
       "This concerns ordinary empirical knowledge, not certainty about every detail or immunity from all possible error.",
     caseFor:

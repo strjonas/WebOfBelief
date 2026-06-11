@@ -50,23 +50,23 @@ import {
 const claimChoices: Array<{ id: Answer; label: string; hint: string }> = [
   {
     id: "affirm",
-    label: "Yes — I believe this",
+    label: "Yes (I believe this)",
     hint: "You take it to be actually true, as worded.",
   },
   {
     id: "reject",
-    label: "No — I reject this",
+    label: "No (I reject this)",
     hint: "You take it to be false, as worded.",
   },
   {
     id: "unsure",
     label: "I'm not sure",
-    hint: "No settled view either way — never counted against you.",
+    hint: "No settled view either way (not counted against you)",
   },
   {
     id: "qualify",
     label: "It's complicated",
-    hint: "The wording doesn't quite fit your view, or you'd only affirm it hypothetically. The check sets it aside.",
+    hint: "The wording doesn't quite fit your view, or you'd only affirm it hypothetically.",
   },
 ];
 
@@ -99,7 +99,7 @@ const BRAND = "Web of Belief";
 // so a hypothetical "if God existed…" reading doesn't get recorded as an
 // actual belief.
 const deityNoteForForeknowledge =
-  "You've affirmed that no god or deity exists. Choose “Yes — I believe this” only if you also take this deity-dependent sentence to be actually true; choose “It's complicated” for a hypothetical reading, or reject it as worded.";
+  "You've affirmed that no god or deity exists. Choose “Yes (I believe this)” only if you also take this deity-dependent sentence to be actually true; choose “It's complicated” for a hypothetical reading, or reject it as worded.";
 
 const deityNoteForDivineCommand =
   "You've affirmed that no god or deity exists. Select “duties exist only because God commands them” only if you take it to be actually true — for a purely hypothetical reading, leave it unselected.";
@@ -492,9 +492,9 @@ function PositionsScreen({
         {step.question}
       </h2>
       <p className="mt-3 max-w-2xl font-serif text-[0.98rem] italic leading-7 text-muted">
-        Select every position you genuinely hold — one, several, or none.
-        Mixed views are welcome; if two selections pull against each other,
-        the result will show it.
+        Select every position you genuinely hold — one, several, or none. Mixed
+        views are welcome; if two selections pull against each other, the result
+        will show it.
       </p>
       {step.help ? (
         <p className="mt-2 max-w-2xl font-serif text-[0.98rem] leading-7 text-ink-soft">
@@ -535,7 +535,7 @@ function PositionsScreen({
           type="checkbox"
           checked={qualified}
           onChange={onToggleQualified}
-          aria-label={`It's complicated — none of these fits: ${step.question}`}
+          aria-label={`It's complicated (none of the above): ${step.question}`}
           className="sr-only"
         />
         <span
@@ -548,11 +548,11 @@ function PositionsScreen({
         </span>
         <span>
           <span className="font-serif text-[1.02rem]">
-            It&apos;s complicated — none of these fits
+            It&apos;s complicated (none of the above)
           </span>
           <span className="mt-0.5 block font-serif text-[0.85rem] italic leading-5 text-muted">
-            Your view on this topic isn&apos;t captured by these wordings. The
-            check sets the topic aside — never read as agreement or denial.
+            The wording doesn&apos;t quite fit your view, or you'd only affirm
+            it hypothetically
           </span>
         </span>
       </label>
@@ -1034,10 +1034,7 @@ export function BeliefChecker() {
       const next = updater(previous);
       // Fire "check_started" only on the very first recorded answer, so the
       // event maps to "this visitor actually began the check" vs. bouncing.
-      if (
-        Object.keys(previous).length === 0 &&
-        Object.keys(next).length > 0
-      ) {
+      if (Object.keys(previous).length === 0 && Object.keys(next).length > 0) {
         trackEvent({ name: "check_started" });
       }
       return next;
@@ -1137,11 +1134,7 @@ export function BeliefChecker() {
       : undefined;
 
   return (
-    <section
-      id="check"
-      ref={topRef}
-      className="scroll-mt-24 py-10 sm:py-14"
-    >
+    <section id="check" ref={topRef} className="scroll-mt-24 py-10 sm:py-14">
       {phase === "questions" ? (
         <>
           {/* Progress header: where am I, how much is left, and the one exit
@@ -1149,8 +1142,7 @@ export function BeliefChecker() {
           <div className="border-b border-rule pb-4">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
               <p className="font-sans text-[0.72rem] uppercase tracking-[0.18em] text-muted">
-                question{" "}
-                <span className="tabular text-ink">{step + 1}</span> of{" "}
+                question <span className="tabular text-ink">{step + 1}</span> of{" "}
                 <span className="tabular">{checkStepCount}</span>
                 <span className="text-rule"> · </span>
                 <span className="text-mark">{currentStep.title}</span>
@@ -1385,9 +1377,9 @@ export function BeliefChecker() {
                         qualifiedCount === 1 ? "" : "s"
                       } you marked “it's complicated”`
                     : ""}{" "}
-                  — was never read as a hidden opposite belief. Results report
-                  relationships in the rule set; they do not prove your
-                  complete worldview coherent or incoherent.
+                  (was never read as a hidden opposite belief). Results report
+                  relationships in the rule set; they do not prove your complete
+                  worldview coherent or incoherent.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-left sm:max-w-xs">
@@ -1426,8 +1418,8 @@ export function BeliefChecker() {
                 make the case for the premise that joins them. Being consistent
                 won&apos;t make a belief true; plenty of tidy worldviews are
                 wrong. It only means your beliefs aren&apos;t quietly working
-                against each other. The aim is to see what you actually
-                believe, and choose it on purpose.
+                against each other. The aim is to see what you actually believe,
+                and choose it on purpose.
               </p>
             ) : null}
 
